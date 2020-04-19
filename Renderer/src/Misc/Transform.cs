@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using GlmSharp;
 
-namespace Renderer
+namespace Renderer.Misc
 {
 	[SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
 	public class Transform

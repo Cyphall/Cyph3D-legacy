@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using GlmSharp;
 using OpenGL;
+using Renderer.GLObject;
 
-namespace Renderer
+namespace Renderer.Material
 {
-	public class ForwardLitMaterial : Material
+	public class ForwardLitMaterial : MaterialBase
 	{
 		private ShaderProgram _shaderProgram;
 		private Texture _colorMap;

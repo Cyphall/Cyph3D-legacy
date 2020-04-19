@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Renderer
+namespace Renderer.Misc
 {
 	public static class Logger
 	{

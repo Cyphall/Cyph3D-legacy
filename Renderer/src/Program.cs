@@ -1,13 +1,16 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Runtime.InteropServices;
 using GLFW;
 using GlmSharp;
 using OpenGL;
+using Renderer.GLObject;
+using Renderer.Material;
+using Renderer.Misc;
+using Renderer.Renderer;
 
 namespace Renderer
 {
-	class Program
+	internal static class Program
 	{
 		private static void Main()
 		{
@@ -38,18 +41,18 @@ namespace Renderer
 			Glfw.GetWindowSize(Context.Window, out winSize.x, out winSize.y);
 			Context.WindowSize = winSize;
 
-			Camera camera = new Camera(new ForwardRenderer(), new vec3(0.5f, 0, -2));
+			Camera camera = new Camera(new ForwardRenderer(), new vec3(1.5f, 0, -2.5f));
 
 			Context.ObjectContainer.Add(
 				new RenderObject(
-					Material.Get(
+					MaterialBase.Get(
 						"metal",
 						() => new ForwardLitMaterial(
-							Texture.Get("SpaceCase1/col", InternalFormat.SrgbAlpha),
-							Texture.Get("SpaceCase1/nrm", InternalFormat.Rgba),
-							Texture.Get("SpaceCase1/rgh", InternalFormat.Rgba),
-							Texture.Get("SpaceCase1/disp", InternalFormat.Rgba),
-							Texture.Get("SpaceCase1/met", InternalFormat.Rgba)
+							Texture.Get("SpaceCase2/col", InternalFormat.SrgbAlpha),
+							Texture.Get("SpaceCase2/nrm", InternalFormat.Rgba),
+							Texture.Get("SpaceCase2/rgh", InternalFormat.Rgba),
+							Texture.Get("SpaceCase2/disp", InternalFormat.Rgba),
+							Texture.Get("SpaceCase2/met", InternalFormat.Rgba)
 						)
 					),
 					"cube",
@@ -61,7 +64,7 @@ namespace Renderer
 
 			Context.ObjectContainer.Add(
 				new RenderObject(
-					Material.Get(
+					MaterialBase.Get(
 						"sun",
 						() => new ForwardUnlitMaterial(
 							Texture.Get("sun", InternalFormat.SrgbAlpha)
@@ -73,17 +76,19 @@ namespace Renderer
 				)
 			);
 
-			// Context.ObjectContainer.Add(new RenderObject(
-			// 	Material.Get(
-			// 		"sun",
-			// 		() => new ForwardUnlitMaterial(
-			// 			Texture.Get("sun", InternalFormat.SrgbAlpha)
-			// 		)
-			// 	),
-			// 	"planet",
-			// 	true,
-			// 	new vec3(-1, 2, 4)
-			// ));
+			// Context.ObjectContainer.Add(
+			// 	new RenderObject(
+			// 		Material.Get(
+			// 			"sun",
+			// 			() => new ForwardUnlitMaterial(
+			// 				Texture.Get("sun", InternalFormat.SrgbAlpha)
+			// 			)
+			// 		),
+			// 		"planet",
+			// 		true,
+			// 		new vec3(4, 0, 4)
+			// 	)
+			// );
 
 
 			while (!Glfw.WindowShouldClose(window))

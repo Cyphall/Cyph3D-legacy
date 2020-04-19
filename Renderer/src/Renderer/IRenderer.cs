@@ -2,7 +2,7 @@
 using GlmSharp;
 using OpenGL;
 
-namespace Renderer
+namespace Renderer.Renderer
 {
 	public interface IRenderer
 	{

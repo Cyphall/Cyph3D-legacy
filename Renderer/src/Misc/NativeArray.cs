@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Renderer
+namespace Renderer.Misc
 {
 	public unsafe class NativeArray<T> : IDisposable where T : unmanaged
 	{

@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using GlmSharp;
 using OpenGL;
+using Renderer.Misc;
 
-namespace Renderer
+namespace Renderer.GLObject
 {
 	public class ShaderProgram : IDisposable
 	{

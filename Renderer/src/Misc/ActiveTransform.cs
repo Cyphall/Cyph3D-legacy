@@ -1,6 +1,6 @@
 ﻿using GlmSharp;
 
-namespace Renderer
+namespace Renderer.Misc
 {
 	public class ActiveTransform : Transform
 	{

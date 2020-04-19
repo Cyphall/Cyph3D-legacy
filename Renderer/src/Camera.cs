@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using GLFW;
 using GlmSharp;
-using OpenGL;
+using Renderer.Renderer;
 
 namespace Renderer
 {
@@ -68,7 +66,6 @@ namespace Renderer
 		{
 			_renderer = renderer;
 			Position = position;
-			Position = new vec3(1.0408809f, 0.14594828f, -0.4750638f);
 			
 			SphericalCoords = new vec2(340.16702f, -0.58333683f);
 

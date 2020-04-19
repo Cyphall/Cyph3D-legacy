@@ -1,7 +1,7 @@
 ﻿using GlmSharp;
 using OpenGL;
 
-namespace Renderer
+namespace Renderer.GLObject
 {
 	public class Renderbuffer
 	{

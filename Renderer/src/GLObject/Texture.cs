@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using GlmSharp;
 using OpenGL;
+using Renderer.Misc;
 using StbImageSharp;
 
-namespace Renderer
+namespace Renderer.GLObject
 {
 	public class Texture : IDisposable
 	{

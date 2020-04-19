@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using GlmSharp;
 using OpenGL;
 
-namespace Renderer
+namespace Renderer.GLObject
 {
 	public class Framebuffer : IDisposable
 	{

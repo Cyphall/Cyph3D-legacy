@@ -1,8 +1,9 @@
 ﻿using System;
 using GlmSharp;
 using OpenGL;
+using Renderer.GLObject;
 
-namespace Renderer
+namespace Renderer.Renderer
 {
 	public class ForwardRenderer : IRenderer
 	{

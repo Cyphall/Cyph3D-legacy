@@ -1,6 +1,6 @@
 ﻿using GlmSharp;
 
-namespace Renderer
+namespace Renderer.Renderer
 {
 	public class DeferredRenderer : IRenderer
 	{

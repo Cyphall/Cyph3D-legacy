@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using GlmSharp;
+using Renderer.Misc;
 
-namespace Renderer
+namespace Renderer.Material
 {
-	public abstract class Material
+	public abstract class MaterialBase
 	{
-		private static Dictionary<string, Material> _materials = new Dictionary<string, Material>();
+		private static Dictionary<string, MaterialBase> _materials = new Dictionary<string, MaterialBase>();
 		
-		public static Material Get(string name, Func<Material> creationMethod)
+		public static MaterialBase Get(string name, Func<MaterialBase> creationMethod)
 		{
 			if (!_materials.ContainsKey(name))
 			{

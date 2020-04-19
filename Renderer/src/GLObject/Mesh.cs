@@ -6,9 +6,10 @@ using ObjLoader.Loader.Data.Elements;
 using ObjLoader.Loader.Data.VertexData;
 using ObjLoader.Loader.Loaders;
 using OpenGL;
+using Renderer.Misc;
 using OBJTexture = ObjLoader.Loader.Data.VertexData.Texture;
 
-namespace Renderer
+namespace Renderer.GLObject
 {
 	public class Mesh : IDisposable
 	{

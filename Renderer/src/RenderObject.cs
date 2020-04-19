@@ -1,17 +1,20 @@
 ﻿using GlmSharp;
+using Renderer.GLObject;
+using Renderer.Material;
+using Renderer.Misc;
 
 namespace Renderer
 {
 	public class RenderObject
 	{
-		private Material _material;
+		private MaterialBase _material;
 		private Mesh _mesh;
 		
 		public ActiveTransform Transform { get; }
 		public bool IsLight { get; }
 
 		public RenderObject(
-			Material material,
+			MaterialBase material,
 			string meshName,
 			bool isLight,
 			vec3? position = null,

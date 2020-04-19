@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using OpenGL;
+using Renderer.Misc;
 
-namespace Renderer
+namespace Renderer.GLObject
 {
 	public class Shader : IDisposable
 	{

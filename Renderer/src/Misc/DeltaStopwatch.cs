@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Renderer
+namespace Renderer.Misc
 {
 	public class DeltaStopwatch : Stopwatch
 	{
