@@ -87,12 +87,10 @@ namespace Renderer.Renderer
 			{
 				RenderObject obj = Context.ObjectContainer[i];
 				
-				for (int j = 0; j < objectCount; j++)
+				int lightCount = Context.LightContainer.Count;
+				for (int j = 0; j < lightCount; j++)
 				{
-					RenderObject potentialLight = Context.ObjectContainer[j];
-					if (!potentialLight.IsLight || j == i) continue;
-					
-					obj.Render(view, projection, viewPos, potentialLight.Transform.Position);
+					obj.Render(view, projection, viewPos, Context.LightContainer[j]);
 				}
 			}
 		}

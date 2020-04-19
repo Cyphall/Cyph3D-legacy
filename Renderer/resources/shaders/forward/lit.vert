@@ -10,14 +10,19 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-uniform vec3 lightPos;
-uniform vec3 viewPos;
+uniform vec3  lightPos;
+uniform vec3  lightColor;
+uniform float lightIntensity;
+
+uniform vec3  viewPos;
 
 out FRAG {
-	vec2 TexCoords;
-	vec3 TangentLightPos;
-	vec3 TangentViewPos;
-	vec3 TangentFragPos;
+	vec2  TexCoords;
+	vec3  TangentLightPos;
+	vec3  LightColor;
+	float LightIntensity;
+	vec3  TangentViewPos;
+	vec3  TangentFragPos;
 } frag;
 
 void main()
@@ -34,6 +39,9 @@ void main()
 	frag.TangentLightPos = TBN * lightPos;
 	frag.TangentViewPos  = TBN * viewPos;
 	frag.TangentFragPos  = TBN * vec3(model * vec4(in_Vertex, 1.0));
+	
+	frag.LightColor = lightColor;
+	frag.LightIntensity = lightIntensity;
 
 	gl_Position = projection * view * model * vec4(in_Vertex, 1.0);
 }

@@ -4,10 +4,12 @@ const float PI = 3.14159265359;
 const float HALF_PI = 1.57079632679;
 
 in FRAG {
-	vec2 TexCoords;
-	vec3 TangentLightPos;
-	vec3 TangentViewPos;
-	vec3 TangentFragPos;
+	vec2  TexCoords;
+	vec3  TangentLightPos;
+	vec3  LightColor;
+	float LightIntensity;
+	vec3  TangentViewPos;
+	vec3  TangentFragPos;
 } frag;
 
 uniform sampler2D colorMap;
@@ -36,26 +38,26 @@ void main()
 	vec3  lightDir       = normalize(frag.TangentLightPos - frag.TangentFragPos);
 	vec3  viewDir        = normalize(frag.TangentViewPos - frag.TangentFragPos);
 	vec3  halfwayDir     = normalize(lightDir + viewDir);
-	vec2  texCoords      = frag.TexCoords;
-	      texCoords      = POM(texCoords, viewDir);
+	vec2  texCoords      = POM(frag.TexCoords, viewDir);
 	vec3  normal         = getNormal(texCoords);
 	float roughness      = getRoughness(texCoords);
 	float metalness      = getMetallic(texCoords);
 	vec3  color          = getColor(texCoords);
-	vec3  lightColor     = vec3(1, 1, 1);
+	vec3  lightColor     = frag.LightColor;
+	float lightIntensity = frag.LightIntensity;
 	
 
 	// Diffuse calculation
 	float diffuseIntensity = max(dot(normal, lightDir), 0);
 	
 	vec3 diffuseMetallic = vec3(0);
-	vec3 diffuseNonMetallic = color * diffuseIntensity;
+	vec3 diffuseNonMetallic = min(color, lightColor) * lightIntensity * diffuseIntensity;
 	
 	// Specular calculation
 	float specularIntensity = DistributionGGX(normal, halfwayDir, roughness);
 
-	vec3 specularMetallic = color * specularIntensity;
-	vec3 specularNonMetallic = lightColor * specularIntensity * pow((1 - roughness) / 2 + 0.1, 4);
+	vec3 specularMetallic =  color * lightColor * lightIntensity * specularIntensity;
+	vec3 specularNonMetallic = lightColor * lightIntensity * specularIntensity * pow((1 - roughness) / 2 + 0.1, 4);
 	
 	
 	vec3 metallicPart = max(diffuseMetallic, specularMetallic);

@@ -20,6 +20,7 @@ namespace Renderer.Material
 
 			return _materials[name];
 		}
-		public abstract void Bind(mat4 model, mat4 view, mat4 projection, vec3 cameraPos, vec3 lightPos);
+		
+		public abstract void Bind(mat4 model, mat4 view, mat4 projection, vec3 cameraPos, PointLight light);
 	}
 }

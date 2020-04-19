@@ -9,5 +9,6 @@ namespace Renderer
 		public static Window Window { get; set; }
 		public static ivec2 WindowSize { get; set; }
 		public static List<RenderObject> ObjectContainer { get; } = new List<RenderObject>();
+		public static List<PointLight> LightContainer { get; } = new List<PointLight>();
 	}
 }

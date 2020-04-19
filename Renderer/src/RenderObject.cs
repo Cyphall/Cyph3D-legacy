@@ -11,12 +11,10 @@ namespace Renderer
 		private Mesh _mesh;
 		
 		public ActiveTransform Transform { get; }
-		public bool IsLight { get; }
 
 		public RenderObject(
 			MaterialBase material,
 			string meshName,
-			bool isLight,
 			vec3? position = null,
 			vec3? rotation = null,
 			vec3? scale = null,
@@ -25,14 +23,13 @@ namespace Renderer
 		{
 			_material = material;
 			_mesh = Mesh.Get(meshName);
-			IsLight = isLight;
 			
 			Transform = new ActiveTransform(position, rotation, scale, velocity, angularVelocity);
 		}
 
-		public void Render(mat4 view, mat4 projection, vec3 cameraPos, vec3 lightPos)
+		public void Render(mat4 view, mat4 projection, vec3 cameraPos, PointLight light)
 		{
-			_material.Bind(Transform.Matrix, view, projection, cameraPos, lightPos);
+			_material.Bind(Transform.Matrix, view, projection, cameraPos, light);
 			_mesh.Render();
 		}
 

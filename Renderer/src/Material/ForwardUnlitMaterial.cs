@@ -29,7 +29,7 @@ namespace Renderer.Material
 			_colorMap = colorMap;
 		}
 
-		public override void Bind(mat4 model, mat4 view, mat4 projection, vec3 cameraPos, vec3 lightPos)
+		public override void Bind(mat4 model, mat4 view, mat4 projection, vec3 cameraPos, PointLight light)
 		{
 			_shaderProgram.Bind();
 
@@ -39,8 +39,6 @@ namespace Renderer.Material
 			_shaderProgram.SetValue("model", model);
 			_shaderProgram.SetValue("view", view);
 			_shaderProgram.SetValue("projection", projection);
-			_shaderProgram.SetValue("lightPos", lightPos);
-			_shaderProgram.SetValue("viewPos", cameraPos);
 		}
 	}
 }

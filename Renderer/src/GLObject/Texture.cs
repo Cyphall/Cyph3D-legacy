@@ -71,8 +71,8 @@ namespace Renderer.GLObject
 
 			Bind();
 
-			Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.LINEAR);
-			Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.LINEAR);
+			Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.NEAREST);
+			Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.NEAREST);
 
 			Gl.TexImage2D(TextureTarget.Texture2d, 0, _internalFormat, image.Width, image.Height, 0, _pixelFormat, _pixelType, image.Data);
 			

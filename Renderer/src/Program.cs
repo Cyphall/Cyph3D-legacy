@@ -48,15 +48,14 @@ namespace Renderer
 					MaterialBase.Get(
 						"metal",
 						() => new ForwardLitMaterial(
-							Texture.Get("SpaceCase2/col", InternalFormat.SrgbAlpha),
-							Texture.Get("SpaceCase2/nrm", InternalFormat.Rgba),
-							Texture.Get("SpaceCase2/rgh", InternalFormat.Rgba),
-							Texture.Get("SpaceCase2/disp", InternalFormat.Rgba),
-							Texture.Get("SpaceCase2/met", InternalFormat.Rgba)
+							Texture.Get("RustedMetal/col", InternalFormat.SrgbAlpha),
+							Texture.Get("RustedMetal/nrm", InternalFormat.Rgba),
+							Texture.Get("RustedMetal/rgh", InternalFormat.Rgba),
+							null,
+							Texture.Get("RustedMetal/met", InternalFormat.Rgba)
 						)
 					),
 					"cube",
-					false,
 					new vec3(0, 0, 0),
 					angularVelocity: new vec3(0, 0 * 5f, 0)
 				)
@@ -71,8 +70,15 @@ namespace Renderer
 						)
 					),
 					"planet",
-					true,
 					new vec3(4, 2, 4)
+				)
+			);
+
+			Context.LightContainer.Add(
+				new PointLight(
+					new vec3(4, 2, 4),
+					new vec3(1f, 0.7686275f, 0.5372549f),
+					1
 				)
 			);
 
@@ -112,7 +118,7 @@ namespace Renderer
 			Texture.DisposeAll();
 			Mesh.DisposeAll();
 			Framebuffer.DisposeAll();
-			
+
 			Glfw.Terminate();
 		}
 	}
