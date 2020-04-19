@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using GlmSharp;
 using OpenGL;
 
@@ -77,6 +76,7 @@ namespace Renderer
 			_framebuffer.Bind();
 			
 			Gl.Enable(EnableCap.DepthTest);
+			Blend = true;
 			
 			Gl.ClearColor(0, 0, 0, 1);
 			Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -86,14 +86,12 @@ namespace Renderer
 			{
 				RenderObject obj = Context.ObjectContainer[i];
 				
-				Blend = false;
 				for (int j = 0; j < objectCount; j++)
 				{
-					RenderObject light = Context.ObjectContainer[j];
-					if (light == obj) continue;
+					RenderObject potentialLight = Context.ObjectContainer[j];
+					if (!potentialLight.IsLight || j == i) continue;
 					
-					obj.Render(view, projection, viewPos, light.Transform.Position);
-					Blend = true;
+					obj.Render(view, projection, viewPos, potentialLight.Transform.Position);
 				}
 			}
 		}
@@ -102,9 +100,7 @@ namespace Renderer
 		{
 			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 			
-			Gl.Disable(EnableCap.DepthTest);
-			
-			Gl.ClearColor(0, 0, 0, 255);
+			Gl.ClearColor(0, 0, 0, 1);
 			Gl.Clear(ClearBufferMask.ColorBufferBit);
 
 			_shaderProgram.Bind();
@@ -112,6 +108,7 @@ namespace Renderer
 			
 			Gl.BindVertexArray(_quadVAO);
 
+			Gl.ActiveTexture(TextureUnit.Texture0);
 			_renderTexture.Bind();
 			
 			Gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
