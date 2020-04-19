@@ -25,7 +25,7 @@ float getHeight(vec2 texCoords);
 float getDepth(vec2 texCoords);
 float getMetallic(vec2 texCoords);
 
-float DistributionGGX(vec3 N, vec3 H, float a);
+float DistributionGGX(vec3 N, vec3 H, float roughness);
 float linearDot(vec3 a, vec3 b);
 vec2 POM(vec2 texCoords, vec3 viewDir);
 vec3 toLinear(vec3 sRGB);
@@ -45,25 +45,23 @@ void main()
 	vec3  lightColor     = vec3(1, 1, 1);
 	
 
-	vec3 metallicPart = vec3(0);
-	vec3 nonMetallicPart = vec3(0);
-
 	// Diffuse calculation
-	float diffuseIntensity = max(linearDot(normal, lightDir), 0);
+	float diffuseIntensity = max(dot(normal, lightDir), 0);
 	
-	metallicPart += (lightColor * color) * diffuseIntensity * roughness;
-	nonMetallicPart += color * diffuseIntensity;
-
+	vec3 diffuseMetallic = vec3(0);
+	vec3 diffuseNonMetallic = color * diffuseIntensity;
+	
 	// Specular calculation
-	float specularIntensity = pow(max(dot(halfwayDir, normal), 0), exp2((1 - roughness) * 12));
-	specularIntensity *=  exp2((1 - roughness) * 4) - 1; // Increase intensity on smoother surfaces
-	specularIntensity *= max(dot(vec3(0, 0, 1), lightDir), 0); // Prevent light leaking
-	
-	metallicPart += (lightColor * color) * specularIntensity;
-	nonMetallicPart += lightColor * specularIntensity;
-	
+	float specularIntensity = DistributionGGX(normal, halfwayDir, roughness);
 
-	out_Color = (metallicPart * metalness) + (nonMetallicPart * (1 - metalness));
+	vec3 specularMetallic = color * specularIntensity;
+	vec3 specularNonMetallic = lightColor * specularIntensity * pow((1 - roughness) / 2 + 0.1, 4);
+	
+	
+	vec3 metallicPart = max(diffuseMetallic, specularMetallic);
+	vec3 nonMetallicPart = max(diffuseNonMetallic, specularNonMetallic);
+
+	out_Color = metallicPart * metalness + nonMetallicPart * (1 - metalness);
 }
 
 vec3 getColor(vec2 texCoords)
@@ -98,8 +96,6 @@ float getMetallic(vec2 texCoords)
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
-	roughness = 0.1 + roughness * 0.9;
-	
 	float a      = roughness*roughness;
 	float a2     = a*a;
 	float NdotH  = max(dot(N, H), 0.0);
@@ -127,13 +123,15 @@ vec2 POM(vec2 texCoords, vec3 viewDir)
 	// First sampling
 	vec2 currentTexCoords = texCoords;
 
+	float currentTexDepth  = getDepth(currentTexCoords);
+	float previousTexDepth = currentTexDepth;
+
+	if (currentTexDepth == 1) return texCoords;
+
 	vec2  stepTexCoordsOffset = -(viewDir.xy / viewDir.z) / layerCount * depthScale;
 	float stepDepthOffset     = 1.0 / layerCount;
 
 	float currentDepth = 0;
-
-	float currentTexDepth  = getDepth(currentTexCoords);
-	float previousTexDepth = currentTexDepth;
 
 	while (currentDepth < currentTexDepth)
 	{

@@ -17,6 +17,7 @@ void main()
 
 	// tone mapping & gamma corection
 	out_Color = reinhard_tone_mapping(color);
+//	out_Color = vec4(toSRGB(color), 1);
 }
 
 vec4 reinhard_tone_mapping(vec3 color)
