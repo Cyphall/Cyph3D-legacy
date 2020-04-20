@@ -30,7 +30,6 @@ float getMetallic(vec2 texCoords);
 float DistributionGGX(vec3 N, vec3 H, float roughness);
 float linearDot(vec3 a, vec3 b);
 vec2 POM(vec2 texCoords, vec3 viewDir);
-vec3 toLinear(vec3 sRGB);
 
 void main()
 {
@@ -183,13 +182,4 @@ vec2 POM(vec2 texCoords, vec3 viewDir)
 	texCoords = previousTexCoords * weight + currentTexCoords * (1.0 - weight);
 
 	return texCoords;
-}
-
-vec3 toLinear(vec3 sRGB)
-{
-	bvec3 cutoff = lessThan(sRGB, vec3(0.04045));
-	vec3 higher = pow((sRGB + vec3(0.055)) / vec3(1.055), vec3(2.4));
-	vec3 lower = sRGB / vec3(12.92);
-
-	return mix(higher, lower, cutoff);
 }
