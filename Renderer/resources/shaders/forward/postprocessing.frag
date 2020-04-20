@@ -7,9 +7,9 @@ uniform vec2 pixelSize;
 
 out vec4 out_Color;
 
+vec3 chromatic_aberration(float strengh);
 vec4 reinhard_tone_mapping(vec3 hdrColor);
 vec3 toSRGB(vec3 linear);
-vec3 toLinear(vec3 sRGB);
 
 void main()
 {
@@ -17,7 +17,6 @@ void main()
 
 	// tone mapping & gamma corection
 	out_Color = reinhard_tone_mapping(color);
-//	out_Color = vec4(toSRGB(color), 1);
 }
 
 vec4 reinhard_tone_mapping(vec3 color)
