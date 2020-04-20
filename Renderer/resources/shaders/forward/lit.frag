@@ -128,7 +128,7 @@ vec2 POM(vec2 texCoords, vec3 viewDir)
 	float currentTexDepth  = getDepth(currentTexCoords);
 	float previousTexDepth = currentTexDepth;
 
-	if (currentTexDepth == 1) return texCoords;
+	if (currentTexDepth == 0) return texCoords;
 
 	vec2  stepTexCoordsOffset = -(viewDir.xy / viewDir.z) / layerCount * depthScale;
 	float stepDepthOffset     = 1.0 / layerCount;
