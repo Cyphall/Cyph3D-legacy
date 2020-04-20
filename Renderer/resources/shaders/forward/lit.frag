@@ -118,58 +118,69 @@ float linearDot(vec3 a, vec3 b)
 
 vec2 POM(vec2 texCoords, vec3 viewDir)
 {
-	const float depthScale           = 0.05;
+	const float depthScale           = 0.04;
 	const int   layerCount           = 16;
-	const int   resamplingLayerCount = 10;
+	const int   resamplingLoopCount  = 8;
 
-	// First sampling
+	// Initial sampling pass
 	vec2 currentTexCoords = texCoords;
 
 	float currentTexDepth  = getDepth(currentTexCoords);
-	float previousTexDepth = currentTexDepth;
+	float previousTexDepth;
 
-	if (currentTexDepth == 0) return texCoords;
+	if (currentTexDepth == 0 || layerCount == 0) return texCoords;
 
-	vec2  stepTexCoordsOffset = -(viewDir.xy / viewDir.z) / layerCount * depthScale;
-	float stepDepthOffset     = 1.0 / layerCount;
+	// Offsets applied at each steps
+	vec2  texCoordsStepOffset = -(viewDir.xy / viewDir.z) / layerCount * depthScale;
+	float depthStepOffset     = 1.0 / layerCount;
 
 	float currentDepth = 0;
 
 	while (currentDepth < currentTexDepth)
 	{
-		currentTexCoords += stepTexCoordsOffset;
+		currentTexCoords += texCoordsStepOffset;
 
 		previousTexDepth = currentTexDepth;
 		currentTexDepth = getDepth(currentTexCoords);
 
-		currentDepth += stepDepthOffset;
+		currentDepth += depthStepOffset;
 	}
+
+	vec2 previousTexCoords = currentTexCoords - texCoordsStepOffset;
+	float previousDepth = currentDepth - depthStepOffset;
 	
-	// Resampling to multiply precision by 10
-	currentDepth -= stepDepthOffset;
-	currentTexCoords -= stepTexCoordsOffset;
-	currentTexDepth = previousTexDepth;
-
-	stepTexCoordsOffset /= resamplingLayerCount;
-	stepDepthOffset /= resamplingLayerCount;
-
-	while (currentDepth < currentTexDepth)
+	// Resampling pass
+	
+	for (int i = 0; i < resamplingLoopCount; i++)
 	{
-		currentTexCoords += stepTexCoordsOffset;
+		texCoordsStepOffset /= 2;
+		depthStepOffset /= 2;
 
-		currentTexDepth = getDepth(currentTexCoords);
-
-		currentDepth += stepDepthOffset;
+		vec2  halfwayTexCoords = previousTexCoords + texCoordsStepOffset;
+		float halfwayTexDepth  = getDepth(halfwayTexCoords);
+		float halfwayDepth     = previousDepth + depthStepOffset;
+		
+		// If we are still above the surface
+		if (halfwayDepth < halfwayTexDepth)
+		{
+			previousTexCoords = halfwayTexCoords;
+			previousTexDepth  = halfwayTexDepth;
+			previousDepth     = halfwayDepth;
+		}
+		else
+		{
+			currentTexCoords = halfwayTexCoords;
+			currentTexDepth  = halfwayTexDepth;
+			currentDepth     = halfwayDepth;
+		}
 	}
 
 	// Interpolation
-	vec2 prevTexCoords = currentTexCoords - stepTexCoordsOffset;
-
 	float afterDepth  = currentTexDepth - currentDepth;
-	float beforeDepth = getDepth(prevTexCoords) - currentDepth + stepDepthOffset;
+	float beforeDepth = getDepth(previousTexCoords) - currentDepth + depthStepOffset;
 
 	float weight = afterDepth / (afterDepth - beforeDepth);
-	texCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+	texCoords = previousTexCoords * weight + currentTexCoords * (1.0 - weight);
 
 	return texCoords;
 }
