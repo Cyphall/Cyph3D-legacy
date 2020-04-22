@@ -21,7 +21,7 @@ namespace Renderer.GLObject
 			}
 		}
 
-		public Framebuffer(out Texture texture, ivec2 size, InternalFormat internalFormat, PixelFormat pixelFormat, PixelType type = PixelType.UnsignedByte)
+		public Framebuffer(out Texture texture, ivec2 size, InternalFormat internalFormat)
 		{
 			uint previousFramebuffer = CurrentlyBound;
 			
@@ -30,7 +30,7 @@ namespace Renderer.GLObject
 			
 			Bind();
 			
-			texture = AddTexture(FramebufferAttachment.ColorAttachment0, internalFormat, pixelFormat, type);
+			texture = AddTexture(FramebufferAttachment.ColorAttachment0, internalFormat);
 
 			FramebufferStatus state = Gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
 
@@ -67,13 +67,13 @@ namespace Renderer.GLObject
 			_framebuffers.Add(this);
 		}
 
-		public Texture AddTexture(FramebufferAttachment attachment, InternalFormat internalFormat, PixelFormat pixelFormat, PixelType type = PixelType.UnsignedByte)
+		public Texture AddTexture(FramebufferAttachment attachment, InternalFormat internalFormat)
 		{
 			uint previousFramebuffer = CurrentlyBound;
 			
 			Bind();
 
-			Texture texture = new Texture(_size, internalFormat, pixelFormat, type);
+			Texture texture = new Texture(_size, internalFormat);
 			
 			Gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, attachment, TextureTarget.Texture2d, texture, 0);
 			

@@ -10,27 +10,12 @@ namespace Renderer.Renderer
 		private Framebuffer _framebuffer;
 		private Texture _renderTexture;
 		private uint _quadVAO;
-		private ShaderProgram _shaderProgram;
+		private ShaderProgram _postProcessingShader;
 		private vec2 _pixelSize =  1 / new vec2(Context.WindowSize);
-		
-		private bool _blend;
-		private bool Blend
-		{
-			set
-			{
-				if (_blend == value) return;
-				
-				_blend = value;
-				if (_blend)
-					Gl.Enable(EnableCap.Blend);
-				else
-					Gl.Disable(EnableCap.Blend);
-			}
-		}
 		
 		public ForwardRenderer()
 		{
-			_framebuffer = new Framebuffer(out _renderTexture, Context.WindowSize, InternalFormat.Rgb16f, PixelFormat.Rgb);
+			_framebuffer = new Framebuffer(out _renderTexture, Context.WindowSize, InternalFormat.Rgb16f);
 			_framebuffer.AddRenderbuffer(FramebufferAttachment.DepthAttachment, InternalFormat.DepthComponent);
 			
 			Gl.Enable(EnableCap.DepthTest);
@@ -39,6 +24,7 @@ namespace Renderer.Renderer
 			Gl.Enable(EnableCap.CullFace);
 			Gl.FrontFace(FrontFaceDirection.Ccw);
 
+			Gl.Enable(EnableCap.Blend);
 			Gl.BlendFunc(BlendingFactor.One, BlendingFactor.One);
 			Gl.BlendEquation(BlendEquationMode.FuncAdd);
 			
@@ -63,7 +49,7 @@ namespace Renderer.Renderer
 			Gl.EnableVertexAttribArray(1);
 			Gl.VertexAttribPointer(1, 2, VertexAttribType.Float, false, 4 * sizeof(float), (IntPtr)(2 * sizeof(float)));
 			
-			_shaderProgram = ShaderProgram.Get("forward/postprocessing");
+			_postProcessingShader = ShaderProgram.Get("forward/postprocessing");
 		}
 
 		public void Render(mat4 view, mat4 projection, vec3 viewPos)
@@ -77,7 +63,6 @@ namespace Renderer.Renderer
 			_framebuffer.Bind();
 			
 			Gl.Enable(EnableCap.DepthTest);
-			Blend = true;
 			
 			Gl.ClearColor(0, 0, 0, 1);
 			Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -102,8 +87,8 @@ namespace Renderer.Renderer
 			Gl.ClearColor(0, 0, 0, 1);
 			Gl.Clear(ClearBufferMask.ColorBufferBit);
 
-			_shaderProgram.Bind();
-			_shaderProgram.SetValue("pixelSize", _pixelSize);
+			_postProcessingShader.Bind();
+			_postProcessingShader.SetValue("pixelSize", _pixelSize);
 			
 			Gl.BindVertexArray(_quadVAO);
 

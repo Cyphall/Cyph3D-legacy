@@ -34,28 +34,28 @@ namespace Renderer.Material
 
 			if (colorMap == null)
 			{
-				colorMap = new Texture(new ivec2(1), InternalFormat.SrgbAlpha, PixelFormat.Rgba);
-				colorMap.PutData(new byte[]{255, 0, 255, 255});
+				colorMap = new Texture(new ivec2(1), InternalFormat.Srgb);
+				colorMap.PutData(new byte[]{255, 0, 255});
 			}
 			if (normalMap == null)
 			{
-				normalMap = new Texture(new ivec2(1), InternalFormat.Rgba, PixelFormat.Rgba);
-				normalMap.PutData(new byte[]{128, 128, 255, 255});
+				normalMap = new Texture(new ivec2(1), InternalFormat.Rgb);
+				normalMap.PutData(new byte[]{128, 128, 255});
 			}
 			if (roughnessMap == null)
 			{
-				roughnessMap = new Texture(new ivec2(1), InternalFormat.Rgba, PixelFormat.Rgba);
-				roughnessMap.PutData(new byte[]{128, 128, 128, 255});
+				roughnessMap = new Texture(new ivec2(1), InternalFormat.Rgb);
+				roughnessMap.PutData(new byte[]{128, 128, 128});
 			}
 			if (displacementMap == null)
 			{
-				displacementMap = new Texture(new ivec2(1), InternalFormat.Rgba, PixelFormat.Rgba);
-				displacementMap.PutData(new byte[]{255, 255, 255, 255});
+				displacementMap = new Texture(new ivec2(1), InternalFormat.Rgb);
+				displacementMap.PutData(new byte[]{255, 255, 255});
 			}
 			if (metallicMap == null)
 			{
-				metallicMap = new Texture(new ivec2(1), InternalFormat.Rgba, PixelFormat.Rgba);
-				metallicMap.PutData(new byte[]{0, 0, 0, 255});
+				metallicMap = new Texture(new ivec2(1), InternalFormat.Rgb);
+				metallicMap.PutData(new byte[]{0, 0, 0});
 			}
 			
 			_colorMap = colorMap;

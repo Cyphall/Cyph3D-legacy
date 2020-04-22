@@ -22,8 +22,8 @@ namespace Renderer.Material
 
 			if (colorMap == null)
 			{
-				colorMap = new Texture(new ivec2(1), InternalFormat.SrgbAlpha, PixelFormat.Rgba);
-				colorMap.PutData(new byte[]{255, 0, 255, 255});
+				colorMap = new Texture(new ivec2(1), InternalFormat.Srgb);
+				colorMap.PutData(new byte[]{255, 255, 255});
 			}
 			
 			_colorMap = colorMap;

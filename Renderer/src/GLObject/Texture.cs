@@ -27,6 +27,20 @@ namespace Renderer.GLObject
 			}
 		}
 
+		private static (PixelFormat, PixelType) ResolveFormat(InternalFormat format)
+		{
+			return format switch
+			{
+				InternalFormat.Rgba16f => (PixelFormat.Rgba, PixelType.HalfFloat),
+				InternalFormat.Rgb16f => (PixelFormat.Rgb, PixelType.HalfFloat),
+				InternalFormat.Rgba => (PixelFormat.Rgba, PixelType.UnsignedByte),
+				InternalFormat.Rgb => (PixelFormat.Rgb, PixelType.UnsignedByte),
+				InternalFormat.SrgbAlpha => (PixelFormat.Rgba, PixelType.UnsignedByte),
+				InternalFormat.Srgb => (PixelFormat.Rgb, PixelType.UnsignedByte),
+				_ => throw new NotImplementedException($"{format} format resolution is not yet implemented.")
+			};
+		}
+
 		static Texture()
 		{
 			StbImage.stbi_set_flip_vertically_on_load(Gl.TRUE);
@@ -48,7 +62,7 @@ namespace Renderer.GLObject
 				try
 				{
 					using Stream stream = File.OpenRead($"resources/textures/{name}.jpg");
-					image = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
+					image = ImageResult.FromStream(stream, ColorComponents.RedGreenBlue);
 				}
 				catch (IOException)
 				{
@@ -59,7 +73,7 @@ namespace Renderer.GLObject
 
 			_size = new ivec2(image.Width, image.Height);
 			_internalFormat = internalFormat;
-			_pixelFormat = PixelFormat.Rgba;
+			_pixelFormat = PixelFormat.Rgb;
 			_pixelType = PixelType.UnsignedByte;
 			
 			_ID = Gl.GenTexture();
@@ -71,20 +85,19 @@ namespace Renderer.GLObject
 
 			Bind();
 
-			Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.NEAREST);
-			Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.NEAREST);
+			Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.LINEAR);
+			Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.LINEAR);
 
 			Gl.TexImage2D(TextureTarget.Texture2d, 0, _internalFormat, image.Width, image.Height, 0, _pixelFormat, _pixelType, image.Data);
 			
 			Gl.BindTexture(TextureTarget.Texture2d, previousTexture);
 		}
 
-		public Texture(ivec2 size, InternalFormat internalFormat, PixelFormat pixelFormat, PixelType pixelType = PixelType.UnsignedByte)
+		public Texture(ivec2 size, InternalFormat internalFormat)
 		{
 			_size = size;
 			_internalFormat = internalFormat;
-			_pixelFormat = pixelFormat;
-			_pixelType = pixelType;
+			(_pixelFormat, _pixelType) = ResolveFormat(internalFormat);
 			
 			_ID = Gl.GenTexture();
 			Gl.BindTexture(TextureTarget.Texture2d, _ID);
