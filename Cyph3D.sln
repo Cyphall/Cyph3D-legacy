@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Renderer", "Renderer\Renderer.csproj", "{0239A372-F66C-495B-BD27-504D29FB4779}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cyph3D", "Cyph3D\Cyph3D.csproj", "{0239A372-F66C-495B-BD27-504D29FB4779}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

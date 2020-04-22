@@ -48,14 +48,14 @@ namespace Renderer
 					MaterialBase.Get(
 						"metal",
 						() => new ForwardLitMaterial(
-							Texture.Get("RustedMetal/col", InternalFormat.SrgbAlpha),
-							Texture.Get("RustedMetal/nrm", InternalFormat.Rgba),
-							Texture.Get("RustedMetal/rgh", InternalFormat.Rgba),
-							null,
-							Texture.Get("RustedMetal/met", InternalFormat.Rgba)
+							Texture.Get("Bricks23/col", InternalFormat.SrgbAlpha),
+							Texture.Get("Bricks23/nrm", InternalFormat.Rgba),
+							Texture.Get("Bricks23/rgh", InternalFormat.Rgba),
+							Texture.Get("Bricks23/disp", InternalFormat.Rgba),
+							null
 						)
 					),
-					"cube",
+					"simple_cube",
 					new vec3(0, 0, 0),
 					angularVelocity: new vec3(0, 0 * 5f, 0)
 				)
@@ -77,7 +77,7 @@ namespace Renderer
 			Context.LightContainer.Add(
 				new PointLight(
 					new vec3(4, 2, 4),
-					new vec3(1f, 0.7686275f, 0.5372549f),
+					new vec3(1f, 1f, 1f),
 					1
 				)
 			);
