@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GlmSharp;
 using OpenGL;
 
@@ -32,12 +33,7 @@ namespace Renderer.GLObject
 			
 			texture = AddTexture(FramebufferAttachment.ColorAttachment0, internalFormat);
 
-			FramebufferStatus state = Gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
-
-			if (state != FramebufferStatus.FramebufferComplete)
-			{
-				throw new InvalidOperationException($"Error while creating framebuffer: {state}");
-			}
+			CheckStatus();
 			
 			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, previousFramebuffer);
 
@@ -55,12 +51,7 @@ namespace Renderer.GLObject
 			
 			renderbuffer = AddRenderbuffer(FramebufferAttachment.ColorAttachment0, internalFormat);
 
-			FramebufferStatus state = Gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
-
-			if (state != FramebufferStatus.FramebufferComplete)
-			{
-				throw new InvalidOperationException($"Error while creating framebuffer: {state}");
-			}
+			CheckStatus();
 			
 			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, previousFramebuffer);
 
@@ -70,12 +61,13 @@ namespace Renderer.GLObject
 		public Texture AddTexture(FramebufferAttachment attachment, InternalFormat internalFormat)
 		{
 			uint previousFramebuffer = CurrentlyBound;
-			
 			Bind();
 
 			Texture texture = new Texture(_size, internalFormat);
 			
 			Gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, attachment, TextureTarget.Texture2d, texture, 0);
+			
+			CheckStatus();
 			
 			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, previousFramebuffer);
 
@@ -85,16 +77,42 @@ namespace Renderer.GLObject
 		public Renderbuffer AddRenderbuffer(FramebufferAttachment attachment, InternalFormat internalFormat)
 		{
 			uint previousFramebuffer = CurrentlyBound;
-			
 			Bind();
 			
 			Renderbuffer renderbuffer = new Renderbuffer(_size, internalFormat);
 			
 			Gl.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, attachment, RenderbufferTarget.Renderbuffer, renderbuffer);
 			
+			CheckStatus();
+			
 			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, previousFramebuffer);
 
 			return renderbuffer;
+		}
+
+		public void SetDrawBuffers(params FramebufferAttachment[] buffers)
+		{
+			uint previousFramebuffer = CurrentlyBound;
+			Bind();
+			
+			Gl.DrawBuffers(buffers.Cast<int>().ToArray());
+			
+			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, previousFramebuffer);
+		}
+
+		private void CheckStatus()
+		{
+			uint previousFramebuffer = CurrentlyBound;
+			Bind();
+			
+			FramebufferStatus state = Gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
+
+			if (state != FramebufferStatus.FramebufferComplete)
+			{
+				throw new InvalidOperationException($"Error while creating framebuffer: {state}");
+			}
+			
+			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, previousFramebuffer);
 		}
 
 		public void Dispose()

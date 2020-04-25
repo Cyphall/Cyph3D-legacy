@@ -1,19 +1,18 @@
 ﻿using GlmSharp;
 using Renderer.GLObject;
-using Renderer.Material;
 using Renderer.Misc;
 
 namespace Renderer
 {
 	public class RenderObject
 	{
-		private MaterialBase _material;
+		private Material _material;
 		private Mesh _mesh;
 		
 		public ActiveTransform Transform { get; }
 
 		public RenderObject(
-			MaterialBase material,
+			Material material,
 			string meshName,
 			vec3? position = null,
 			vec3? rotation = null,
@@ -27,9 +26,9 @@ namespace Renderer
 			Transform = new ActiveTransform(position, rotation, scale, velocity, angularVelocity);
 		}
 
-		public void Render(mat4 view, mat4 projection, vec3 cameraPos, PointLight light)
+		public void Render(mat4 view, mat4 projection, vec3 cameraPos)
 		{
-			_material.Bind(Transform.Matrix, view, projection, cameraPos, light);
+			_material.Bind(Transform.Matrix, view, projection, cameraPos);
 			_mesh.Render();
 		}
 

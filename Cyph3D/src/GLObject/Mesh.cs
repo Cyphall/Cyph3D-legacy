@@ -21,7 +21,7 @@ namespace Renderer.GLObject
 
 		private uint _vaoID;
 
-		private uint _verticesCount;
+		private int _verticesCount;
 		
 		private static Dictionary<string, Mesh> _meshes = new Dictionary<string, Mesh>();
 
@@ -66,12 +66,12 @@ namespace Renderer.GLObject
 				rawMesh = new ObjLoaderFactory().Create().Load(stream);
 			}
 
-			_verticesCount = (uint) rawMesh.Groups[0].Faces.Count * 3;
-			NativeArray<float> vertices = new NativeArray<float>(_verticesCount*3, 0);
-			NativeArray<float> uvs = new NativeArray<float>(_verticesCount*2, 0);
-			NativeArray<float> normals = new NativeArray<float>(_verticesCount*3, 0);
-			NativeArray<float> tangents = new NativeArray<float>(_verticesCount*3, 0);
-			NativeArray<float> bitangents = new NativeArray<float>(_verticesCount*3, 0);
+			_verticesCount = rawMesh.Groups[0].Faces.Count * 3;
+			NativeArray<float> vertices = new NativeArray<float>(_verticesCount*3);
+			NativeArray<float> uvs = new NativeArray<float>(_verticesCount*2);
+			NativeArray<float> normals = new NativeArray<float>(_verticesCount*3);
+			NativeArray<float> tangents = new NativeArray<float>(_verticesCount*3);
+			NativeArray<float> bitangents = new NativeArray<float>(_verticesCount*3);
 
 			for (int i = 0; i < rawMesh.Groups[0].Faces.Count; i++)
 			{
@@ -154,19 +154,19 @@ namespace Renderer.GLObject
 			}
 			
 			Gl.BindBuffer(BufferTarget.ArrayBuffer, _verticesBufferID);
-				Gl.BufferData(BufferTarget.ArrayBuffer, vertices.size * sizeof(float), vertices, BufferUsage.DynamicDraw);
+				Gl.BufferData(BufferTarget.ArrayBuffer, vertices.Count * sizeof(float), vertices, BufferUsage.DynamicDraw);
 
 			Gl.BindBuffer(BufferTarget.ArrayBuffer, _uvsBufferID);
-				Gl.BufferData(BufferTarget.ArrayBuffer, uvs.size * sizeof(float), uvs, BufferUsage.DynamicDraw);
+				Gl.BufferData(BufferTarget.ArrayBuffer, uvs.Count * sizeof(float), uvs, BufferUsage.DynamicDraw);
 
 			Gl.BindBuffer(BufferTarget.ArrayBuffer, _normalsBufferID);
-				Gl.BufferData(BufferTarget.ArrayBuffer, normals.size * sizeof(float), normals, BufferUsage.DynamicDraw);
+				Gl.BufferData(BufferTarget.ArrayBuffer, normals.Count * sizeof(float), normals, BufferUsage.DynamicDraw);
 
 			Gl.BindBuffer(BufferTarget.ArrayBuffer, _tangentsBufferID);
-				Gl.BufferData(BufferTarget.ArrayBuffer, tangents.size * sizeof(float), tangents, BufferUsage.DynamicDraw);
+				Gl.BufferData(BufferTarget.ArrayBuffer, tangents.Count * sizeof(float), tangents, BufferUsage.DynamicDraw);
 
 			Gl.BindBuffer(BufferTarget.ArrayBuffer, _bitangentsBufferID);
-				Gl.BufferData(BufferTarget.ArrayBuffer, bitangents.size * sizeof(float), bitangents, BufferUsage.DynamicDraw);
+				Gl.BufferData(BufferTarget.ArrayBuffer, bitangents.Count * sizeof(float), bitangents, BufferUsage.DynamicDraw);
 			
 			Gl.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
@@ -191,7 +191,7 @@ namespace Renderer.GLObject
 		public void Render()
 		{
 			Gl.BindVertexArray(_vaoID);
-				Gl.DrawArrays(PrimitiveType.Triangles, 0, (int)_verticesCount);
+				Gl.DrawArrays(PrimitiveType.Triangles, 0, _verticesCount);
 		}
 
 		public void Dispose()

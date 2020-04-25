@@ -37,6 +37,7 @@ namespace Renderer.GLObject
 				InternalFormat.Rgb => (PixelFormat.Rgb, PixelType.UnsignedByte),
 				InternalFormat.SrgbAlpha => (PixelFormat.Rgba, PixelType.UnsignedByte),
 				InternalFormat.Srgb => (PixelFormat.Rgb, PixelType.UnsignedByte),
+				(InternalFormat)34837 => (PixelFormat.Rgb, PixelType.Float),
 				_ => throw new NotImplementedException($"{format} format resolution is not yet implemented.")
 			};
 		}
@@ -55,7 +56,7 @@ namespace Renderer.GLObject
 			try
 			{
 				using Stream stream = File.OpenRead($"resources/textures/{name}.png");
-				image = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
+				image = ImageResult.FromStream(stream, ColorComponents.RedGreenBlue);
 			}
 			catch (IOException)
 			{

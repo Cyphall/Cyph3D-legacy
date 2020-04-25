@@ -4,9 +4,7 @@ using GLFW;
 using GlmSharp;
 using OpenGL;
 using Renderer.GLObject;
-using Renderer.Material;
 using Renderer.Misc;
-using Renderer.Renderer;
 
 namespace Renderer
 {
@@ -41,32 +39,15 @@ namespace Renderer
 			Glfw.GetWindowSize(Context.Window, out winSize.x, out winSize.y);
 			Context.WindowSize = winSize;
 
-			Camera camera = new Camera(new ForwardRenderer(), new vec3(1.5f, 0, -2.5f));
+			Camera camera = new Camera(new vec3(1.5f, 0, -2.5f));
 
 			Context.ObjectContainer.Add(
 				new RenderObject(
-					MaterialBase.Get(
-						"metal",
-						() => new ForwardLitMaterial(
-							Texture.Get("Bricks23/col", InternalFormat.SrgbAlpha),
-							Texture.Get("Bricks23/nrm", InternalFormat.Rgba),
-							Texture.Get("Bricks23/rgh", InternalFormat.Rgba),
-							Texture.Get("Bricks23/disp", InternalFormat.Rgba),
-							null
-						)
-					),
-					"simple_cube",
-					new vec3(0, 0, 0),
-					angularVelocity: new vec3(0, 0 * 5f, 0)
-				)
-			);
-
-			Context.ObjectContainer.Add(
-				new RenderObject(
-					MaterialBase.Get(
+					Material.Get(
 						"sun",
-						() => new ForwardUnlitMaterial(
-							Texture.Get("sun", InternalFormat.SrgbAlpha)
+						() => new Material(
+							false,
+							Texture.Get("sun", InternalFormat.Srgb)
 						)
 					),
 					"planet",
@@ -77,24 +58,10 @@ namespace Renderer
 			Context.LightContainer.Add(
 				new PointLight(
 					new vec3(4, 2, 4),
-					new vec3(1f, 1f, 1f),
-					1
+					new vec3(1f, 0.8f, 0.6f),
+					1f
 				)
 			);
-
-			// Context.ObjectContainer.Add(
-			// 	new RenderObject(
-			// 		Material.Get(
-			// 			"sun",
-			// 			() => new ForwardUnlitMaterial(
-			// 				Texture.Get("sun", InternalFormat.SrgbAlpha)
-			// 			)
-			// 		),
-			// 		"planet",
-			// 		true,
-			// 		new vec3(4, 0, 4)
-			// 	)
-			// );
 
 
 			while (!Glfw.WindowShouldClose(window))

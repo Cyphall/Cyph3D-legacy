@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using GlmSharp;
 using OpenGL;
 using Renderer.GLObject;
+using Renderer.Misc;
 
-namespace Renderer.Material
+namespace Renderer
 {
-	public class ForwardLitMaterial : MaterialBase
+	public class Material
 	{
 		private ShaderProgram _shaderProgram;
 		private Texture _colorMap;
@@ -14,8 +15,11 @@ namespace Renderer.Material
 		private Texture _roughnessMap;
 		private Texture _displacementMap;
 		private Texture _metallicMap;
+
+		private bool _isLit;
 		
-		public ForwardLitMaterial(
+		public Material(
+			bool isLit,
 			Texture colorMap = null,
 			Texture normalMap = null,
 			Texture roughnessMap = null,
@@ -23,7 +27,7 @@ namespace Renderer.Material
 			Texture metallicMap = null
 		)
 		{
-			_shaderProgram = ShaderProgram.Get("forward/lit");
+			_shaderProgram = ShaderProgram.Get("deferred/firstPass");
 			_shaderProgram.Bind();
 			
 			_shaderProgram.SetValue("colorMap", 0);
@@ -57,6 +61,8 @@ namespace Renderer.Material
 				metallicMap = new Texture(new ivec2(1), InternalFormat.Rgb);
 				metallicMap.PutData(new byte[]{0, 0, 0});
 			}
+
+			_isLit = isLit;
 			
 			_colorMap = colorMap;
 			_normalMap = normalMap;
@@ -65,7 +71,7 @@ namespace Renderer.Material
 			_metallicMap = metallicMap;
 		}
 
-		public override void Bind(mat4 model, mat4 view, mat4 projection, vec3 cameraPos, PointLight light)
+		public void Bind(mat4 model, mat4 view, mat4 projection, vec3 cameraPos)
 		{
 			_shaderProgram.Bind();
 
@@ -84,11 +90,23 @@ namespace Renderer.Material
 			_shaderProgram.SetValue("view", view);
 			_shaderProgram.SetValue("projection", projection);
 			
-			_shaderProgram.SetValue("lightPos", light.Transform.Position);
-			_shaderProgram.SetValue("lightColor", light.Color);
-			_shaderProgram.SetValue("lightIntensity", light.Intensity);
-			
 			_shaderProgram.SetValue("viewPos", cameraPos);
+
+			_shaderProgram.SetValue("isLit", _isLit ? 1 : 0);
+		}
+		
+		private static Dictionary<string, Material> _materials = new Dictionary<string, Material>();
+		
+		public static Material Get(string name, Func<Material> creationMethod)
+		{
+			if (!_materials.ContainsKey(name))
+			{
+				Logger.Info($"Loading material \"{name}\"");
+				_materials.Add(name, creationMethod.Invoke());
+				Logger.Info($"Material \"{name}\" loaded");
+			}
+
+			return _materials[name];
 		}
 	}
 }

@@ -110,11 +110,6 @@ namespace Renderer.GLObject
 			if (_ID == CurrentlyBound) return;
 			Gl.UseProgram(_ID);
 		}
-
-		public void BindOutputToColorAttachment(string output, uint colorAttachment)
-		{
-			Gl.BindFragDataLocation(this, colorAttachment, output);
-		}
 		
 		public void SetValue(string variableName, float data)
 		{

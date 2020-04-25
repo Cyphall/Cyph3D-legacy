@@ -24,6 +24,23 @@
         <None Include="resources/**">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Remove="resources\shaders\forward\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="src\Material\ForwardLitMaterial.cs" />
+      <Compile Remove="src\Material\ForwardUnlitMaterial.cs" />
+      <Compile Remove="src\Material\ForwardMaterial.cs" />
+      <Compile Remove="src\Material\DeferredMaterial.cs" />
+      <Compile Remove="src\Renderer\ForwardRenderer.cs" />
+      <Compile Remove="src\Material\MaterialBase.cs" />
+      <Compile Remove="src\Material\UnlitMaterial.cs" />
+      <Compile Remove="resources\shaders\forward\**" />
+      <Compile Remove="src\Renderer\IRenderer.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="resources\shaders\forward\**" />
     </ItemGroup>
 
 </Project>

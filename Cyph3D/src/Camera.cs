@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using GLFW;
 using GlmSharp;
-using Renderer.Renderer;
+using OpenGL;
+using Renderer.GLObject;
 
 namespace Renderer
 {
 	public class Camera
 	{
 		private bool _orientationChanged = true;
+		private bool _leftClickPreviousState;
 		
 		private vec3 _orientation = vec3.Zero;
 		private vec3 Orientation
@@ -60,11 +64,10 @@ namespace Renderer
 			}
 		}
 
-		private IRenderer _renderer;
+		private Renderer _renderer = new Renderer();
 
-		public Camera(IRenderer renderer, vec3 position = default)
+		public Camera(vec3 position = default)
 		{
-			_renderer = renderer;
 			Position = position;
 			
 			SphericalCoords = new vec2(340.16702f, -0.58333683f);
@@ -99,7 +102,7 @@ namespace Renderer
 
 		public void Update(double deltaTime)
 		{
-			float ratio = (float)deltaTime / 4;
+			float ratio = (float)deltaTime;
 
 			if (Glfw.GetKey(Context.Window, Keys.LeftControl) == InputState.Press)
 			{
@@ -126,6 +129,13 @@ namespace Renderer
 			{
 				Position -= SideOrientation * ratio;
 			}
+
+			bool leftClickCurrentState = Glfw.GetMouseButton(Context.Window, MouseButton.Left) == InputState.Press;
+			if (!_leftClickPreviousState && leftClickCurrentState)
+			{
+				LeftClick();
+			}
+			_leftClickPreviousState = leftClickCurrentState;
 			
 			dvec2 mouseOffset = new dvec2();
 			Glfw.GetCursorPosition(Context.Window, out mouseOffset.x, out mouseOffset.y);
@@ -134,6 +144,28 @@ namespace Renderer
 			SphericalCoords += new vec2((float)(-mouseOffset.x / 12.0), (float)(-mouseOffset.y / 12.0));
 			
 			Glfw.SetCursorPosition(Context.Window, _winCenter.x, _winCenter.y);
+		}
+
+		private void LeftClick()
+		{
+			Context.ObjectContainer.Add(
+				new RenderObject(
+					Material.Get(
+						"metal",
+						() => new Material(
+							true,
+							Texture.Get("SpaceCase1/col", InternalFormat.Srgb),
+							Texture.Get("SpaceCase1/nrm", InternalFormat.Rgb),
+							Texture.Get("SpaceCase1/rgh", InternalFormat.Rgb),
+							Texture.Get("SpaceCase1/disp", InternalFormat.Rgb),
+							Texture.Get("SpaceCase1/met", InternalFormat.Rgb)
+						)
+					),
+					"cube",
+					Position,
+					angularVelocity: new vec3(0, 5f, 0)
+				)
+			);
 		}
 
 		public void Render()
