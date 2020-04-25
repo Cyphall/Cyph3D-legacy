@@ -12,6 +12,7 @@ namespace Renderer
 	{
 		private bool _orientationChanged = true;
 		private bool _leftClickPreviousState;
+		private bool _rightClickPreviousState;
 		
 		private vec3 _orientation = vec3.Zero;
 		private vec3 Orientation
@@ -137,6 +138,13 @@ namespace Renderer
 			}
 			_leftClickPreviousState = leftClickCurrentState;
 			
+			bool rightClickPreviousState = Glfw.GetMouseButton(Context.Window, MouseButton.Right) == InputState.Press;
+			if (!_rightClickPreviousState && rightClickPreviousState)
+			{
+				RightClick();
+			}
+			_rightClickPreviousState = rightClickPreviousState;
+			
 			dvec2 mouseOffset = new dvec2();
 			Glfw.GetCursorPosition(Context.Window, out mouseOffset.x, out mouseOffset.y);
 			mouseOffset -= _winCenter;
@@ -152,8 +160,20 @@ namespace Renderer
 				new RenderObject(
 					Material.GetOrLoad("Sci-Fi/SpaceCase1", true),
 					Mesh.GetOrLoad("cube"),
-					Position,
+					Position + Orientation,
 					angularVelocity: new vec3(0, 5f, 0)
+				)
+			);
+		}
+
+		private void RightClick()
+		{
+			Context.ObjectContainer.Add(
+				new RenderObject(
+					Material.GetOrLoad("Metals/OrnateBrass", true),
+					Mesh.GetOrLoad("teapot"),
+					Position + Orientation,
+					angularVelocity: new vec3(0, 0, 0)
 				)
 			);
 		}
