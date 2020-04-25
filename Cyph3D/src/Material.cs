@@ -49,14 +49,14 @@ namespace Renderer
 			if (_roughnessMap == null)
 			{
 				_roughnessMap = new Texture(new ivec2(1), InternalFormat.Rgb);
-				_roughnessMap.PutData(new byte[]{128, 128, 128});
+				_roughnessMap.PutData(new byte[]{128}, PixelFormat.Luminance);
 			}
 			
 			_displacementMap = Texture.FromFile($"{name}/disp");
 			if (_displacementMap == null)
 			{
 				_displacementMap = new Texture(new ivec2(1), InternalFormat.Rgb);
-				_displacementMap.PutData(new byte[]{255, 255, 255});
+				_displacementMap.PutData(new byte[]{255}, PixelFormat.Luminance);
 			}
 			
 			_metallicMap = Texture.FromFile($"{name}/met");

@@ -96,11 +96,11 @@ namespace Renderer.GLObject
 			{
 				case ColorComponents.Grey:
 					pixelFormat = PixelFormat.Luminance;
-					internalFormat = sRGB ? InternalFormat.Srgb : InternalFormat.Luminance8;
+					internalFormat = sRGB ? InternalFormat.Srgb : InternalFormat.Rgb;
 					break;
 				case ColorComponents.GreyAlpha:
 					pixelFormat = PixelFormat.LuminanceAlpha;
-					internalFormat = sRGB ? InternalFormat.SrgbAlpha : InternalFormat.Luminance8Alpha8;
+					internalFormat = sRGB ? InternalFormat.SrgbAlpha : InternalFormat.Rgba;
 					break;
 				case ColorComponents.RedGreenBlue:
 					pixelFormat = PixelFormat.Rgb;
