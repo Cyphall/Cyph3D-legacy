@@ -13,7 +13,7 @@ namespace Renderer
 
 		public RenderObject(
 			Material material,
-			string meshName,
+			Mesh mesh,
 			vec3? position = null,
 			vec3? rotation = null,
 			vec3? scale = null,
@@ -21,7 +21,7 @@ namespace Renderer
 			vec3? angularVelocity = null)
 		{
 			_material = material;
-			_mesh = Mesh.Get(meshName);
+			_mesh = mesh;
 			
 			Transform = new ActiveTransform(position, rotation, scale, velocity, angularVelocity);
 		}

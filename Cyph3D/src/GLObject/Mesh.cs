@@ -176,7 +176,7 @@ namespace Renderer.GLObject
 			normals.Dispose();
 		}
 		
-		public static Mesh Get(string name)
+		public static Mesh GetOrLoad(string name)
 		{
 			if (!_meshes.ContainsKey(name))
 			{

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GlmSharp;
 using OpenGL;
 using Renderer.GLObject;
@@ -10,6 +9,7 @@ namespace Renderer
 	public class Material
 	{
 		private ShaderProgram _shaderProgram;
+		
 		private Texture _colorMap;
 		private Texture _normalMap;
 		private Texture _roughnessMap;
@@ -18,14 +18,9 @@ namespace Renderer
 
 		private bool _isLit;
 		
-		public Material(
-			bool isLit,
-			Texture colorMap = null,
-			Texture normalMap = null,
-			Texture roughnessMap = null,
-			Texture displacementMap = null,
-			Texture metallicMap = null
-		)
+		private static Dictionary<string, Material> _materials = new Dictionary<string, Material>();
+		
+		public Material(string name, bool isLit)
 		{
 			_shaderProgram = ShaderProgram.Get("deferred/firstPass");
 			_shaderProgram.Bind();
@@ -36,39 +31,42 @@ namespace Renderer
 			_shaderProgram.SetValue("displacementMap", 3);
 			_shaderProgram.SetValue("metallicMap", 4);
 
-			if (colorMap == null)
+			_colorMap = Texture.FromFile($"{name}/col", true);
+			if (_colorMap == null)
 			{
-				colorMap = new Texture(new ivec2(1), InternalFormat.Srgb);
-				colorMap.PutData(new byte[]{255, 0, 255});
+				_colorMap = new Texture(new ivec2(1), InternalFormat.Srgb);
+				_colorMap.PutData(new byte[]{255, 0, 255});
 			}
-			if (normalMap == null)
+			
+			_normalMap = Texture.FromFile($"{name}/nrm");
+			if (_normalMap == null)
 			{
-				normalMap = new Texture(new ivec2(1), InternalFormat.Rgb);
-				normalMap.PutData(new byte[]{128, 128, 255});
+				_normalMap = new Texture(new ivec2(1), InternalFormat.Rgb);
+				_normalMap.PutData(new byte[]{128, 128, 255});
 			}
-			if (roughnessMap == null)
+			
+			_roughnessMap = Texture.FromFile($"{name}/rgh");
+			if (_roughnessMap == null)
 			{
-				roughnessMap = new Texture(new ivec2(1), InternalFormat.Rgb);
-				roughnessMap.PutData(new byte[]{128, 128, 128});
+				_roughnessMap = new Texture(new ivec2(1), InternalFormat.Rgb);
+				_roughnessMap.PutData(new byte[]{128, 128, 128});
 			}
-			if (displacementMap == null)
+			
+			_displacementMap = Texture.FromFile($"{name}/disp");
+			if (_displacementMap == null)
 			{
-				displacementMap = new Texture(new ivec2(1), InternalFormat.Rgb);
-				displacementMap.PutData(new byte[]{255, 255, 255});
+				_displacementMap = new Texture(new ivec2(1), InternalFormat.Rgb);
+				_displacementMap.PutData(new byte[]{255, 255, 255});
 			}
-			if (metallicMap == null)
+			
+			_metallicMap = Texture.FromFile($"{name}/met");
+			if (_metallicMap == null)
 			{
-				metallicMap = new Texture(new ivec2(1), InternalFormat.Rgb);
-				metallicMap.PutData(new byte[]{0, 0, 0});
+				_metallicMap = new Texture(new ivec2(1), InternalFormat.Rgb);
+				_metallicMap.PutData(new byte[]{0, 0, 0});
 			}
 
 			_isLit = isLit;
-			
-			_colorMap = colorMap;
-			_normalMap = normalMap;
-			_roughnessMap = roughnessMap;
-			_displacementMap = displacementMap;
-			_metallicMap = metallicMap;
 		}
 
 		public void Bind(mat4 model, mat4 view, mat4 projection, vec3 cameraPos)
@@ -95,14 +93,12 @@ namespace Renderer
 			_shaderProgram.SetValue("isLit", _isLit ? 1 : 0);
 		}
 		
-		private static Dictionary<string, Material> _materials = new Dictionary<string, Material>();
-		
-		public static Material Get(string name, Func<Material> creationMethod)
+		public static Material GetOrLoad(string name, bool isLit)
 		{
 			if (!_materials.ContainsKey(name))
 			{
 				Logger.Info($"Loading material \"{name}\"");
-				_materials.Add(name, creationMethod.Invoke());
+				_materials.Add(name, new Material(name, isLit));
 				Logger.Info($"Material \"{name}\" loaded");
 			}
 

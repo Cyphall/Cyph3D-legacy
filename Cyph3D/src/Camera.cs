@@ -150,18 +150,8 @@ namespace Renderer
 		{
 			Context.ObjectContainer.Add(
 				new RenderObject(
-					Material.Get(
-						"metal",
-						() => new Material(
-							true,
-							Texture.Get("SpaceCase1/col", InternalFormat.Srgb),
-							Texture.Get("SpaceCase1/nrm", InternalFormat.Rgb),
-							Texture.Get("SpaceCase1/rgh", InternalFormat.Rgb),
-							Texture.Get("SpaceCase1/disp", InternalFormat.Rgb),
-							Texture.Get("SpaceCase1/met", InternalFormat.Rgb)
-						)
-					),
-					"cube",
+					Material.GetOrLoad("Sci-Fi/SpaceCase1", true),
+					Mesh.GetOrLoad("cube"),
 					Position,
 					angularVelocity: new vec3(0, 5f, 0)
 				)

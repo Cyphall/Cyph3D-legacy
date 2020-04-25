@@ -43,14 +43,11 @@ namespace Renderer
 
 			Context.ObjectContainer.Add(
 				new RenderObject(
-					Material.Get(
-						"sun",
-						() => new Material(
-							false,
-							Texture.Get("sun", InternalFormat.Srgb)
-						)
+					Material.GetOrLoad(
+						"Sun",
+						false
 					),
-					"planet",
+					Mesh.GetOrLoad("planet"),
 					new vec3(4, 2, 4)
 				)
 			);
