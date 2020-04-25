@@ -34,7 +34,7 @@ namespace Renderer
 			_colorMap = Texture.FromFile($"{name}/col", true);
 			if (_colorMap == null)
 			{
-				_colorMap = new Texture(new ivec2(1), InternalFormat.Srgb);
+				_colorMap = new Texture(new ivec2(1), InternalFormat.Srgb8);
 				_colorMap.PutData(new byte[]{255, 0, 255});
 			}
 			

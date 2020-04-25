@@ -96,19 +96,19 @@ namespace Renderer.GLObject
 			{
 				case ColorComponents.Grey:
 					pixelFormat = PixelFormat.Luminance;
-					internalFormat = sRGB ? InternalFormat.Srgb : InternalFormat.Rgb;
+					internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Rgb;
 					break;
 				case ColorComponents.GreyAlpha:
 					pixelFormat = PixelFormat.LuminanceAlpha;
-					internalFormat = sRGB ? InternalFormat.SrgbAlpha : InternalFormat.Rgba;
+					internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba;
 					break;
 				case ColorComponents.RedGreenBlue:
 					pixelFormat = PixelFormat.Rgb;
-					internalFormat = sRGB ? InternalFormat.Srgb : InternalFormat.Rgb;
+					internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Rgb;
 					break;
 				case ColorComponents.RedGreenBlueAlpha:
 					pixelFormat = PixelFormat.Rgba;
-					internalFormat = sRGB ? InternalFormat.SrgbAlpha : InternalFormat.Rgba;
+					internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba;
 					break;
 				default:
 					throw new NotSupportedException($"The colors format {image.Comp} is not supported");
