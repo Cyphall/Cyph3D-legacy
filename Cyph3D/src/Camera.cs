@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using GLFW;
 using GlmSharp;
 using OpenGL;
 using Renderer.GLObject;
+using Renderer.Misc;
 
 namespace Renderer
 {

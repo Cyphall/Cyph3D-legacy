@@ -1,6 +1,6 @@
 ﻿using GlmSharp;
 
-namespace Renderer
+namespace Renderer.Misc
 {
 	public static class MathExt
 	{
@@ -29,6 +29,11 @@ namespace Renderer
 				Modulo(vec.y, mod),
 				Modulo(vec.z, mod)
 				);
+		}
+
+		public static vec3 FromRGB(byte r, byte g, byte b)
+		{
+			return new vec3(r / 255f, g / 255f, b / 255f);
 		}
 	}
 }
