@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using GLFW;
@@ -68,11 +68,11 @@ namespace Renderer
 
 		private Renderer _renderer = new Renderer();
 
-		public Camera(vec3 position = default)
+		public Camera(vec3 position = default, vec2 sphericalCoords = default)
 		{
 			Position = position;
-			
-			SphericalCoords = new vec2(340.16702f, -0.58333683f);
+
+			SphericalCoords = sphericalCoords;
 
 			Projection = mat4.Perspective(glm.Radians(80f), (float)Context.WindowSize.x / Context.WindowSize.y, 0.0001f, 1000f);
 
@@ -157,6 +157,7 @@ namespace Renderer
 
 		private void LeftClick()
 		{
+			return;
 			Context.ObjectContainer.Add(
 				new RenderObject(
 					Material.GetOrLoad("Sci-Fi/SpaceCase1", true),
@@ -169,6 +170,7 @@ namespace Renderer
 
 		private void RightClick()
 		{
+			return;
 			Context.ObjectContainer.Add(
 				new RenderObject(
 					Material.GetOrLoad("Metals/OrnateBrass", true),
