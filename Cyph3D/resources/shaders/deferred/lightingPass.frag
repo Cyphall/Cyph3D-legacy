@@ -99,7 +99,7 @@ void main()
 	vec3  color             = getColor();
 	float emissiveIntensity = getEmissive() * 2;
 
-	vec3 totalDiffuseMetallic = color * emissiveIntensity;
+//	vec3 totalDiffuseMetallic = color * emissiveIntensity;
 	vec3 totalDiffuseNonMetallic = color * emissiveIntensity;
 	vec3 totalSpecularMetallic = vec3(0);
 	vec3 totalSpecularNonMetallic = vec3(0);
@@ -115,7 +115,7 @@ void main()
 		// Diffuse calculation
 		float diffuseIntensity = max(dot(normal, lightDir), 0);
 
-		vec3 diffuseMetallic = vec3(0);
+//		vec3 diffuseMetallic = vec3(0);
 		vec3 diffuseNonMetallic = color * lightColor * lightIntensity * diffuseIntensity;
 
 		// Specular calculation
@@ -124,14 +124,15 @@ void main()
 		vec3 specularMetallic =  color * lightColor * lightIntensity * specularIntensity;
 		vec3 specularNonMetallic = lightColor * lightIntensity * specularIntensity * pow((1 - roughness) / 2 + 0.1, 4);
 
-		totalDiffuseMetallic = max(totalDiffuseMetallic, diffuseMetallic);
+//		totalDiffuseMetallic = max(totalDiffuseMetallic, diffuseMetallic);
 		totalDiffuseNonMetallic = max(totalDiffuseNonMetallic, diffuseNonMetallic);
 
 		totalSpecularMetallic += specularMetallic;
 		totalSpecularNonMetallic += specularNonMetallic;
 	}
 
-	vec3 metallicPart = max(totalDiffuseMetallic, totalSpecularMetallic);
+//	vec3 metallicPart = max(totalDiffuseMetallic, totalSpecularMetallic);
+	vec3 metallicPart = totalSpecularMetallic;
 	vec3 nonMetallicPart = max(totalDiffuseNonMetallic, totalSpecularNonMetallic);
 
 	vec3 HDRColor = metallicPart * metalness + nonMetallicPart * (1 - metalness);
