@@ -4,7 +4,7 @@ using OpenGL;
 using Renderer.GLObject;
 using Renderer.Misc;
 
-namespace Renderer
+namespace Renderer.GLObject
 {
 	public class Material
 	{
