@@ -110,7 +110,7 @@ void main()
 		float distance       = distance(lights[i].pos, fragPos);
 		vec3  halfwayDir     = normalize(lightDir + viewDir);
 		vec3  lightColor     = lights[i].color;
-		float lightIntensity = lights[i].intensity / max((distance * distance), 1);
+		float lightIntensity = lights[i].intensity / (1 + distance * distance);
 
 		// Diffuse calculation
 		float diffuseIntensity = max(dot(normal, lightDir), 0);
