@@ -22,6 +22,8 @@ namespace Renderer.GLObject
 		private uint _vaoID;
 
 		private int _verticesCount;
+
+		private static ObjLoaderFactory _loaderFactory;
 		
 		private static Dictionary<string, Mesh> _meshes = new Dictionary<string, Mesh>();
 
@@ -63,7 +65,7 @@ namespace Renderer.GLObject
 			LoadResult rawMesh;
 			using (FileStream stream = File.OpenRead($"resources/meshes/{name}.obj"))
 			{
-				rawMesh = new ObjLoaderFactory().Create().Load(stream);
+				rawMesh = _loaderFactory.Create().Load(stream);
 			}
 
 			_verticesCount = rawMesh.Groups[0].Faces.Count * 3;
@@ -211,6 +213,11 @@ namespace Renderer.GLObject
 			{
 				mesh.Dispose();
 			}
+		}
+
+		static Mesh()
+		{
+			_loaderFactory = new ObjLoaderFactory();
 		}
 	}
 }
