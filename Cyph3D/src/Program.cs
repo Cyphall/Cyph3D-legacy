@@ -39,26 +39,49 @@ namespace Renderer
 			Glfw.GetWindowSize(Context.Window, out winSize.x, out winSize.y);
 			Context.WindowSize = winSize;
 
-			Camera camera = new Camera(new vec3(1.5f, 0, -2.5f));
-
+			Camera camera = new Camera(new vec3(0, 1.5f, -3));
+			
 			Context.ObjectContainer.Add(
 				new RenderObject(
 					Material.GetOrLoad(
-						"Sun",
-						false
+						"LinkedToMesh/corridor",
+						true
 					),
-					Mesh.GetOrLoad("planet"),
-					new vec3(4, 2, 4)
+					Mesh.GetOrLoad("corridor"),
+					rotation: new vec3(0, 270, 0)
 				)
 			);
+			
+			// Context.ObjectContainer.Add(
+			// 	new RenderObject(
+			// 		Material.GetOrLoad(
+			// 			"Sun",
+			// 			false
+			// 		),
+			// 		Mesh.GetOrLoad("planet"),
+			// 		new vec3(0, 2.9f, 0.62f),
+			// 		scale: new vec3(0.1f)
+			// 	)
+			// );
 
-			Context.LightContainer.Add(
-				new PointLight(
-					new vec3(4, 2, 4),
-					new vec3(1f, 0.8f, 0.6f),
-					1f
-				)
-			);
+			for (int i = 0; i < 10; i++)
+			{
+				Context.LightContainer.Add(
+					new PointLight(
+						new vec3(0, 2.9f, -0.93f + i * 1.55f),
+						MathExt.FromRGB(222, 215, 188),
+						0.3f
+					)
+				);
+			
+				Context.LightContainer.Add(
+					new PointLight(
+						new vec3(0, 2.9f, -0.62f + i * 1.55f),
+						MathExt.FromRGB(222, 215, 188),
+						0.3f
+					)
+				);
+			}
 
 
 			while (!Glfw.WindowShouldClose(window))
