@@ -15,6 +15,7 @@ namespace Renderer.GLObject
 		private Texture _roughnessMap;
 		private Texture _displacementMap;
 		private Texture _metallicMap;
+		private Texture _emissiveMap;
 
 		private bool _isLit;
 		
@@ -30,6 +31,7 @@ namespace Renderer.GLObject
 			_shaderProgram.SetValue("roughnessMap", 2);
 			_shaderProgram.SetValue("displacementMap", 3);
 			_shaderProgram.SetValue("metallicMap", 4);
+			_shaderProgram.SetValue("emissiveMap", 5);
 
 			_colorMap = Texture.FromFile($"{name}/col", true);
 			if (_colorMap == null)
@@ -65,6 +67,13 @@ namespace Renderer.GLObject
 				_metallicMap = new Texture(new ivec2(1), InternalFormat.Rgb);
 				_metallicMap.PutData(new byte[]{0, 0, 0});
 			}
+			
+			_emissiveMap = Texture.FromFile($"{name}/emis");
+			if (_emissiveMap == null)
+			{
+				_emissiveMap = new Texture(new ivec2(1), InternalFormat.Rgb);
+				_emissiveMap.PutData(new byte[]{0, 0, 0});
+			}
 
 			_isLit = isLit;
 		}
@@ -83,6 +92,8 @@ namespace Renderer.GLObject
 			_displacementMap.Bind();
 			Gl.ActiveTexture(TextureUnit.Texture4);
 			_metallicMap.Bind();
+			Gl.ActiveTexture(TextureUnit.Texture5);
+			_emissiveMap.Bind();
 			
 			_shaderProgram.SetValue("model", model);
 			_shaderProgram.SetValue("view", view);

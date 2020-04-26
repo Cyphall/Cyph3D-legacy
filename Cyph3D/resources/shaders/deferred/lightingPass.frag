@@ -41,6 +41,7 @@ vec3 getColor();
 vec3 getNormal();
 float getRoughness();
 float getMetallic();
+float getEmissive();
 int isLit();
 
 float DistributionGGX(vec3 N, vec3 H, float roughness);
@@ -90,15 +91,16 @@ void main()
 	}
 
 	// setup
-	vec3  fragPos        = getPosition();
-	vec3  viewDir        = normalize(frag.ViewPos - fragPos);
-	vec3  normal         = getNormal();
-	float roughness      = getRoughness();
-	float metalness      = getMetallic();
-	vec3  color          = getColor();
+	vec3  fragPos           = getPosition();
+	vec3  viewDir           = normalize(frag.ViewPos - fragPos);
+	vec3  normal            = getNormal();
+	float roughness         = getRoughness();
+	float metalness         = getMetallic();
+	vec3  color             = getColor();
+	float emissiveIntensity = getEmissive() * 2;
 
-	vec3 totalDiffuseMetallic = vec3(0);
-	vec3 totalDiffuseNonMetallic = vec3(0);
+	vec3 totalDiffuseMetallic = color * emissiveIntensity;
+	vec3 totalDiffuseNonMetallic = color * emissiveIntensity;
 	vec3 totalSpecularMetallic = vec3(0);
 	vec3 totalSpecularNonMetallic = vec3(0);
 
@@ -108,13 +110,13 @@ void main()
 		float distance       = distance(lights[i].pos, fragPos);
 		vec3  halfwayDir     = normalize(lightDir + viewDir);
 		vec3  lightColor     = lights[i].color;
-		float lightIntensity = lights[i].intensity / (distance * distance);
+		float lightIntensity = lights[i].intensity / max((distance * distance), 1);
 
 		// Diffuse calculation
 		float diffuseIntensity = max(dot(normal, lightDir), 0);
 
 		vec3 diffuseMetallic = vec3(0);
-		vec3 diffuseNonMetallic = min(color, lightColor) * lightIntensity * diffuseIntensity;
+		vec3 diffuseNonMetallic = color * lightColor * lightIntensity * diffuseIntensity;
 
 		// Specular calculation
 		float specularIntensity = DistributionGGX(normal, halfwayDir, roughness);
@@ -126,7 +128,7 @@ void main()
 		totalDiffuseNonMetallic = max(totalDiffuseNonMetallic, diffuseNonMetallic);
 
 		totalSpecularMetallic += specularMetallic;
-		totalSpecularNonMetallic += totalDiffuseNonMetallic;
+		totalSpecularNonMetallic += specularNonMetallic;
 	}
 
 	vec3 metallicPart = max(totalDiffuseMetallic, totalSpecularMetallic);
@@ -162,6 +164,11 @@ float getMetallic()
 	return texture(materialTexture, frag.TexCoords).g;
 }
 
+float getEmissive()
+{
+	return texture(materialTexture, frag.TexCoords).a;
+}
+
 int isLit()
 {
 	return int(texture(materialTexture, frag.TexCoords).b);
@@ -192,7 +199,8 @@ vec3 toSRGB(vec3 linear)
 
 vec4 reinhard_tone_mapping(vec3 color)
 {
-	color = color / (color + 1);
+	float exposure = 2;
+	color *= exposure/(1. + color / exposure);
 
 	// sRGB correction
 	color = toSRGB(color);

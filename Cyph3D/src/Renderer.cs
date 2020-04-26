@@ -23,7 +23,7 @@ namespace Renderer
 			_gbuffer = new Framebuffer(out _positionTexture, Context.WindowSize, (InternalFormat) 34837); // 34837 = RGB32F
 			_normalTexture = _gbuffer.AddTexture(FramebufferAttachment.ColorAttachment1, InternalFormat.Rgb);
 			_colorTexture = _gbuffer.AddTexture(FramebufferAttachment.ColorAttachment2, InternalFormat.Rgb16f);
-			_materialTexture = _gbuffer.AddTexture(FramebufferAttachment.ColorAttachment3, InternalFormat.Rgb);
+			_materialTexture = _gbuffer.AddTexture(FramebufferAttachment.ColorAttachment3, InternalFormat.Rgba);
 			_gbuffer.AddRenderbuffer(FramebufferAttachment.DepthAttachment, InternalFormat.DepthComponent);
 
 			_gbuffer.SetDrawBuffers(
@@ -111,9 +111,6 @@ namespace Renderer
 			_lightingPassShader.Bind();
 
 			_lightingPassShader.SetValue("viewPos", viewPos);
-			_lightingPassShader.SetValue("lightPos", Context.LightContainer[0].Transform.Position);
-			_lightingPassShader.SetValue("lightColor", Context.LightContainer[0].Color);
-			_lightingPassShader.SetValue("lightIntensity", Context.LightContainer[0].Intensity);
 
 			_lightingPassShader.SetValue("debug", 0);
 			_lightingPassShader.SetValue("numLights", lightCount);

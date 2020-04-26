@@ -13,13 +13,14 @@ uniform sampler2D normalMap;
 uniform sampler2D roughnessMap;
 uniform sampler2D displacementMap;
 uniform sampler2D metallicMap;
+uniform sampler2D emissiveMap;
 
 uniform int isLit;
 
 layout(location = 0) out vec3 position;
 layout(location = 1) out vec3 normal;
 layout(location = 2) out vec3 color;
-layout(location = 3) out vec3 material;
+layout(location = 3) out vec4 material;
 
 float getDepth(vec2 texCoords);
 vec2 POM(vec2 texCoords, vec3 viewDir);
@@ -39,6 +40,7 @@ void main()
 	material.r = texture(roughnessMap, texCoords).r;
 	material.g = texture(metallicMap, texCoords).r;
 	material.b = isLit;
+	material.a = texture(emissiveMap, texCoords).r;
 }
 
 float getDepth(vec2 texCoords)
