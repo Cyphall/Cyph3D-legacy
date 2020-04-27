@@ -43,6 +43,7 @@ float getRoughness();
 float getMetallic();
 float getEmissive();
 int isLit();
+vec3 saturate(vec3 color);
 
 float DistributionGGX(vec3 N, vec3 H, float roughness);
 vec3 toSRGB(vec3 linear);
@@ -97,10 +98,10 @@ void main()
 	float roughness         = getRoughness();
 	float metalness         = getMetallic();
 	vec3  color             = getColor();
-	float emissiveIntensity = getEmissive() * 2;
+	float emissiveIntensity = getEmissive();
 
-//	vec3 totalDiffuseMetallic = color * emissiveIntensity;
-	vec3 totalDiffuseNonMetallic = color * emissiveIntensity;
+//	vec3 totalDiffuseMetallic = saturate(color) * emissiveIntensity;
+	vec3 totalDiffuseNonMetallic = saturate(color) * emissiveIntensity;
 	vec3 totalSpecularMetallic = vec3(0);
 	vec3 totalSpecularNonMetallic = vec3(0);
 
@@ -173,6 +174,12 @@ float getEmissive()
 int isLit()
 {
 	return int(texture(materialTexture, frag.TexCoords).b);
+}
+
+vec3 saturate(vec3 color)
+{
+	float highest = max(max(color.r, color.g), color.b);
+	return color / highest;
 }
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
