@@ -104,7 +104,7 @@ namespace Renderer
 
 		public void Update(double deltaTime)
 		{
-			float ratio = (float)deltaTime;
+			float ratio = (float)deltaTime * 2;
 
 			if (Glfw.GetKey(Context.Window, Keys.LeftControl) == InputState.Press)
 			{
