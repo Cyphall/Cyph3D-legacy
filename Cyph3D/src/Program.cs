@@ -59,26 +59,50 @@ namespace Renderer
 			// 			false
 			// 		),
 			// 		Mesh.GetOrLoad("planet"),
-			// 		new vec3(0, 2.9f, 0.62f),
-			// 		scale: new vec3(0.1f)
+			// 		new vec3(0, 2.99f, -0.93f),
+			// 		scale: new vec3(0.01f)
 			// 	)
 			// );
+			
+			Context.LightContainer.Add(
+				new PointLight(
+					new vec3(-0.29f, 0.6f, 10.19f),
+					MathExt.FromRGB(245, 243, 255),
+					1f
+				)
+			);
+			
+			Context.LightContainer.Add(
+				new PointLight(
+					new vec3(-0.1f, 0.6f, 10.6f),
+					MathExt.FromRGB(245, 243, 255),
+					1f
+				)
+			);
+			
+			Context.LightContainer.Add(
+				new PointLight(
+					new vec3(0.21f, 0.6f, 10.83f),
+					MathExt.FromRGB(245, 243, 255),
+					1f
+				)
+			);
 
 			for (int i = 0; i < 10; i++)
 			{
 				Context.LightContainer.Add(
 					new PointLight(
-						new vec3(0, 2.9f, -0.93f + i * 1.55f),
+						new vec3(0, 2.99f, -0.93f + i * 1.55f),
 						MathExt.FromRGB(222, 215, 188),
-						0.3f
+						0.2f
 					)
 				);
 			
 				Context.LightContainer.Add(
 					new PointLight(
-						new vec3(0, 2.9f, -0.62f + i * 1.55f),
+						new vec3(0, 2.99f, -0.62f + i * 1.55f),
 						MathExt.FromRGB(222, 215, 188),
-						0.3f
+						0.2f
 					)
 				);
 			}
