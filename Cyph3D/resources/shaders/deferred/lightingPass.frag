@@ -168,12 +168,12 @@ float getMetallic()
 
 float getEmissive()
 {
-	return texture(materialTexture, frag.TexCoords).a;
+	return texture(materialTexture, frag.TexCoords).b;
 }
 
 int isLit()
 {
-	return int(texture(materialTexture, frag.TexCoords).b);
+	return int(texture(materialTexture, frag.TexCoords).a);
 }
 
 vec3 saturate(vec3 color)

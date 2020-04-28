@@ -39,8 +39,8 @@ void main()
 
 	material.r = texture(roughnessMap, texCoords).r;
 	material.g = texture(metallicMap, texCoords).r;
-	material.b = isLit;
-	material.a = texture(emissiveMap, texCoords).r;
+	material.b = texture(emissiveMap, texCoords).r;
+	material.a = isLit;
 }
 
 float getDepth(vec2 texCoords)
