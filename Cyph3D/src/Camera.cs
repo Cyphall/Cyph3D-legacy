@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using GLFW;
 using GlmSharp;
-using OpenGL;
 using Renderer.GLObject;
 using Renderer.Misc;
 
@@ -74,7 +71,7 @@ namespace Renderer
 
 			SphericalCoords = sphericalCoords;
 
-			Projection = mat4.Perspective(glm.Radians(80f), (float)Context.WindowSize.x / Context.WindowSize.y, 0.0001f, 1000f);
+			Projection = MathExt.Perspective(90, (float)Context.WindowSize.x / Context.WindowSize.y, 0.0001f, 1000f);
 
 			_winCenter = Context.WindowSize / 2;
 			Glfw.SetCursorPosition(Context.Window, _winCenter.x, _winCenter.y);

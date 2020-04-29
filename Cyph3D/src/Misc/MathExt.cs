@@ -35,5 +35,12 @@ namespace Renderer.Misc
 		{
 			return new vec3(r / 255f, g / 255f, b / 255f);
 		}
+
+		public static mat4 Perspective(float fovx, float aspect, float zNear, float zFar)
+		{
+			float fovy = 2.0f * glm.Atan(glm.Tan(glm.Radians(fovx) * 0.5f) / aspect);
+
+			return mat4.Perspective(fovy, aspect, zNear, zFar);
+		}
 	}
 }
