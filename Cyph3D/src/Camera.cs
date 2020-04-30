@@ -71,7 +71,7 @@ namespace Renderer
 
 			SphericalCoords = sphericalCoords;
 
-			Projection = MathExt.Perspective(90, (float)Context.WindowSize.x / Context.WindowSize.y, 0.0001f, 1000f);
+			Projection = MathExt.Perspective(100, (float)Context.WindowSize.x / Context.WindowSize.y, 0.0001f, 1000f);
 
 			_winCenter = Context.WindowSize / 2;
 			Glfw.SetCursorPosition(Context.Window, _winCenter.x, _winCenter.y);
