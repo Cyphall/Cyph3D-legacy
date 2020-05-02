@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Renderer.Misc
 {
-	public unsafe struct NativeArray<T> : IDisposable where T : unmanaged
+	public unsafe class NativeArray<T> : IDisposable where T : unmanaged
 	{
 		private readonly T* _array;
 		public uint Count { get; }
