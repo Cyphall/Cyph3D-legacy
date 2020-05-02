@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using GlmSharp;
 using OpenGL;
 using Renderer.GLObject;
-using Renderer.Misc;
 
 namespace Renderer
 {
@@ -95,14 +93,8 @@ namespace Renderer
 
 		private void LightingPass(vec3 viewPos)
 		{
-			int lightCount = Context.LightContainer.Count;
-			NativeArray<PointLight.Light> light = new NativeArray<PointLight.Light>(lightCount);
-			for (int i = 0; i < lightCount; i++)
-			{
-				light[i] = Context.LightContainer[i].GLLight;
-			}
-			_lightsBuffer.PutData(light);
-			light.Dispose();
+			if (Context.LightManager.PointLightsChanged)
+				_lightsBuffer.PutData(Context.LightManager.PointLightsNative);
 
 			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 
@@ -113,7 +105,6 @@ namespace Renderer
 			_lightingPassShader.SetValue("viewPos", viewPos);
 
 			_lightingPassShader.SetValue("debug", 0);
-			_lightingPassShader.SetValue("numLights", lightCount);
 
 			Gl.ActiveTexture(TextureUnit.Texture0);
 			_positionTexture.Bind();

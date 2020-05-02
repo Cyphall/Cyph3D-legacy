@@ -37,8 +37,8 @@ namespace Renderer
 			return vec3.Mix(higher, lower, new vec3(cutoff.x ? 1 : 0, cutoff.y ? 1 : 0, cutoff.z ? 1 : 0));
 		}
 
-		public Light GLLight =>
-			new Light
+		public NativePointLight GLLight =>
+			new NativePointLight
 			{
 				Pos = Transform.Position,
 				Color = _linearColor,
@@ -46,7 +46,7 @@ namespace Renderer
 			};
 
 		[StructLayout(LayoutKind.Explicit)]
-		public struct Light
+		public struct NativePointLight
 		{
 			[FieldOffset(0)] public vec3  Pos;
 			[FieldOffset(12)]public float Intensity;

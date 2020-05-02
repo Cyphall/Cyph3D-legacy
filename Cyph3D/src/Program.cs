@@ -39,7 +39,7 @@ namespace Renderer
 			Glfw.GetWindowSize(Context.Window, out winSize.x, out winSize.y);
 			Context.WindowSize = winSize;
 
-			Camera camera = TestCube();
+			Camera camera = Dungeon();
 
 			while (!Glfw.WindowShouldClose(window))
 			{
@@ -57,6 +57,7 @@ namespace Renderer
 				Glfw.SwapBuffers(window);
 			}
 
+			Context.LightManager.Dispose();
 			ShaderProgram.DisposeAll();
 			Shader.DisposeAll();
 			Texture.DisposeAll();
@@ -81,7 +82,7 @@ namespace Renderer
 				)
 			);
 			
-			Context.LightContainer.Add(
+			Context.LightManager.AddPointLight(
 				new PointLight(
 					new vec3(-0.29f, 0.6f, 10.19f),
 					MathExt.FromRGB(245, 243, 255),
@@ -89,7 +90,7 @@ namespace Renderer
 				)
 			);
 			
-			Context.LightContainer.Add(
+			Context.LightManager.AddPointLight(
 				new PointLight(
 					new vec3(-0.1f, 0.6f, 10.6f),
 					MathExt.FromRGB(245, 243, 255),
@@ -97,7 +98,7 @@ namespace Renderer
 				)
 			);
 			
-			Context.LightContainer.Add(
+			Context.LightManager.AddPointLight(
 				new PointLight(
 					new vec3(0.21f, 0.6f, 10.83f),
 					MathExt.FromRGB(245, 243, 255),
@@ -107,7 +108,7 @@ namespace Renderer
 			
 			for (int i = 0; i < 10; i++)
 			{
-				Context.LightContainer.Add(
+				Context.LightManager.AddPointLight(
 					new PointLight(
 						new vec3(0, 2.99f, -0.93f + i * 1.55f),
 						MathExt.FromRGB(222, 215, 188),
@@ -115,7 +116,7 @@ namespace Renderer
 					)
 				);
 			
-				Context.LightContainer.Add(
+				Context.LightManager.AddPointLight(
 					new PointLight(
 						new vec3(0, 2.99f, -0.62f + i * 1.55f),
 						MathExt.FromRGB(222, 215, 188),
@@ -131,10 +132,9 @@ namespace Renderer
 		{
 			Camera camera = new Camera(new vec3(-8, 1.8f, 0), new vec2(90, 0));
 			
-			Context.LightContainer.Add(
+			Context.LightManager.AddPointLight(
 				new PointLight(
 					new vec3(0, 2, 0),
-					// MathExt.FromRGB(0, 0, 255),
 					MathExt.FromRGB(255, 141, 35),
 					5f
 				)
@@ -143,7 +143,7 @@ namespace Renderer
 			Context.ObjectContainer.Add(
 				new RenderObject(
 					Material.GetOrLoad(
-						"Metals/CopperRock",
+						"Tiles/WallBrick",
 						true
 					),
 					Mesh.GetOrLoad("dungeon")
@@ -155,7 +155,7 @@ namespace Renderer
 
 		private static void TestQuat()
 		{
-			Context.LightContainer.Add(
+			Context.LightManager.AddPointLight(
 				new PointLight(
 					new vec3(0, 5, 8),
 					MathExt.FromRGB(255, 255, 255),
@@ -192,7 +192,7 @@ namespace Renderer
 		{
 			Camera camera = new Camera(new vec3(2, 0, -1), new vec2(-60, 0));
 			
-			Context.LightContainer.Add(
+			Context.LightManager.AddPointLight(
 				new PointLight(
 					new vec3(3, 2, 3),
 					MathExt.FromRGB(255, 255, 255),
@@ -203,7 +203,7 @@ namespace Renderer
 			Context.ObjectContainer.Add(
 				new RenderObject(
 					Material.GetOrLoad(
-						"Tiles/WallBrick",
+						"Metals/RustedMetal",
 						true
 					),
 					Mesh.GetOrLoad("simple_cube")
@@ -217,7 +217,7 @@ namespace Renderer
 		{
 			Camera camera = new Camera(new vec3(2, 0, -1), new vec2(-60, 0));
 			
-			Context.LightContainer.Add(
+			Context.LightManager.AddPointLight(
 				new PointLight(
 					new vec3(4, 2, 4),
 					MathExt.FromRGB(255, 255, 255),

@@ -100,12 +100,11 @@ void main()
 	vec3  color             = getColor();
 	float emissiveIntensity = getEmissive();
 
-//	vec3 totalDiffuseMetallic = saturate(color) * emissiveIntensity;
 	vec3 totalDiffuseNonMetallic = saturate(color) * emissiveIntensity;
 	vec3 totalSpecularMetallic = vec3(0);
 	vec3 totalSpecularNonMetallic = vec3(0);
 
-	for (int i = 0; i < numLights; i++)
+	for (int i = 0; i < lights.length(); i++)
 	{
 		vec3  lightDir       = normalize(lights[i].pos - fragPos);
 		float distance       = distance(lights[i].pos, fragPos);
@@ -116,7 +115,6 @@ void main()
 		// Diffuse calculation
 		float diffuseIntensity = max(dot(normal, lightDir), 0);
 
-//		vec3 diffuseMetallic = vec3(0);
 		vec3 diffuseNonMetallic = color * lightColor * lightIntensity * diffuseIntensity;
 
 		// Specular calculation
@@ -125,14 +123,12 @@ void main()
 		vec3 specularMetallic =  color * lightColor * lightIntensity * specularIntensity;
 		vec3 specularNonMetallic = lightColor * lightIntensity * specularIntensity * pow((1 - roughness) / 2 + 0.1, 4);
 
-//		totalDiffuseMetallic = max(totalDiffuseMetallic, diffuseMetallic);
 		totalDiffuseNonMetallic = max(totalDiffuseNonMetallic, diffuseNonMetallic);
 
 		totalSpecularMetallic += specularMetallic;
 		totalSpecularNonMetallic += specularNonMetallic;
 	}
 
-//	vec3 metallicPart = max(totalDiffuseMetallic, totalSpecularMetallic);
 	vec3 metallicPart = totalSpecularMetallic;
 	vec3 nonMetallicPart = max(totalDiffuseNonMetallic, totalSpecularNonMetallic);
 
