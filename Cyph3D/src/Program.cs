@@ -39,74 +39,7 @@ namespace Renderer
 			Glfw.GetWindowSize(Context.Window, out winSize.x, out winSize.y);
 			Context.WindowSize = winSize;
 
-			Camera camera = new Camera(new vec3(0, 1.5f, -3));
-			
-			Context.ObjectContainer.Add(
-				new RenderObject(
-					Material.GetOrLoad(
-						"LinkedToMesh/corridor",
-						true
-					),
-					Mesh.GetOrLoad("corridor"),
-					rotation: new vec3(0, 270, 0)
-				)
-			);
-			
-			// Context.ObjectContainer.Add(
-			// 	new RenderObject(
-			// 		Material.GetOrLoad(
-			// 			"Sun",
-			// 			false
-			// 		),
-			// 		Mesh.GetOrLoad("planet"),
-			// 		new vec3(0, 2.99f, -0.93f),
-			// 		scale: new vec3(0.01f)
-			// 	)
-			// );
-			
-			Context.LightContainer.Add(
-				new PointLight(
-					new vec3(-0.29f, 0.6f, 10.19f),
-					MathExt.FromRGB(245, 243, 255),
-					1f
-				)
-			);
-			
-			Context.LightContainer.Add(
-				new PointLight(
-					new vec3(-0.1f, 0.6f, 10.6f),
-					MathExt.FromRGB(245, 243, 255),
-					1f
-				)
-			);
-			
-			Context.LightContainer.Add(
-				new PointLight(
-					new vec3(0.21f, 0.6f, 10.83f),
-					MathExt.FromRGB(245, 243, 255),
-					1f
-				)
-			);
-
-			for (int i = 0; i < 10; i++)
-			{
-				Context.LightContainer.Add(
-					new PointLight(
-						new vec3(0, 2.99f, -0.93f + i * 1.55f),
-						MathExt.FromRGB(222, 215, 188),
-						0.2f
-					)
-				);
-			
-				Context.LightContainer.Add(
-					new PointLight(
-						new vec3(0, 2.99f, -0.62f + i * 1.55f),
-						MathExt.FromRGB(222, 215, 188),
-						0.2f
-					)
-				);
-			}
-
+			Camera camera = TestCube();
 
 			while (!Glfw.WindowShouldClose(window))
 			{
@@ -131,6 +64,178 @@ namespace Renderer
 			Framebuffer.DisposeAll();
 
 			Glfw.Terminate();
+		}
+
+		private static Camera Spaceship()
+		{
+			Camera camera = new Camera(new vec3(0, 1.5f, -3));
+			
+			Context.ObjectContainer.Add(
+				new RenderObject(
+					Material.GetOrLoad(
+						"LinkedToMesh/corridor",
+						true
+					),
+					Mesh.GetOrLoad("corridor"),
+					rotation: new vec3(0, 270, 0)
+				)
+			);
+			
+			Context.LightContainer.Add(
+				new PointLight(
+					new vec3(-0.29f, 0.6f, 10.19f),
+					MathExt.FromRGB(245, 243, 255),
+					1f
+				)
+			);
+			
+			Context.LightContainer.Add(
+				new PointLight(
+					new vec3(-0.1f, 0.6f, 10.6f),
+					MathExt.FromRGB(245, 243, 255),
+					1f
+				)
+			);
+			
+			Context.LightContainer.Add(
+				new PointLight(
+					new vec3(0.21f, 0.6f, 10.83f),
+					MathExt.FromRGB(245, 243, 255),
+					1f
+				)
+			);
+			
+			for (int i = 0; i < 10; i++)
+			{
+				Context.LightContainer.Add(
+					new PointLight(
+						new vec3(0, 2.99f, -0.93f + i * 1.55f),
+						MathExt.FromRGB(222, 215, 188),
+						0.2f
+					)
+				);
+			
+				Context.LightContainer.Add(
+					new PointLight(
+						new vec3(0, 2.99f, -0.62f + i * 1.55f),
+						MathExt.FromRGB(222, 215, 188),
+						0.2f
+					)
+				);
+			}
+
+			return camera;
+		}
+		
+		private static Camera Dungeon()
+		{
+			Camera camera = new Camera(new vec3(-8, 1.8f, 0), new vec2(90, 0));
+			
+			Context.LightContainer.Add(
+				new PointLight(
+					new vec3(0, 2, 0),
+					// MathExt.FromRGB(0, 0, 255),
+					MathExt.FromRGB(255, 141, 35),
+					5f
+				)
+			);
+			
+			Context.ObjectContainer.Add(
+				new RenderObject(
+					Material.GetOrLoad(
+						"Metals/CopperRock",
+						true
+					),
+					Mesh.GetOrLoad("dungeon")
+				)
+			);
+
+			return camera;
+		}
+
+		private static void TestQuat()
+		{
+			Context.LightContainer.Add(
+				new PointLight(
+					new vec3(0, 5, 8),
+					MathExt.FromRGB(255, 255, 255),
+					10f
+				)
+			);
+			
+			Context.ObjectContainer.Add(
+				new RenderObject(
+					Material.GetOrLoad(
+						"Tiles/ModernTiles",
+						true
+					),
+					Mesh.GetOrLoad("Tiles32_cube"),
+					position: new vec3(0, -18, 0),
+					scale: new vec3(16)
+				)
+			);
+			
+			Context.ObjectContainer.Add(
+				new RenderObject(
+					Material.GetOrLoad(
+						"Sun",
+						false
+					),
+					Mesh.GetOrLoad("simple_cube"),
+					rotation: new vec3(0, 0, 45),
+					angularVelocity: new vec3(30f, 0, 0)
+				)
+			);
+		}
+		
+		private static Camera TestCube()
+		{
+			Camera camera = new Camera(new vec3(2, 0, -1), new vec2(-60, 0));
+			
+			Context.LightContainer.Add(
+				new PointLight(
+					new vec3(3, 2, 3),
+					MathExt.FromRGB(255, 255, 255),
+					10f
+				)
+			);
+			
+			Context.ObjectContainer.Add(
+				new RenderObject(
+					Material.GetOrLoad(
+						"Tiles/WallBrick",
+						true
+					),
+					Mesh.GetOrLoad("simple_cube")
+				)
+			);
+
+			return camera;
+		}
+		
+		private static Camera TestSphere()
+		{
+			Camera camera = new Camera(new vec3(2, 0, -1), new vec2(-60, 0));
+			
+			Context.LightContainer.Add(
+				new PointLight(
+					new vec3(4, 2, 4),
+					MathExt.FromRGB(255, 255, 255),
+					10f
+				)
+			);
+			
+			Context.ObjectContainer.Add(
+				new RenderObject(
+					Material.GetOrLoad(
+						"Metals/OrnateBrass",
+						true
+					),
+					Mesh.GetOrLoad("Tiles32_cube")
+				)
+			);
+
+			return camera;
 		}
 	}
 }
