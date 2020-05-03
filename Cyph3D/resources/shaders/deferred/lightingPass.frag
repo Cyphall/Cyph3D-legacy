@@ -107,6 +107,7 @@ void main()
 	vec3  color             = getColor();
 	float emissiveIntensity = getEmissive();
 
+	vec3 totalDiffuseMetallic = saturate(color) * emissiveIntensity;
 	vec3 totalDiffuseNonMetallic = saturate(color) * emissiveIntensity;
 	vec3 totalSpecularMetallic = vec3(0);
 	vec3 totalSpecularNonMetallic = vec3(0);
@@ -136,7 +137,7 @@ void main()
 		totalSpecularNonMetallic += specularNonMetallic;
 	}
 
-	vec3 metallicPart = totalSpecularMetallic;
+	vec3 metallicPart = max(totalDiffuseMetallic, totalSpecularMetallic);
 	vec3 nonMetallicPart = max(totalDiffuseNonMetallic, totalSpecularNonMetallic);
 
 	vec3 HDRColor = metallicPart * metalness + nonMetallicPart * (1 - metalness);
