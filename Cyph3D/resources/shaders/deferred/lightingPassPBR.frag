@@ -30,12 +30,14 @@ uniform sampler2D materialTexture;
 uniform sampler2D depthTexture;
 
 uniform int debug;
-uniform int numLights;
 
 /* ------ outputs ------ */
 out vec4 out_Color;
 
 /* ------ function declarations ------ */
+vec4 debugView();
+vec4 lighting();
+
 vec3 getPosition();
 vec3 getColor();
 vec3 getNormal();
@@ -45,62 +47,67 @@ float getEmissive();
 float getDepth();
 int isLit();
 
+vec3 saturate(vec3 color);
+vec3 toSRGB(vec3 linear);
+vec4 reinhard_tone_mapping(vec3 hdrColor);
+
 float DistributionGGX(vec3 N, vec3 H, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec3 fresnelSchlick(float cosTheta, vec3 F0);
-
-vec3 saturate(vec3 color);
-vec3 toSRGB(vec3 linear);
-vec4 reinhard_tone_mapping(vec3 hdrColor);
 
 /* ------ code ------ */
 void main()
 {
 	if (debug == 1)
 	{
-		vec2 texCoords = frag.TexCoords;
-		if (texCoords.x >= 0.5 && texCoords.y >= 0.5)
-		{
-			texCoords.x = (texCoords.x - 0.5) * 2;
-			texCoords.y = (texCoords.y - 0.5) * 2;
-			out_Color = texture(positionTexture, texCoords);
-			return;
-		}
-		else if (texCoords.x >= 0.5 && texCoords.y < 0.5)
-		{
-			texCoords.x = (texCoords.x - 0.5) * 2;
-			texCoords.y = texCoords.y * 2;
-			out_Color = texture(normalTexture, texCoords);
-			return;
-		}
-		else if (texCoords.x < 0.5 && texCoords.y >= 0.5)
-		{
-			texCoords.x = texCoords.x * 2;
-			texCoords.y = (texCoords.y - 0.5) * 2;
-			out_Color = reinhard_tone_mapping(texture(colorTexture, texCoords).rgb);
-			return;
-		}
-		else if (texCoords.x < 0.5 && texCoords.y < 0.5)
-		{
-			texCoords.x = texCoords.x * 2;
-			texCoords.y = texCoords.y * 2;
-			out_Color = texture(materialTexture, texCoords);
-			return;
-		}
+		out_Color = debugView();
 	}
-	
-	if (getDepth() == 1)
+	else if (getDepth() == 1)
 	{
 		discard;
 	}
-
-	if (isLit() == 0)
+	else if (isLit() == 0)
 	{
 		out_Color = reinhard_tone_mapping(getColor());
-		return;
 	}
+	else
+	{
+		out_Color = lighting();
+	}
+}
 
+vec4 debugView()
+{
+	vec2 texCoords = frag.TexCoords;
+	if (texCoords.x >= 0.5 && texCoords.y >= 0.5)
+	{
+		texCoords.x = (texCoords.x - 0.5) * 2;
+		texCoords.y = (texCoords.y - 0.5) * 2;
+		return texture(positionTexture, texCoords);
+	}
+	else if (texCoords.x >= 0.5 && texCoords.y < 0.5)
+	{
+		texCoords.x = (texCoords.x - 0.5) * 2;
+		texCoords.y = texCoords.y * 2;
+		return texture(normalTexture, texCoords);
+	}
+	else if (texCoords.x < 0.5 && texCoords.y >= 0.5)
+	{
+		texCoords.x = texCoords.x * 2;
+		texCoords.y = (texCoords.y - 0.5) * 2;
+		return reinhard_tone_mapping(texture(colorTexture, texCoords).rgb);
+	}
+	else
+	{
+		texCoords.x = texCoords.x * 2;
+		texCoords.y = texCoords.y * 2;
+		return texture(materialTexture, texCoords);
+	}
+}
+
+vec4 lighting()
+{
 	// setup
 	vec3  fragPos           = getPosition();
 	vec3  viewDir           = normalize(frag.ViewPos - fragPos);
@@ -142,8 +149,8 @@ void main()
 		float NdotL = max(dot(normal, L), 0.0);
 		Lo += (kD * color / PI + specular) * radiance * NdotL;
 	}
-	
-	out_Color = reinhard_tone_mapping(max(Lo, saturate(color) * emissiveIntensity));
+
+	return reinhard_tone_mapping(max(Lo, saturate(color) * emissiveIntensity));
 }
 
 vec3 getPosition()
@@ -192,6 +199,26 @@ vec3 saturate(vec3 color)
 	return color / highest;
 }
 
+vec3 toSRGB(vec3 linear)
+{
+	bvec3 cutoff = lessThan(linear, vec3(0.0031308));
+	vec3 higher = vec3(1.055) * pow(linear, vec3(1.0/2.4)) - vec3(0.055);
+	vec3 lower = linear * vec3(12.92);
+
+	return mix(higher, lower, cutoff);
+}
+
+vec4 reinhard_tone_mapping(vec3 color)
+{
+	float exposure = 2;
+	color *= exposure/(1. + color / exposure);
+
+	// sRGB correction
+	color = toSRGB(color);
+
+	return vec4(color, 1);
+}
+
 // Normal Distribution Function
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
@@ -232,24 +259,4 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
 	return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
-}
-
-vec3 toSRGB(vec3 linear)
-{
-	bvec3 cutoff = lessThan(linear, vec3(0.0031308));
-	vec3 higher = vec3(1.055) * pow(linear, vec3(1.0/2.4)) - vec3(0.055);
-	vec3 lower = linear * vec3(12.92);
-
-	return mix(higher, lower, cutoff);
-}
-
-vec4 reinhard_tone_mapping(vec3 color)
-{
-	float exposure = 2;
-	color *= exposure/(1. + color / exposure);
-
-	// sRGB correction
-	color = toSRGB(color);
-
-	return vec4(color, 1);
 }

@@ -2,7 +2,6 @@
 
 /* ------ consts ------ */
 const float PI = 3.14159265359;
-const float HALF_PI = 1.57079632679;
 
 /* ------ inputs from vertex shader ------ */
 in FRAG {
@@ -31,12 +30,14 @@ uniform sampler2D materialTexture;
 uniform sampler2D depthTexture;
 
 uniform int debug;
-uniform int numLights;
 
 /* ------ outputs ------ */
 out vec4 out_Color;
 
 /* ------ function declarations ------ */
+vec4 debugView();
+vec4 lighting();
+
 vec3 getPosition();
 vec3 getColor();
 vec3 getNormal();
@@ -45,59 +46,65 @@ float getMetallic();
 float getEmissive();
 float getDepth();
 int isLit();
-vec3 saturate(vec3 color);
 
-float DistributionGGX(vec3 N, vec3 H, float roughness);
+vec3 saturate(vec3 color);
 vec3 toSRGB(vec3 linear);
 vec4 reinhard_tone_mapping(vec3 hdrColor);
+
+float DistributionGGX(vec3 N, vec3 H, float roughness);
 
 /* ------ code ------ */
 void main()
 {
 	if (debug == 1)
 	{
-		vec2 texCoords = frag.TexCoords;
-		if (texCoords.x >= 0.5 && texCoords.y >= 0.5)
-		{
-			texCoords.x = (texCoords.x - 0.5) * 2;
-			texCoords.y = (texCoords.y - 0.5) * 2;
-			out_Color = texture(positionTexture, texCoords);
-			return;
-		}
-		else if (texCoords.x >= 0.5 && texCoords.y < 0.5)
-		{
-			texCoords.x = (texCoords.x - 0.5) * 2;
-			texCoords.y = texCoords.y * 2;
-			out_Color = texture(normalTexture, texCoords);
-			return;
-		}
-		else if (texCoords.x < 0.5 && texCoords.y >= 0.5)
-		{
-			texCoords.x = texCoords.x * 2;
-			texCoords.y = (texCoords.y - 0.5) * 2;
-			out_Color = reinhard_tone_mapping(texture(colorTexture, texCoords).rgb);
-			return;
-		}
-		else if (texCoords.x < 0.5 && texCoords.y < 0.5)
-		{
-			texCoords.x = texCoords.x * 2;
-			texCoords.y = texCoords.y * 2;
-			out_Color = texture(materialTexture, texCoords);
-			return;
-		}
+		out_Color = debugView();
 	}
-	
-	if (getDepth() == 1)
+	else if (getDepth() == 1)
 	{
 		discard;
 	}
-
-	if (isLit() == 0)
+	else if (isLit() == 0)
 	{
 		out_Color = reinhard_tone_mapping(getColor());
-		return;
 	}
+	else
+	{
+		out_Color = lighting();
+	}
+}
 
+vec4 debugView()
+{
+	vec2 texCoords = frag.TexCoords;
+	if (texCoords.x >= 0.5 && texCoords.y >= 0.5)
+	{
+		texCoords.x = (texCoords.x - 0.5) * 2;
+		texCoords.y = (texCoords.y - 0.5) * 2;
+		return texture(positionTexture, texCoords);
+	}
+	else if (texCoords.x >= 0.5 && texCoords.y < 0.5)
+	{
+		texCoords.x = (texCoords.x - 0.5) * 2;
+		texCoords.y = texCoords.y * 2;
+		return texture(normalTexture, texCoords);
+	}
+	else if (texCoords.x < 0.5 && texCoords.y >= 0.5)
+	{
+		texCoords.x = texCoords.x * 2;
+		texCoords.y = (texCoords.y - 0.5) * 2;
+		return reinhard_tone_mapping(texture(colorTexture, texCoords).rgb);
+	}
+	else
+	{
+		texCoords.x = texCoords.x * 2;
+		texCoords.y = texCoords.y * 2;
+		return texture(materialTexture, texCoords);
+	}
+}
+
+vec4 lighting()
+{
 	// setup
 	vec3  fragPos           = getPosition();
 	vec3  viewDir           = normalize(frag.ViewPos - fragPos);
@@ -142,7 +149,7 @@ void main()
 
 	vec3 HDRColor = metallicPart * metalness + nonMetallicPart * (1 - metalness);
 
-	out_Color = reinhard_tone_mapping(HDRColor);
+	return reinhard_tone_mapping(HDRColor);
 }
 
 vec3 getPosition()
@@ -191,20 +198,6 @@ vec3 saturate(vec3 color)
 	return color / highest;
 }
 
-float DistributionGGX(vec3 N, vec3 H, float roughness)
-{
-	float a      = roughness*roughness;
-	float a2     = a*a;
-	float NdotH  = max(dot(N, H), 0.0);
-	float NdotH2 = NdotH*NdotH;
-
-	float num   = a2;
-	float denom = (NdotH2 * (a2 - 1.0) + 1.0);
-	denom = PI * denom * denom;
-
-	return num / denom;
-}
-
 vec3 toSRGB(vec3 linear)
 {
 	bvec3 cutoff = lessThan(linear, vec3(0.0031308));
@@ -223,4 +216,18 @@ vec4 reinhard_tone_mapping(vec3 color)
 	color = toSRGB(color);
 
 	return vec4(color, 1);
+}
+
+float DistributionGGX(vec3 N, vec3 H, float roughness)
+{
+	float a      = roughness*roughness;
+	float a2     = a*a;
+	float NdotH  = max(dot(N, H), 0.0);
+	float NdotH2 = NdotH*NdotH;
+
+	float num   = a2;
+	float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+	denom = PI * denom * denom;
+
+	return num / denom;
 }
