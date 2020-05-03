@@ -28,6 +28,7 @@ uniform sampler2D positionTexture;
 uniform sampler2D normalTexture;
 uniform sampler2D colorTexture;
 uniform sampler2D materialTexture;
+uniform sampler2D depthTexture;
 
 uniform int debug;
 uniform int numLights;
@@ -42,6 +43,7 @@ vec3 getNormal();
 float getRoughness();
 float getMetallic();
 float getEmissive();
+float getDepth();
 int isLit();
 vec3 saturate(vec3 color);
 
@@ -83,6 +85,11 @@ void main()
 			out_Color = texture(materialTexture, texCoords);
 			return;
 		}
+	}
+	
+	if (getDepth() == 1)
+	{
+		discard;
 	}
 
 	if (isLit() == 0)
@@ -165,6 +172,11 @@ float getMetallic()
 float getEmissive()
 {
 	return texture(materialTexture, frag.TexCoords).b;
+}
+
+float getDepth()
+{
+	return texture(depthTexture, frag.TexCoords).r;
 }
 
 int isLit()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using GlmSharp;
 using OpenGL;
+using Renderer.Enum;
 using Renderer.Misc;
 using StbImageSharp;
 
@@ -15,7 +16,7 @@ namespace Renderer.GLObject
 		
 		private static HashSet<Texture> _textures = new HashSet<Texture>();
 
-		public Texture(ivec2 size, InternalFormat internalFormat, Filtering filtering = Filtering.Nearest)
+		public Texture(ivec2 size, InternalFormat internalFormat, TextureFiltering filtering = TextureFiltering.Nearest)
 		{
 			_size = size;
 			
@@ -24,15 +25,15 @@ namespace Renderer.GLObject
 
 			int finteringRaw = filtering switch
 			{
-				Filtering.Linear => Gl.LINEAR,
-				Filtering.Nearest => Gl.NEAREST,
+				TextureFiltering.Linear => Gl.LINEAR,
+				TextureFiltering.Nearest => Gl.NEAREST,
 				_ => throw new ArgumentOutOfRangeException(nameof(filtering), filtering, null)
 			};
 			
 			Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, finteringRaw);
 			Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, finteringRaw);
 			
-			Gl.TexImage2D(TextureTarget.Texture2d, 0, internalFormat, size.x, size.y, 0, PixelFormat.Rgb, PixelType.UnsignedByte, IntPtr.Zero);
+			Gl.TexStorage2D(TextureTarget.Texture2d, 1, internalFormat, size.x, size.y);
 
 			_textures.Add(this);
 		}
@@ -96,19 +97,19 @@ namespace Renderer.GLObject
 			{
 				case ColorComponents.Grey:
 					pixelFormat = PixelFormat.Luminance;
-					internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Rgb;
+					internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Rgb8;
 					break;
 				case ColorComponents.GreyAlpha:
 					pixelFormat = PixelFormat.LuminanceAlpha;
-					internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba;
+					internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba8;
 					break;
 				case ColorComponents.RedGreenBlue:
 					pixelFormat = PixelFormat.Rgb;
-					internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Rgb;
+					internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Rgb8;
 					break;
 				case ColorComponents.RedGreenBlueAlpha:
 					pixelFormat = PixelFormat.Rgba;
-					internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba;
+					internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba8;
 					break;
 				default:
 					throw new NotSupportedException($"The colors format {image.Comp} is not supported");
@@ -116,7 +117,7 @@ namespace Renderer.GLObject
 
 			ivec2 size = new ivec2(image.Width, image.Height);
 			
-			Texture texture = new Texture(size, internalFormat, Filtering.Linear);
+			Texture texture = new Texture(size, internalFormat, TextureFiltering.Linear);
 			texture.PutData(image.Data, pixelFormat);
 
 			Logger.Info($"Texture \"{name}\" loaded");
@@ -127,12 +128,6 @@ namespace Renderer.GLObject
 		static Texture()
 		{
 			StbImage.stbi_set_flip_vertically_on_load(Gl.TRUE);
-		}
-
-		public enum Filtering
-		{
-			Linear,
-			Nearest
 		}
 	}
 }

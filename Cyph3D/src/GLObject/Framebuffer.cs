@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GlmSharp;
 using OpenGL;
+using Renderer.Enum;
 
 namespace Renderer.GLObject
 {
@@ -58,12 +59,12 @@ namespace Renderer.GLObject
 			_framebuffers.Add(this);
 		}
 
-		public Texture AddTexture(FramebufferAttachment attachment, InternalFormat internalFormat)
+		public Texture AddTexture(FramebufferAttachment attachment, InternalFormat internalFormat, TextureFiltering filtering = TextureFiltering.Nearest)
 		{
 			uint previousFramebuffer = CurrentlyBound;
 			Bind();
 
-			Texture texture = new Texture(_size, internalFormat);
+			Texture texture = new Texture(_size, internalFormat, filtering);
 			
 			Gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, attachment, TextureTarget.Texture2d, texture, 0);
 			

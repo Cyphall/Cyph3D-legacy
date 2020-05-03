@@ -43,35 +43,35 @@ namespace Renderer.GLObject
 			_normalMap = Texture.FromFile($"{name}/nrm");
 			if (_normalMap == null)
 			{
-				_normalMap = new Texture(new ivec2(1), InternalFormat.Rgb);
+				_normalMap = new Texture(new ivec2(1), InternalFormat.Rgb8);
 				_normalMap.PutData(new byte[]{128, 128, 255});
 			}
 			
 			_roughnessMap = Texture.FromFile($"{name}/rgh");
 			if (_roughnessMap == null)
 			{
-				_roughnessMap = new Texture(new ivec2(1), InternalFormat.Rgb);
+				_roughnessMap = new Texture(new ivec2(1), InternalFormat.Rgb8);
 				_roughnessMap.PutData(new byte[]{128}, PixelFormat.Luminance);
 			}
 			
 			_displacementMap = Texture.FromFile($"{name}/disp");
 			if (_displacementMap == null)
 			{
-				_displacementMap = new Texture(new ivec2(1), InternalFormat.Rgb);
+				_displacementMap = new Texture(new ivec2(1), InternalFormat.Rgb8);
 				_displacementMap.PutData(new byte[]{255}, PixelFormat.Luminance);
 			}
 			
 			_metallicMap = Texture.FromFile($"{name}/met");
 			if (_metallicMap == null)
 			{
-				_metallicMap = new Texture(new ivec2(1), InternalFormat.Rgb);
+				_metallicMap = new Texture(new ivec2(1), InternalFormat.Rgb8);
 				_metallicMap.PutData(new byte[]{0, 0, 0});
 			}
 			
 			_emissiveMap = Texture.FromFile($"{name}/emis");
 			if (_emissiveMap == null)
 			{
-				_emissiveMap = new Texture(new ivec2(1), InternalFormat.Rgb);
+				_emissiveMap = new Texture(new ivec2(1), InternalFormat.Rgb8);
 				_emissiveMap.PutData(new byte[]{0, 0, 0});
 			}
 

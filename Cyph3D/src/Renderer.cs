@@ -1,6 +1,7 @@
 ﻿using System;
 using GlmSharp;
 using OpenGL;
+using Renderer.Enum;
 using Renderer.GLObject;
 
 namespace Renderer
@@ -12,18 +13,19 @@ namespace Renderer
 		private Texture _normalTexture;
 		private Texture _colorTexture;
 		private Texture _materialTexture;
+		private Texture _depthTexture;
 		private uint _quadVAO;
 		private ShaderProgram _lightingPassShader;
 		private ShaderStorageBuffer _lightsBuffer;
 
 		public Renderer()
 		{
-			_gbuffer = new Framebuffer(out _positionTexture, Context.WindowSize, (InternalFormat) 34837); // 34837 = RGB32F
-			_normalTexture = _gbuffer.AddTexture(FramebufferAttachment.ColorAttachment1, InternalFormat.Rgb);
+			_gbuffer = new Framebuffer(out _positionTexture, Context.WindowSize, (InternalFormat) Gl.RGB32F);
+			_normalTexture = _gbuffer.AddTexture(FramebufferAttachment.ColorAttachment1, InternalFormat.Rgb8);
 			_colorTexture = _gbuffer.AddTexture(FramebufferAttachment.ColorAttachment2, InternalFormat.Rgb16f);
-			_materialTexture = _gbuffer.AddTexture(FramebufferAttachment.ColorAttachment3, InternalFormat.Rgba);
-			_gbuffer.AddRenderbuffer(FramebufferAttachment.DepthAttachment, InternalFormat.DepthComponent);
-
+			_materialTexture = _gbuffer.AddTexture(FramebufferAttachment.ColorAttachment3, InternalFormat.Rgba8);
+			_depthTexture = _gbuffer.AddTexture(FramebufferAttachment.DepthAttachment, InternalFormat.DepthComponent24, TextureFiltering.Linear);
+			
 			_gbuffer.SetDrawBuffers(
 				FramebufferAttachment.ColorAttachment0,
 				FramebufferAttachment.ColorAttachment1,
@@ -67,6 +69,7 @@ namespace Renderer
 			_lightingPassShader.SetValue("normalTexture", 1);
 			_lightingPassShader.SetValue("colorTexture", 2);
 			_lightingPassShader.SetValue("materialTexture", 3);
+			_lightingPassShader.SetValue("depthTexture", 4);
 			
 			
 			_lightsBuffer = new ShaderStorageBuffer(0);
@@ -114,6 +117,8 @@ namespace Renderer
 			_colorTexture.Bind();
 			Gl.ActiveTexture(TextureUnit.Texture3);
 			_materialTexture.Bind();
+			Gl.ActiveTexture(TextureUnit.Texture4);
+			_depthTexture.Bind();
 
 			Gl.BindVertexArray(_quadVAO);
 
