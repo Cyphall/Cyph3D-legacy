@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using GLFW;
 using GlmSharp;
@@ -25,6 +25,7 @@ namespace Renderer
 			Glfw.WindowHint(Hint.OpenglDebugContext, true);
 			Glfw.WindowHint(Hint.DepthBits, 0);
 			Glfw.WindowHint(Hint.StencilBits, 0);
+			Glfw.WindowHint(Hint.OpenglProfile, Profile.Core);
 
 			VideoMode mode = Glfw.GetVideoMode(Glfw.PrimaryMonitor);
 			Window window = Glfw.CreateWindow(mode.Width, mode.Height, "Renderer", Glfw.PrimaryMonitor, Window.None);
