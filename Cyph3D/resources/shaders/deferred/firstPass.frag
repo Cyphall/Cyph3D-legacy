@@ -28,7 +28,7 @@ vec2 POM(vec2 texCoords, vec3 viewDir);
 
 void main()
 {
-	vec2 texCoords = POM(frag.TexCoords, frag.WorldToTangent * normalize(viewPos - frag.FragPos));
+	vec2 texCoords = POM(frag.TexCoords, normalize(frag.WorldToTangent * (viewPos - frag.FragPos)));
 
 	color = texture(colorMap, texCoords).rgb;
 	
@@ -55,6 +55,8 @@ vec2 POM(vec2 texCoords, vec3 viewDir)
 	const int   minLayerCount        = 4;
 	const int   maxLayerCount        = 8;
 	const int   resamplingLoopCount  = 6;
+	
+	if (viewDir.z <= 0) discard;
 
 	int layerCount = int(mix(maxLayerCount, minLayerCount, max(dot(vec3(0, 0, 1), viewDir), 0)));
 	
