@@ -63,7 +63,7 @@ namespace Renderer
 			Gl.VertexAttribPointer(1, 2, VertexAttribType.Float, false, 4 * sizeof(float), (IntPtr) (2 * sizeof(float)));
 
 
-			_lightingPassShader = ShaderProgram.Get("deferred/lightingPass");
+			_lightingPassShader = ShaderProgram.Get("deferred/lightingPassPBR");
 
 			_lightingPassShader.SetValue("positionTexture", 0);
 			_lightingPassShader.SetValue("normalTexture", 1);
