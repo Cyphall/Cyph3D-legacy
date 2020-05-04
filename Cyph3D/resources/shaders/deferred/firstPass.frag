@@ -3,6 +3,7 @@
 in FRAG {
 	vec2 TexCoords;
 	mat3 TangentToWorld;
+	mat3 WorldToTangent;
 	vec3 FragPos;
 } frag;
 
@@ -27,7 +28,7 @@ vec2 POM(vec2 texCoords, vec3 viewDir);
 
 void main()
 {
-	vec2 texCoords = POM(frag.TexCoords, transpose(frag.TangentToWorld) * normalize(viewPos - frag.FragPos));
+	vec2 texCoords = POM(frag.TexCoords, frag.WorldToTangent * normalize(viewPos - frag.FragPos));
 
 	color = texture(colorMap, texCoords).rgb;
 	
@@ -50,10 +51,13 @@ float getDepth(vec2 texCoords)
 
 vec2 POM(vec2 texCoords, vec3 viewDir)
 {
-	const float depthScale           = 0.1;
-	const int   layerCount           = 16;
+	const float depthScale           = 0.05;
+	const int   minLayerCount        = 2;
+	const int   maxLayerCount        = 8;
 	const int   resamplingLoopCount  = 4;
 
+	int layerCount = int(mix(maxLayerCount, minLayerCount, max(dot(vec3(0, 0, 1), viewDir), 0)));
+	
 	// Initial sampling pass
 	vec2 currentTexCoords = texCoords;
 
@@ -85,8 +89,8 @@ vec2 POM(vec2 texCoords, vec3 viewDir)
 
 	for (int i = 0; i < resamplingLoopCount; i++)
 	{
-		texCoordsStepOffset /= 2;
-		depthStepOffset /= 2;
+		texCoordsStepOffset *= 0.5;
+		depthStepOffset *= 0.5;
 
 		vec2  halfwayTexCoords = previousTexCoords + texCoordsStepOffset;
 		float halfwayTexDepth  = getDepth(halfwayTexCoords);
@@ -109,7 +113,7 @@ vec2 POM(vec2 texCoords, vec3 viewDir)
 
 	// Interpolation
 	float afterDepth  = currentTexDepth - currentDepth;
-	float beforeDepth = getDepth(previousTexCoords) - currentDepth + depthStepOffset;
+	float beforeDepth = previousTexDepth - currentDepth + depthStepOffset;
 
 	float weight = afterDepth / (afterDepth - beforeDepth);
 	texCoords = previousTexCoords * weight + currentTexCoords * (1.0 - weight);

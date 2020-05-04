@@ -33,10 +33,10 @@ namespace Renderer.GLObject
 			_shaderProgram.SetValue("metallicMap", 4);
 			_shaderProgram.SetValue("emissiveMap", 5);
 
-			_colorMap = Texture.FromFile($"{name}/col", true);
+			_colorMap = Texture.FromFile($"{name}/col", true, true);
 			if (_colorMap == null)
 			{
-				_colorMap = new Texture(new ivec2(1), InternalFormat.Srgb8);
+				_colorMap = new Texture(new ivec2(1), InternalFormat.CompressedSrgbS3tcDxt1Ext);
 				_colorMap.PutData(new byte[]{255, 0, 255});
 			}
 			
@@ -47,31 +47,31 @@ namespace Renderer.GLObject
 				_normalMap.PutData(new byte[]{128, 128, 255});
 			}
 			
-			_roughnessMap = Texture.FromFile($"{name}/rgh");
+			_roughnessMap = Texture.FromFile($"{name}/rgh", compressed: true);
 			if (_roughnessMap == null)
 			{
-				_roughnessMap = new Texture(new ivec2(1), InternalFormat.Rgb8);
+				_roughnessMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext);
 				_roughnessMap.PutData(new byte[]{128}, PixelFormat.Luminance);
 			}
 			
-			_displacementMap = Texture.FromFile($"{name}/disp");
+			_displacementMap = Texture.FromFile($"{name}/disp", compressed: true);
 			if (_displacementMap == null)
 			{
-				_displacementMap = new Texture(new ivec2(1), InternalFormat.Rgb8);
+				_displacementMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext);
 				_displacementMap.PutData(new byte[]{255}, PixelFormat.Luminance);
 			}
 			
-			_metallicMap = Texture.FromFile($"{name}/met");
+			_metallicMap = Texture.FromFile($"{name}/met", compressed: true);
 			if (_metallicMap == null)
 			{
-				_metallicMap = new Texture(new ivec2(1), InternalFormat.Rgb8);
+				_metallicMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext);
 				_metallicMap.PutData(new byte[]{0, 0, 0});
 			}
 			
-			_emissiveMap = Texture.FromFile($"{name}/emis");
+			_emissiveMap = Texture.FromFile($"{name}/emis", compressed: true);
 			if (_emissiveMap == null)
 			{
-				_emissiveMap = new Texture(new ivec2(1), InternalFormat.Rgb8);
+				_emissiveMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext);
 				_emissiveMap.PutData(new byte[]{0, 0, 0});
 			}
 

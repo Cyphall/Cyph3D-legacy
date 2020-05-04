@@ -66,7 +66,7 @@ namespace Renderer.GLObject
 			Gl.BindTexture(TextureTarget.Texture2d, _ID);
 		}
 		
-		public static Texture FromFile(string name, bool sRGB = false)
+		public static Texture FromFile(string name, bool sRGB = false, bool compressed = false)
 		{
 			Logger.Info($"Loading texture \"{name}\"");
 			
@@ -97,19 +97,31 @@ namespace Renderer.GLObject
 			{
 				case ColorComponents.Grey:
 					pixelFormat = PixelFormat.Luminance;
-					internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Rgb8;
+					if (compressed)
+						internalFormat = sRGB ? InternalFormat.CompressedSrgbS3tcDxt1Ext : InternalFormat.CompressedRedRgtc1;
+					else
+						internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Red;
 					break;
 				case ColorComponents.GreyAlpha:
 					pixelFormat = PixelFormat.LuminanceAlpha;
-					internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba8;
+					if (compressed)
+						internalFormat = sRGB ? InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext : InternalFormat.CompressedRgbaS3tcDxt5Ext;
+					else
+						internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba8;
 					break;
 				case ColorComponents.RedGreenBlue:
 					pixelFormat = PixelFormat.Rgb;
-					internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Rgb8;
+					if (compressed)
+						internalFormat = sRGB ? InternalFormat.CompressedSrgbS3tcDxt1Ext : InternalFormat.CompressedRgbS3tcDxt1Ext;
+					else
+						internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Rgb8;
 					break;
 				case ColorComponents.RedGreenBlueAlpha:
 					pixelFormat = PixelFormat.Rgba;
-					internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba8;
+					if (compressed)
+						internalFormat = sRGB ? InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext : InternalFormat.CompressedRgbaS3tcDxt5Ext;
+					else
+						internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba8;
 					break;
 				default:
 					throw new NotSupportedException($"The colors format {image.Comp} is not supported");
