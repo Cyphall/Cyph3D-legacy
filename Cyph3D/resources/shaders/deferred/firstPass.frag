@@ -52,9 +52,9 @@ float getDepth(vec2 texCoords)
 vec2 POM(vec2 texCoords, vec3 viewDir)
 {
 	const float depthScale           = 0.05;
-	const int   minLayerCount        = 2;
+	const int   minLayerCount        = 4;
 	const int   maxLayerCount        = 8;
-	const int   resamplingLoopCount  = 4;
+	const int   resamplingLoopCount  = 6;
 
 	int layerCount = int(mix(maxLayerCount, minLayerCount, max(dot(vec3(0, 0, 1), viewDir), 0)));
 	
