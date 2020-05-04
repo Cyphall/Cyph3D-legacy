@@ -131,13 +131,13 @@ namespace Renderer
 		
 		private static Camera Dungeon()
 		{
-			Camera camera = new Camera(new vec3(-8, 1.8f, 0), new vec2(90, 0));
+			Camera camera = new Camera(new vec3(-12, 1.8f, 0), new vec2(90, 0));
 			
 			Context.LightManager.AddPointLight(
 				new PointLight(
-					new vec3(0, 2, 0),
+					new vec3(0, 1.5f, 0),
 					MathExt.FromRGB(255, 141, 35),
-					5f
+					10f
 				)
 			);
 			
