@@ -15,6 +15,8 @@ namespace Renderer.GLObject
 				return value;
 			}
 		}
+		
+		public static implicit operator uint(Renderbuffer renderbuffer) => renderbuffer._ID;
 
 		public Renderbuffer(ivec2 size, InternalFormat internalFormat)
 		{
@@ -26,17 +28,17 @@ namespace Renderer.GLObject
 			
 			Gl.RenderbufferStorage(RenderbufferTarget.Renderbuffer, internalFormat, size.x, size.y);
 			
-			Gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, previousBuffer);
+			Bind(previousBuffer);
 		}
 		
-		public static implicit operator uint(Renderbuffer t)
-		{
-			return t._ID;
-		}
-
 		public void Bind()
 		{
-			Gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _ID);
+			Bind(this);
+		}
+		
+		private static void Bind(uint renderbuffer)
+		{
+			Gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, renderbuffer);
 		}
 	}
 }

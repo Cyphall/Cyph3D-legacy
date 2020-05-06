@@ -15,9 +15,22 @@ namespace Renderer.GLObject
 		private ivec2 _size;
 		
 		private static HashSet<Texture> _textures = new HashSet<Texture>();
+		
+		private static uint CurrentlyBound
+		{
+			get
+			{
+				Gl.GetInteger(GetPName.TextureBinding2d, out uint value);
+				return value;
+			}
+		}
+		
+		public static implicit operator uint(Texture texture) => texture._ID;
 
 		public Texture(ivec2 size, InternalFormat internalFormat, TextureFiltering filtering = TextureFiltering.Nearest)
 		{
+			uint previousTexture = CurrentlyBound;
+			
 			_size = size;
 			
 			_ID = Gl.GenTexture();
@@ -36,16 +49,16 @@ namespace Renderer.GLObject
 			Gl.TexStorage2D(TextureTarget.Texture2d, 1, internalFormat, size.x, size.y);
 
 			_textures.Add(this);
-		}
-
-		public static implicit operator uint(Texture t)
-		{
-			return t._ID;
+			
+			Bind(previousTexture);
 		}
 
 		public void PutData(byte[] data, PixelFormat format = PixelFormat.Rgb, PixelType type = PixelType.UnsignedByte)
 		{
+			uint previousTexture = CurrentlyBound;
+			Bind();
 			Gl.TexSubImage2D(TextureTarget.Texture2d, 0, 0, 0, _size.x, _size.y, format, type, data);
+			Bind(previousTexture);
 		}
 
 		public void Dispose()
@@ -63,7 +76,12 @@ namespace Renderer.GLObject
 
 		public void Bind()
 		{
-			Gl.BindTexture(TextureTarget.Texture2d, _ID);
+			Bind(this);
+		}
+		
+		private static void Bind(uint texture)
+		{
+			Gl.BindTexture(TextureTarget.Texture2d, texture);
 		}
 		
 		public static Texture FromFile(string name, bool sRGB = false, bool compressed = false)

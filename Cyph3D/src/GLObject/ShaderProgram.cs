@@ -26,6 +26,8 @@ namespace Renderer.GLObject
 			}
 		}
 		
+		public static implicit operator uint(ShaderProgram shaderProgram) => shaderProgram._ID;
+		
 		private static Dictionary<string, ShaderProgram> _shaderPrograms = new Dictionary<string, ShaderProgram>();
 		
 		private ShaderProgram(string shadersName)
@@ -59,12 +61,7 @@ namespace Renderer.GLObject
 				throw new InvalidOperationException($"Error while linking shaders ({_vertex.FileName}, {_fragment.FileName}) to program: {error}");
 			}
 			
-			Gl.UseProgram(previousProgram);
-		}
-		
-		public static implicit operator uint(ShaderProgram t)
-		{
-			return t._ID;
+			Bind(previousProgram);
 		}
 		
 		public static ShaderProgram Get(string name)
@@ -104,11 +101,15 @@ namespace Renderer.GLObject
 				program.Dispose();
 			}
 		}
-
+		
 		public void Bind()
 		{
-			if (_ID == CurrentlyBound) return;
-			Gl.UseProgram(_ID);
+			Bind(this);
+		}
+		
+		private static void Bind(uint shaderProgram)
+		{
+			Gl.UseProgram(shaderProgram);
 		}
 		
 		public void SetValue(string variableName, float data)
