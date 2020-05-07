@@ -43,8 +43,8 @@ namespace Renderer.GLObject
 				throw new InvalidOperationException($"Unable to create shader program instance for shader {shadersName}");
 			}
 			
-			Gl.AttachShader(_ID, _vertex.ID);
-			Gl.AttachShader(_ID, _fragment.ID);
+			Gl.AttachShader(_ID, _vertex);
+			Gl.AttachShader(_ID, _fragment);
 	
 			Gl.LinkProgram(_ID);
 			
@@ -61,6 +61,8 @@ namespace Renderer.GLObject
 				throw new InvalidOperationException($"Error while linking shaders ({_vertex.FileName}, {_fragment.FileName}) to program: {error}");
 			}
 			
+			_shaderPrograms.Add(shadersName, this);
+			
 			Bind(previousProgram);
 		}
 		
@@ -69,7 +71,8 @@ namespace Renderer.GLObject
 			if (!_shaderPrograms.ContainsKey(name))
 			{
 				Logger.Info($"Loading shader program \"{name}\"");
-				_shaderPrograms.Add(name, new ShaderProgram(name));
+				// ReSharper disable once ObjectCreationAsStatement
+				new ShaderProgram(name);
 				Logger.Info($"Shader program \"{name}\" loaded");
 			}
 
@@ -92,6 +95,7 @@ namespace Renderer.GLObject
 			_fragment.Dispose();
 			
 			Gl.DeleteProgram(_ID);
+			_ID = 0;
 		}
 		
 		public static void DisposeAll()

@@ -9,18 +9,20 @@ namespace Renderer.GLObject
 {
 	public class Shader : IDisposable
 	{
-		public uint ID { get; }
+		private uint _ID;
 		public string FileName { get; }
 
+		public static implicit operator uint(Shader shader) => shader._ID;
+		
 		private static Dictionary<(string, ShaderType), Shader> _shaders = new Dictionary<(string, ShaderType), Shader>();
 		
 		private Shader(string fileName, ShaderType type)
 		{
 			FileName = fileName;
 			
-			ID = Gl.CreateShader(type);
+			_ID = Gl.CreateShader(type);
 
-			if (ID == 0)
+			if (_ID == 0)
 			{
 				throw new InvalidOperationException($"Unable to create shader instance for {FileName}");
 			}
@@ -37,17 +39,17 @@ namespace Renderer.GLObject
 				throw;
 			}
 
-			Gl.ShaderSource(ID, source);
-			Gl.CompileShader(ID);
+			Gl.ShaderSource(_ID, source);
+			Gl.CompileShader(_ID);
 			
-			Gl.GetShader(ID, ShaderParameterName.CompileStatus, out int compileSuccess);
+			Gl.GetShader(_ID, ShaderParameterName.CompileStatus, out int compileSuccess);
 			
 			if(compileSuccess == Gl.FALSE)
 			{
-				Gl.GetShader(ID, ShaderParameterName.InfoLogLength, out int length);
+				Gl.GetShader(_ID, ShaderParameterName.InfoLogLength, out int length);
 				
 				StringBuilder error = new StringBuilder(length);
-				Gl.GetShaderInfoLog(ID, length, out _, error);
+				Gl.GetShaderInfoLog(_ID, length, out _, error);
 		
 				throw new InvalidOperationException($"Error while compiling shader {FileName}: {error}");
 			}
@@ -67,7 +69,8 @@ namespace Renderer.GLObject
 		
 		public void Dispose()
 		{
-			Gl.DeleteShader(ID);
+			Gl.DeleteShader(_ID);
+			_ID = 0;
 		}
 		
 		public static void DisposeAll()

@@ -121,6 +121,7 @@ namespace Renderer.GLObject
 		public void Dispose()
 		{
 			Gl.DeleteFramebuffers(_ID);
+			_ID = 0;
 		}
 		
 		public static void DisposeAll()

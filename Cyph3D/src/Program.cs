@@ -62,6 +62,8 @@ namespace Renderer
 			ShaderProgram.DisposeAll();
 			Shader.DisposeAll();
 			Texture.DisposeAll();
+			Renderbuffer.DisposeAll();
+			ShaderStorageBuffer.DisposeAll();
 			Mesh.DisposeAll();
 			Framebuffer.DisposeAll();
 

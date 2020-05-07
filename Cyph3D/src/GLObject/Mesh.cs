@@ -205,6 +205,11 @@ namespace Renderer.GLObject
 				_tangentsBufferID,
 				_bitangentsBufferID
 				);
+			_verticesBufferID = 0;
+			_uvsBufferID = 0;
+			_normalsBufferID = 0;
+			_tangentsBufferID = 0;
+			_bitangentsBufferID = 0;
 		}
 		
 		public static void DisposeAll()

@@ -5,12 +5,14 @@ using Renderer.Misc;
 
 namespace Renderer.GLObject
 {
-	public class ShaderStorageBuffer
+	public class ShaderStorageBuffer : IDisposable
 	{
 		private uint _ID;
 		private uint _index;
 		
 		private static HashSet<uint> _usedIndexes = new HashSet<uint>();
+		
+		private static HashSet<ShaderStorageBuffer> _shaderStorageBuffers = new HashSet<ShaderStorageBuffer>();
 		
 		private static uint CurrentlyBound
 		{
@@ -34,6 +36,8 @@ namespace Renderer.GLObject
 			Bind();
 			
 			Gl.BindBufferBase(BufferTarget.ShaderStorageBuffer, _index, _ID);
+
+			_shaderStorageBuffers.Add(this);
 			
 			Bind(previous);
 		}
@@ -56,6 +60,20 @@ namespace Renderer.GLObject
 		private static void Bind(uint shaderStorageBuffer)
 		{
 			Gl.BindBuffer(BufferTarget.ShaderStorageBuffer, shaderStorageBuffer);
+		}
+
+		public void Dispose()
+		{
+			Gl.DeleteBuffers(_ID);
+			_ID = 0;
+		}
+		
+		public static void DisposeAll()
+		{
+			foreach (ShaderStorageBuffer shaderStorageBuffer in _shaderStorageBuffers)
+			{
+				shaderStorageBuffer.Dispose();
+			}
 		}
 	}
 }

@@ -64,6 +64,7 @@ namespace Renderer.GLObject
 		public void Dispose()
 		{
 			Gl.DeleteTextures(_ID);
+			_ID = 0;
 		}
 
 		public static void DisposeAll()
