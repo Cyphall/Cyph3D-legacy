@@ -1,6 +1,6 @@
 ﻿using System;
-using GLFW;
 using GlmSharp;
+using OpenToolkit.Windowing.GraphicsLibraryFramework;
 using Renderer.GLObject;
 using Renderer.Misc;
 
@@ -9,8 +9,6 @@ namespace Renderer
 	public class Camera
 	{
 		private bool _orientationChanged = true;
-		private bool _leftClickPreviousState;
-		private bool _rightClickPreviousState;
 		
 		private vec3 _orientation = vec3.Zero;
 		private vec3 Orientation
@@ -20,7 +18,6 @@ namespace Renderer
 				if (_orientationChanged) RecalculateOrientation();
 				return _orientation;
 			}
-			set => _orientation = value;
 		}
 
 		private vec3 _sideOrientation = vec3.Zero;
@@ -31,7 +28,6 @@ namespace Renderer
 				if (_orientationChanged) RecalculateOrientation();
 				return _sideOrientation;
 			}
-			set => _sideOrientation = value;
 		}
 
 		private ivec2 _winCenter;
@@ -71,10 +67,10 @@ namespace Renderer
 
 			SphericalCoords = sphericalCoords;
 
-			Projection = MathExt.Perspective(100, (float)Context.WindowSize.x / Context.WindowSize.y, 0.0001f, 1000f);
+			Projection = MathExt.Perspective(100, (float)Context.Window.Size.x / Context.Window.Size.y, 0.0001f, 1000f);
 
-			_winCenter = Context.WindowSize / 2;
-			Glfw.SetCursorPosition(Context.Window, _winCenter.x, _winCenter.y);
+			_winCenter = Context.Window.Size / 2;
+			Context.Window.CursorPos = _winCenter;
 		}
 
 		private void RecalculateOrientation()
@@ -103,71 +99,62 @@ namespace Renderer
 		{
 			float ratio = (float)deltaTime * 2;
 
-			if (Glfw.GetKey(Context.Window, Keys.LeftControl) == InputState.Press)
+			if (Context.Window.GetKey(Keys.LeftControl) == InputAction.Press)
 			{
 				ratio /= 20;
 			}
-			if (Glfw.GetKey(Context.Window, Keys.LeftShift) == InputState.Press)
+			if (Context.Window.GetKey(Keys.LeftShift) == InputAction.Press)
 			{
 				ratio *= 5;
 			}
 
-			if (Glfw.GetKey(Context.Window, Keys.W) == InputState.Press)
+			if (Context.Window.GetKey(Keys.W) == InputAction.Press)
 			{
 				Position += Orientation * ratio;
 			}
-			if (Glfw.GetKey(Context.Window, Keys.S) == InputState.Press)
+			if (Context.Window.GetKey(Keys.S) == InputAction.Press)
 			{
 				Position -= Orientation * ratio;
 			}
-			if (Glfw.GetKey(Context.Window, Keys.A) == InputState.Press)
+			if (Context.Window.GetKey(Keys.A) == InputAction.Press)
 			{
 				Position += SideOrientation * ratio;
 			}
-			if (Glfw.GetKey(Context.Window, Keys.D) == InputState.Press)
+			if (Context.Window.GetKey(Keys.D) == InputAction.Press)
 			{
 				Position -= SideOrientation * ratio;
 			}
 
-			bool leftClickCurrentState = Glfw.GetMouseButton(Context.Window, MouseButton.Left) == InputState.Press;
-			if (!_leftClickPreviousState && leftClickCurrentState)
-			{
-				LeftClick();
-			}
-			_leftClickPreviousState = leftClickCurrentState;
+			// Context.Window.LeftClickCallback = LeftClick;
+			// Context.Window.RightClickCallback = RightClick;
 			
-			bool rightClickPreviousState = Glfw.GetMouseButton(Context.Window, MouseButton.Right) == InputState.Press;
-			if (!_rightClickPreviousState && rightClickPreviousState)
-			{
-				RightClick();
-			}
-			_rightClickPreviousState = rightClickPreviousState;
-			
-			dvec2 mouseOffset = new dvec2();
-			Glfw.GetCursorPosition(Context.Window, out mouseOffset.x, out mouseOffset.y);
+			vec2 mouseOffset = Context.Window.CursorPos;
 			mouseOffset -= _winCenter;
 
-			SphericalCoords += new vec2((float)(-mouseOffset.x / 12.0), (float)(-mouseOffset.y / 12.0));
+			SphericalCoords += new vec2(-mouseOffset.x / 12, -mouseOffset.y / 12);
 			
-			Glfw.SetCursorPosition(Context.Window, _winCenter.x, _winCenter.y);
+			Context.Window.CursorPos = _winCenter;
 		}
 
-		private void LeftClick()
+		private void LeftClick(InputAction action, KeyModifiers mods)
 		{
-			return;
+			if (action != InputAction.Press) return;
+			
 			Context.ObjectContainer.Add(
 				new RenderObject(
 					Material.GetOrLoad("Sci-Fi/SpaceCase1", true),
 					Mesh.GetOrLoad("cube"),
 					Position + Orientation,
-					angularVelocity: new vec3(0, 5f, 0)
+					angularVelocity: new vec3(0, 5f, 0),
+					scale: new vec3(0.5f)
 				)
 			);
 		}
 
-		private void RightClick()
+		private void RightClick(InputAction action, KeyModifiers mods)
 		{
-			return;
+			if (action != InputAction.Press) return;
+			
 			Context.ObjectContainer.Add(
 				new RenderObject(
 					Material.GetOrLoad("Metals/OrnateBrass", true),

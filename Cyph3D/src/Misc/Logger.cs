@@ -1,4 +1,5 @@
 ﻿using System;
+using ObjLoader.Loader.Common;
 
 namespace Renderer.Misc
 {
@@ -6,31 +7,41 @@ namespace Renderer.Misc
 	{
 		public static DeltaStopwatch Time { get; } = DeltaStopwatch.StartNew();
 
-		public static LogLevel LogLevel { get; } = LogLevel.FULL;
-
-		public static void Info(object message, string context = "")
-		{
-			if ((int)LogLevel >= 2)
-				Print(message, string.IsNullOrEmpty(context) ? "INFO" : context + " INFO");
-		}
+		public static LogLevel LogLevel { get; } = LogLevel.Full;
 
 		public static void Error(object message, string context = "")
 		{
-			if ((int)LogLevel >= 1)
-				Print(message, string.IsNullOrEmpty(context) ? "ERROR" : context + " ERROR");
+			if (LogLevel < LogLevel.Error) return;
+			
+			Console.Error.WriteLine(Format(message, context, "ERROR"));
+		}
+		
+		public static void Warning(object message, string context = "")
+		{
+			if (LogLevel < LogLevel.Warning) return;
+			
+			Console.Out.WriteLine(Format(message, context, "WARN"));
+		}
+		
+		public static void Info(object message, string context = "")
+		{
+			if (LogLevel < LogLevel.Full) return;
+			
+			Console.Out.WriteLine(Format(message, context, "INFO"));
 		}
 
-		private static void Print(object message, string prefix)
+		private static string Format(object message, string context, string prefix)
 		{
 			TimeSpan ts = Time.Elapsed;
-			Console.WriteLine($"{(long)ts.TotalSeconds}.{ts:ffff} {prefix}: {message}");
+			return $"{(long)ts.TotalSeconds}.{ts:ffff} {(context.IsNullOrEmpty() ? "" : $"{context} ")}{prefix}: {message}";
 		}
 	}
 
 	public enum LogLevel
 	{
-		NONE = 0,
-		ERROR = 1,
-		FULL = 2
+		None = 0,
+		Error = 1,
+		Warning = 2,
+		Full = 3
 	}
 }

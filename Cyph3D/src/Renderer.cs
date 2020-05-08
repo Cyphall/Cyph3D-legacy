@@ -1,6 +1,6 @@
 ﻿using System;
 using GlmSharp;
-using OpenGL;
+using OpenToolkit.Graphics.OpenGL4;
 using Renderer.Enum;
 using Renderer.GLObject;
 
@@ -14,31 +14,31 @@ namespace Renderer
 		private Texture _colorTexture;
 		private Texture _materialTexture;
 		private Texture _depthTexture;
-		private uint _quadVAO;
+		private int _quadVAO;
 		private ShaderProgram _lightingPassShader;
 		private ShaderStorageBuffer _lightsBuffer;
 
 		public Renderer()
 		{
-			_gbuffer = new Framebuffer(out _positionTexture, Context.WindowSize, (InternalFormat) Gl.RGB32F);
+			_gbuffer = new Framebuffer(out _positionTexture, Context.Window.Size, (InternalFormat) All.Rgb32f);
 			_normalTexture = _gbuffer.AddTexture(FramebufferAttachment.ColorAttachment1, InternalFormat.Rgb8);
 			_colorTexture = _gbuffer.AddTexture(FramebufferAttachment.ColorAttachment2, InternalFormat.Rgb16f);
 			_materialTexture = _gbuffer.AddTexture(FramebufferAttachment.ColorAttachment3, InternalFormat.Rgba8);
-			_depthTexture = _gbuffer.AddTexture(FramebufferAttachment.DepthAttachment, InternalFormat.DepthComponent24, TextureFiltering.Linear);
+			_depthTexture = _gbuffer.AddTexture(FramebufferAttachment.DepthAttachment, (InternalFormat) All.DepthComponent24, TextureFiltering.Linear);
 			
 			_gbuffer.SetDrawBuffers(
-				FramebufferAttachment.ColorAttachment0,
-				FramebufferAttachment.ColorAttachment1,
-				FramebufferAttachment.ColorAttachment2,
-				FramebufferAttachment.ColorAttachment3
+				DrawBuffersEnum.ColorAttachment0,
+				DrawBuffersEnum.ColorAttachment1,
+				DrawBuffersEnum.ColorAttachment2,
+				DrawBuffersEnum.ColorAttachment3
 			);
 
-			Gl.Enable(EnableCap.DepthTest);
+			GL.Enable(EnableCap.DepthTest);
 
-			Gl.ClearColor(0, 0, 0, 1);
+			GL.ClearColor(0, 0, 0, 1);
 
-			Gl.Enable(EnableCap.CullFace);
-			Gl.FrontFace(FrontFaceDirection.Ccw);
+			GL.Enable(EnableCap.CullFace);
+			GL.FrontFace(FrontFaceDirection.Ccw);
 
 			float[] quadVertices =
 			{
@@ -52,15 +52,15 @@ namespace Renderer
 				1.0f, 1.0f, 1.0f, 1.0f
 			};
 
-			_quadVAO = Gl.GenVertexArray();
-			uint quadVBO = Gl.GenBuffer();
-			Gl.BindVertexArray(_quadVAO);
-			Gl.BindBuffer(BufferTarget.ArrayBuffer, quadVBO);
-			Gl.BufferData(BufferTarget.ArrayBuffer, (uint) quadVertices.Length * sizeof(float), quadVertices, BufferUsage.StaticDraw);
-			Gl.EnableVertexAttribArray(0);
-			Gl.VertexAttribPointer(0, 2, VertexAttribType.Float, false, 4 * sizeof(float), IntPtr.Zero);
-			Gl.EnableVertexAttribArray(1);
-			Gl.VertexAttribPointer(1, 2, VertexAttribType.Float, false, 4 * sizeof(float), (IntPtr) (2 * sizeof(float)));
+			_quadVAO = GL.GenVertexArray();
+			int quadVBO = GL.GenBuffer();
+			GL.BindVertexArray(_quadVAO);
+			GL.BindBuffer(BufferTarget.ArrayBuffer, quadVBO);
+			GL.BufferData(BufferTarget.ArrayBuffer, quadVertices.Length * sizeof(float), quadVertices, BufferUsageHint.StaticDraw);
+			GL.EnableVertexAttribArray(0);
+			GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), IntPtr.Zero);
+			GL.EnableVertexAttribArray(1);
+			GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), (IntPtr) (2 * sizeof(float)));
 
 
 			_lightingPassShader = ShaderProgram.Get("deferred/lightingPassPBR");
@@ -70,6 +70,8 @@ namespace Renderer
 			_lightingPassShader.SetValue("colorTexture", 2);
 			_lightingPassShader.SetValue("materialTexture", 3);
 			_lightingPassShader.SetValue("depthTexture", 4);
+			
+			_lightingPassShader.Unbind();
 			
 			
 			_lightsBuffer = new ShaderStorageBuffer(0);
@@ -85,7 +87,7 @@ namespace Renderer
 		{
 			_gbuffer.Bind();
 
-			Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
 			int objectCount = Context.ObjectContainer.Count;
 			for (int i = 0; i < objectCount; i++)
@@ -99,9 +101,9 @@ namespace Renderer
 			if (Context.LightManager.PointLightsChanged)
 				_lightsBuffer.PutData(Context.LightManager.PointLightsNative);
 
-			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 
-			Gl.Clear(ClearBufferMask.ColorBufferBit);
+			GL.Clear(ClearBufferMask.ColorBufferBit);
 
 			_lightingPassShader.Bind();
 
@@ -109,20 +111,22 @@ namespace Renderer
 
 			_lightingPassShader.SetValue("debug", 0);
 
-			Gl.ActiveTexture(TextureUnit.Texture0);
+			GL.ActiveTexture(TextureUnit.Texture0);
 			_positionTexture.Bind();
-			Gl.ActiveTexture(TextureUnit.Texture1);
+			GL.ActiveTexture(TextureUnit.Texture1);
 			_normalTexture.Bind();
-			Gl.ActiveTexture(TextureUnit.Texture2);
+			GL.ActiveTexture(TextureUnit.Texture2);
 			_colorTexture.Bind();
-			Gl.ActiveTexture(TextureUnit.Texture3);
+			GL.ActiveTexture(TextureUnit.Texture3);
 			_materialTexture.Bind();
-			Gl.ActiveTexture(TextureUnit.Texture4);
+			GL.ActiveTexture(TextureUnit.Texture4);
 			_depthTexture.Bind();
 
-			Gl.BindVertexArray(_quadVAO);
+			GL.BindVertexArray(_quadVAO);
 
-			Gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
+			GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+			
+			_lightingPassShader.Unbind();
 		}
 	}
 }

@@ -1,41 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using OpenGL;
+using OpenToolkit.Graphics.OpenGL4;
 using Renderer.Misc;
 
 namespace Renderer.GLObject
 {
 	public class ShaderStorageBuffer : IDisposable
 	{
-		private uint _ID;
-		private uint _index;
+		private int _ID;
+		private int _index;
 		
-		private static HashSet<uint> _usedIndexes = new HashSet<uint>();
+		private static HashSet<int> _usedIndexes = new HashSet<int>();
 		
 		private static HashSet<ShaderStorageBuffer> _shaderStorageBuffers = new HashSet<ShaderStorageBuffer>();
 		
-		private static uint CurrentlyBound
-		{
-			get
-			{
-				Gl.GetInteger(GetPName.ShaderStorageBufferBinding, out uint value);
-				return value;
-			}
-		}
+		private static int CurrentlyBound => GL.GetInteger((GetPName)All.ShaderStorageBufferBinding);
 		
-		public static implicit operator uint(ShaderStorageBuffer shaderStorageBuffer) => shaderStorageBuffer._ID;
+		public static implicit operator int(ShaderStorageBuffer shaderStorageBuffer) => shaderStorageBuffer._ID;
 
-		public ShaderStorageBuffer(uint index)
+		public ShaderStorageBuffer(int index)
 		{
-			uint previous = CurrentlyBound;
+			int previous = CurrentlyBound;
 			
-			_ID = Gl.GenBuffer();
+			_ID = GL.GenBuffer();
 			_index = index;
 			_usedIndexes.Add(index);
 			
 			Bind();
 			
-			Gl.BindBufferBase(BufferTarget.ShaderStorageBuffer, _index, _ID);
+			GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, _index, _ID);
 
 			_shaderStorageBuffers.Add(this);
 			
@@ -44,10 +37,10 @@ namespace Renderer.GLObject
 
 		public void PutData<T>(NativeArray<T> array) where T : unmanaged
 		{
-			uint previous = CurrentlyBound;
+			int previous = CurrentlyBound;
 			Bind();
 			
-			Gl.BufferData(BufferTarget.ShaderStorageBuffer, array.ByteSize, array, BufferUsage.DynamicDraw);
+			GL.BufferData(BufferTarget.ShaderStorageBuffer, array.ByteSize, array, BufferUsageHint.DynamicDraw);
 			
 			Bind(previous);
 		}
@@ -57,14 +50,14 @@ namespace Renderer.GLObject
 			Bind(this);
 		}
 		
-		private static void Bind(uint shaderStorageBuffer)
+		private static void Bind(int shaderStorageBuffer)
 		{
-			Gl.BindBuffer(BufferTarget.ShaderStorageBuffer, shaderStorageBuffer);
+			GL.BindBuffer(BufferTarget.ShaderStorageBuffer, shaderStorageBuffer);
 		}
 
 		public void Dispose()
 		{
-			Gl.DeleteBuffers(_ID);
+			GL.DeleteBuffer(_ID);
 			_ID = 0;
 		}
 		

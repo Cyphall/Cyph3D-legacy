@@ -6,12 +6,12 @@ namespace Renderer.Misc
 	public unsafe class NativeArray<T> : IDisposable where T : unmanaged
 	{
 		private readonly T* _array;
-		public uint Count { get; }
-		public uint ByteSize => Count * (uint)sizeof(T);
+		public int Count { get; }
+		public int ByteSize => Count * sizeof(T);
 		
 		public NativeArray(int count, T defaultValue = default)
 		{
-			Count = (uint)count;
+			Count = count;
 			_array = (T*) Marshal.AllocHGlobal(new IntPtr(sizeof(T) * Count)).ToPointer();
 			for (int i = 0; i < Count; i++)
 			{

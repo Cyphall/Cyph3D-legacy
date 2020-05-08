@@ -1,37 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using OpenGL;
+using OpenToolkit.Graphics.OpenGL4;
 using Renderer.Misc;
 
 namespace Renderer.GLObject
 {
 	public class Shader : IDisposable
 	{
-		private uint _ID;
+		private int _ID;
 		public string FileName { get; }
 
-		public static implicit operator uint(Shader shader) => shader._ID;
+		public static implicit operator int(Shader shader) => shader._ID;
 		
-		private static Dictionary<(string, ShaderType), Shader> _shaders = new Dictionary<(string, ShaderType), Shader>();
+		private static Dictionary<string, Shader> _shaders = new Dictionary<string, Shader>();
 		
 		private Shader(string fileName, ShaderType type)
 		{
 			FileName = fileName;
 			
-			_ID = Gl.CreateShader(type);
+			_ID = GL.CreateShader(type);
 
 			if (_ID == 0)
 			{
 				throw new InvalidOperationException($"Unable to create shader instance for {FileName}");
 			}
 
-			string[] source = new string[1];
+			string source = "";
 
 			try
 			{
-				source[0] = File.ReadAllText($"resources/shaders/{FileName}");
+				source = File.ReadAllText($"resources/shaders/{FileName}");
 			}
 			catch (IOException)
 			{
@@ -39,37 +38,38 @@ namespace Renderer.GLObject
 				throw;
 			}
 
-			Gl.ShaderSource(_ID, source);
-			Gl.CompileShader(_ID);
+			GL.ShaderSource(_ID, source);
+			GL.CompileShader(_ID);
 			
-			Gl.GetShader(_ID, ShaderParameterName.CompileStatus, out int compileSuccess);
+			GL.GetShader(_ID, ShaderParameter.CompileStatus, out int compileSuccess);
 			
-			if(compileSuccess == Gl.FALSE)
+			if(compileSuccess == (int)All.False)
 			{
-				Gl.GetShader(_ID, ShaderParameterName.InfoLogLength, out int length);
+				GL.GetShader(_ID, ShaderParameter.InfoLogLength, out int length);
 				
-				StringBuilder error = new StringBuilder(length);
-				Gl.GetShaderInfoLog(_ID, length, out _, error);
+				GL.GetShaderInfoLog(_ID, length, out _, out string error);
 		
 				throw new InvalidOperationException($"Error while compiling shader {FileName}: {error}");
 			}
+			
+			_shaders.Add(fileName, this);
 		}
 		
 		public static Shader Get(string name, ShaderType type)
 		{
-			if (!_shaders.ContainsKey((name, type)))
+			if (!_shaders.ContainsKey(name))
 			{
 				Logger.Info($"Loading shader \"{name}\"");
-				_shaders.Add((name, type), new Shader(name, type));
-				Logger.Info($"Shader \"{name}\" loaded");
+				Shader shader = new Shader(name, type);
+				Logger.Info($"Shader \"{name}\" loaded (id: {shader._ID})");
 			}
 
-			return _shaders[(name, type)];
+			return _shaders[name];
 		}
 		
 		public void Dispose()
 		{
-			Gl.DeleteShader(_ID);
+			GL.DeleteShader(_ID);
 			_ID = 0;
 		}
 		

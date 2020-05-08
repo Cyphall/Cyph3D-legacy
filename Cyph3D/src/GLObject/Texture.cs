@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using GlmSharp;
-using OpenGL;
+using OpenToolkit.Graphics.OpenGL4;
 using Renderer.Enum;
 using Renderer.Misc;
 using StbImageSharp;
@@ -11,42 +11,35 @@ namespace Renderer.GLObject
 {
 	public class Texture : IDisposable
 	{
-		private uint _ID;
+		private int _ID;
 		private ivec2 _size;
 		
 		private static HashSet<Texture> _textures = new HashSet<Texture>();
 		
-		private static uint CurrentlyBound
-		{
-			get
-			{
-				Gl.GetInteger(GetPName.TextureBinding2d, out uint value);
-				return value;
-			}
-		}
+		private static int CurrentlyBound => GL.GetInteger(GetPName.TextureBinding2D);
 		
-		public static implicit operator uint(Texture texture) => texture._ID;
+		public static implicit operator int(Texture texture) => texture._ID;
 
 		public Texture(ivec2 size, InternalFormat internalFormat, TextureFiltering filtering = TextureFiltering.Nearest)
 		{
-			uint previousTexture = CurrentlyBound;
+			int previousTexture = CurrentlyBound;
 			
 			_size = size;
 			
-			_ID = Gl.GenTexture();
+			_ID = GL.GenTexture();
 			Bind();
 
 			int finteringRaw = filtering switch
 			{
-				TextureFiltering.Linear => Gl.LINEAR,
-				TextureFiltering.Nearest => Gl.NEAREST,
+				TextureFiltering.Linear => (int)All.Linear,
+				TextureFiltering.Nearest => (int)All.Nearest,
 				_ => throw new ArgumentOutOfRangeException(nameof(filtering), filtering, null)
 			};
 			
-			Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, finteringRaw);
-			Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, finteringRaw);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, finteringRaw);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, finteringRaw);
 			
-			Gl.TexStorage2D(TextureTarget.Texture2d, 1, internalFormat, size.x, size.y);
+			GL.TexStorage2D(TextureTarget2d.Texture2D, 1, (SizedInternalFormat)internalFormat, size.x, size.y);
 
 			_textures.Add(this);
 			
@@ -55,15 +48,15 @@ namespace Renderer.GLObject
 
 		public void PutData(byte[] data, PixelFormat format = PixelFormat.Rgb, PixelType type = PixelType.UnsignedByte)
 		{
-			uint previousTexture = CurrentlyBound;
+			int previousTexture = CurrentlyBound;
 			Bind();
-			Gl.TexSubImage2D(TextureTarget.Texture2d, 0, 0, 0, _size.x, _size.y, format, type, data);
+			GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, _size.x, _size.y, format, type, data);
 			Bind(previousTexture);
 		}
 
 		public void Dispose()
 		{
-			Gl.DeleteTextures(_ID);
+			GL.DeleteTexture(_ID);
 			_ID = 0;
 		}
 
@@ -80,9 +73,9 @@ namespace Renderer.GLObject
 			Bind(this);
 		}
 		
-		private static void Bind(uint texture)
+		private static void Bind(int texture)
 		{
-			Gl.BindTexture(TextureTarget.Texture2d, texture);
+			GL.BindTexture(TextureTarget.Texture2D, texture);
 		}
 		
 		public static Texture FromFile(string name, bool sRGB = false, bool compressed = false)
@@ -151,14 +144,14 @@ namespace Renderer.GLObject
 			Texture texture = new Texture(size, internalFormat, TextureFiltering.Linear);
 			texture.PutData(image.Data, pixelFormat);
 
-			Logger.Info($"Texture \"{name}\" loaded");
+			Logger.Info($"Texture \"{name}\" loaded (id: {texture._ID})");
 			
 			return texture;
 		}
 
 		static Texture()
 		{
-			StbImage.stbi_set_flip_vertically_on_load(Gl.TRUE);
+			StbImage.stbi_set_flip_vertically_on_load((int)All.True);
 		}
 	}
 }

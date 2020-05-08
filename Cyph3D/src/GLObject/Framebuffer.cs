@@ -2,35 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using GlmSharp;
-using OpenGL;
+using OpenToolkit.Graphics.OpenGL4;
 using Renderer.Enum;
 
 namespace Renderer.GLObject
 {
 	public class Framebuffer : IDisposable
 	{
-		private uint _ID;
+		private int _ID;
 		private ivec2 _size;
 		
 		private static HashSet<Framebuffer> _framebuffers = new HashSet<Framebuffer>();
 		
-		private static uint CurrentlyBound
-		{
-			get
-			{
-				Gl.GetInteger((GetPName)Gl.FRAMEBUFFER_BINDING, out uint value);
-				return value;
-			}
-		}
+		private static int CurrentlyBound => GL.GetInteger(GetPName.FramebufferBinding);
 
-		public static implicit operator uint(Framebuffer framebuffer) => framebuffer._ID;
+		public static implicit operator int(Framebuffer framebuffer) => framebuffer._ID;
 
 		public Framebuffer(out Texture texture, ivec2 size, InternalFormat internalFormat)
 		{
-			uint previousFramebuffer = CurrentlyBound;
+			int previousFramebuffer = CurrentlyBound;
 			
 			_size = size;
-			_ID = Gl.GenFramebuffer();
+			_ID = GL.GenFramebuffer();
 			
 			Bind();
 			
@@ -43,12 +36,12 @@ namespace Renderer.GLObject
 			_framebuffers.Add(this);
 		}
 		
-		public Framebuffer(out Renderbuffer renderbuffer, ivec2 size, InternalFormat internalFormat)
+		public Framebuffer(out Renderbuffer renderbuffer, ivec2 size, RenderbufferStorage internalFormat)
 		{
-			uint previousFramebuffer = CurrentlyBound;
+			int previousFramebuffer = CurrentlyBound;
 			
 			_size = size;
-			_ID = Gl.GenFramebuffer();
+			_ID = GL.GenFramebuffer();
 			
 			Bind();
 			
@@ -63,12 +56,12 @@ namespace Renderer.GLObject
 
 		public Texture AddTexture(FramebufferAttachment attachment, InternalFormat internalFormat, TextureFiltering filtering = TextureFiltering.Nearest)
 		{
-			uint previousFramebuffer = CurrentlyBound;
+			int previousFramebuffer = CurrentlyBound;
 			Bind();
 
 			Texture texture = new Texture(_size, internalFormat, filtering);
 			
-			Gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, attachment, TextureTarget.Texture2d, texture, 0);
+			GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, attachment, TextureTarget.Texture2D, texture, 0);
 			
 			CheckStatus();
 			
@@ -77,14 +70,14 @@ namespace Renderer.GLObject
 			return texture;
 		}
 
-		public Renderbuffer AddRenderbuffer(FramebufferAttachment attachment, InternalFormat internalFormat)
+		public Renderbuffer AddRenderbuffer(FramebufferAttachment attachment, RenderbufferStorage internalFormat)
 		{
-			uint previousFramebuffer = CurrentlyBound;
+			int previousFramebuffer = CurrentlyBound;
 			Bind();
 			
 			Renderbuffer renderbuffer = new Renderbuffer(_size, internalFormat);
 			
-			Gl.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, attachment, RenderbufferTarget.Renderbuffer, renderbuffer);
+			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, attachment, RenderbufferTarget.Renderbuffer, renderbuffer);
 			
 			CheckStatus();
 			
@@ -93,24 +86,24 @@ namespace Renderer.GLObject
 			return renderbuffer;
 		}
 
-		public void SetDrawBuffers(params FramebufferAttachment[] buffers)
+		public void SetDrawBuffers(params DrawBuffersEnum[] buffers)
 		{
-			uint previousFramebuffer = CurrentlyBound;
+			int previousFramebuffer = CurrentlyBound;
 			Bind();
 			
-			Gl.DrawBuffers(buffers.Cast<int>().ToArray());
+			GL.DrawBuffers(buffers.Length, buffers);
 			
 			Bind(previousFramebuffer);
 		}
 
 		private void CheckStatus()
 		{
-			uint previousFramebuffer = CurrentlyBound;
+			int previousFramebuffer = CurrentlyBound;
 			Bind();
 			
-			FramebufferStatus state = Gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
+			FramebufferErrorCode state = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
 
-			if (state != FramebufferStatus.FramebufferComplete)
+			if (state != FramebufferErrorCode.FramebufferComplete)
 			{
 				throw new InvalidOperationException($"Error while creating framebuffer: {state}");
 			}
@@ -120,7 +113,7 @@ namespace Renderer.GLObject
 
 		public void Dispose()
 		{
-			Gl.DeleteFramebuffers(_ID);
+			GL.DeleteFramebuffer(_ID);
 			_ID = 0;
 		}
 		
@@ -137,9 +130,9 @@ namespace Renderer.GLObject
 			Bind(this);
 		}
 
-		private static void Bind(uint framebuffer)
+		private static void Bind(int framebuffer)
 		{
-			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
+			GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
 		}
 	}
 }

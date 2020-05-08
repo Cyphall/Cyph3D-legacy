@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
-using GLFW;
 using GlmSharp;
-using OpenGL;
+using OpenToolkit.Graphics.OpenGL4;
+using OpenToolkit.Windowing.GraphicsLibraryFramework;
 using Renderer.GLObject;
 using Renderer.Misc;
 
@@ -12,41 +12,49 @@ namespace Renderer
 	{
 		private static void Main()
 		{
-			Gl.Initialize();
-			Glfw.Init();
+			GLFW.Init();
 
-			Gl.DebugMessageCallback(
-				(source, type, id, severity, length, message, param) => { Logger.Error($"message: {Marshal.PtrToStringAnsi(message, length)} | id: {id} | source: {source} | type: {type}", "OPENGL"); }, IntPtr.Zero);
-			Glfw.SetErrorCallback((code, message) => Logger.Error(Marshal.PtrToStringAnsi(message), "GLFW"));
+			GLFW.SetErrorCallback((code, message) => Logger.Error(message, "GLFW"));
 
 
-			Glfw.WindowHint(Hint.ContextVersionMajor, 4);
-			Glfw.WindowHint(Hint.ContextVersionMinor, 6);
-			Glfw.WindowHint(Hint.OpenglDebugContext, true);
-			Glfw.WindowHint(Hint.DepthBits, 0);
-			Glfw.WindowHint(Hint.StencilBits, 0);
-			Glfw.WindowHint(Hint.OpenglProfile, Profile.Core);
+			GLFW.WindowHint(WindowHintInt.ContextVersionMajor, 4);
+			GLFW.WindowHint(WindowHintInt.ContextVersionMinor, 6);
+			GLFW.WindowHint(WindowHintBool.OpenGLDebugContext, true);
+			GLFW.WindowHint(WindowHintInt.DepthBits, 0);
+			GLFW.WindowHint(WindowHintInt.StencilBits, 0);
+			GLFW.WindowHint(WindowHintOpenGlProfile.OpenGlProfile, OpenGlProfile.Core);
 
-			VideoMode mode = Glfw.GetVideoMode(Glfw.PrimaryMonitor);
-			Window window = Glfw.CreateWindow(mode.Width, mode.Height, "Renderer", Glfw.PrimaryMonitor, Window.None);
-			// Window window = Glfw.CreateWindow(mode.Width, mode.Height, "Renderer", Monitor.None, Window.None);
+			Context.Window = new Window();
 
-			Context.Window = window;
+			GL.LoadBindings(new GLFWBindingsContext());
 
-			Glfw.MakeContextCurrent(window);
-			Glfw.SetInputMode(window, InputMode.Cursor, (int) CursorMode.Disabled);
+			GL.DebugMessageCallback(
+				(source, type, id, severity, length, message, param) => {
+					string logMessage = $"{Marshal.PtrToStringAnsi(message, length)} \n id: {id} \n source: {source}";
 
-			ivec2 winSize = new ivec2();
-			Glfw.GetWindowSize(Context.Window, out winSize.x, out winSize.y);
-			Context.WindowSize = winSize;
+					switch (severity)
+					{
+						case DebugSeverity.DebugSeverityHigh:
+							Logger.Error(logMessage, "OPENGL");
+							break;
+						case DebugSeverity.DebugSeverityMedium:
+							Logger.Warning(logMessage, "OPENGL");
+							break;
+						case DebugSeverity.DebugSeverityLow:
+							Logger.Info(logMessage, "OPENGL");
+							break;
+					}
+				}, IntPtr.Zero
+			);
+
 
 			Camera camera = Dungeon();
 
-			while (!Glfw.WindowShouldClose(window))
+			while (!Context.Window.ShouldClose)
 			{
-				Glfw.PollEvents();
+				GLFW.PollEvents();
 
-				if (Glfw.GetKey(window, Keys.Escape) == InputState.Press) Glfw.SetWindowShouldClose(window, true);
+				if (Context.Window.GetKey(Keys.Escape) == InputAction.Press) Context.Window.ShouldClose = true;
 
 				double deltaTime = Logger.Time.DeltaTime;
 
@@ -55,7 +63,7 @@ namespace Renderer
 
 				camera.Render();
 
-				Glfw.SwapBuffers(window);
+				Context.Window.SwapBuffers();
 			}
 
 			Context.LightManager.Dispose();
@@ -67,13 +75,13 @@ namespace Renderer
 			Mesh.DisposeAll();
 			Framebuffer.DisposeAll();
 
-			Glfw.Terminate();
+			GLFW.Terminate();
 		}
 
 		private static Camera Spaceship()
 		{
 			Camera camera = new Camera(new vec3(0, 1.5f, -3));
-			
+
 			Context.ObjectContainer.Add(
 				new RenderObject(
 					Material.GetOrLoad(
@@ -84,7 +92,7 @@ namespace Renderer
 					rotation: new vec3(0, 270, 0)
 				)
 			);
-			
+
 			Context.LightManager.AddPointLight(
 				new PointLight(
 					new vec3(-0.29f, 0.6f, 10.19f),
@@ -92,7 +100,7 @@ namespace Renderer
 					1f
 				)
 			);
-			
+
 			Context.LightManager.AddPointLight(
 				new PointLight(
 					new vec3(-0.1f, 0.6f, 10.6f),
@@ -100,7 +108,7 @@ namespace Renderer
 					1f
 				)
 			);
-			
+
 			Context.LightManager.AddPointLight(
 				new PointLight(
 					new vec3(0.21f, 0.6f, 10.83f),
@@ -108,7 +116,7 @@ namespace Renderer
 					1f
 				)
 			);
-			
+
 			for (int i = 0; i < 10; i++)
 			{
 				Context.LightManager.AddPointLight(
@@ -118,7 +126,7 @@ namespace Renderer
 						0.2f
 					)
 				);
-			
+
 				Context.LightManager.AddPointLight(
 					new PointLight(
 						new vec3(0, 2.99f, -0.62f + i * 1.55f),
@@ -130,11 +138,11 @@ namespace Renderer
 
 			return camera;
 		}
-		
+
 		private static Camera Dungeon()
 		{
 			Camera camera = new Camera(new vec3(-12, 1.8f, 0), new vec2(90, 0));
-			
+
 			Context.LightManager.AddPointLight(
 				new PointLight(
 					new vec3(0, 1.5f, 0),
@@ -142,7 +150,7 @@ namespace Renderer
 					10f
 				)
 			);
-			
+
 			Context.ObjectContainer.Add(
 				new RenderObject(
 					Material.GetOrLoad(
@@ -165,7 +173,7 @@ namespace Renderer
 					10f
 				)
 			);
-			
+
 			Context.ObjectContainer.Add(
 				new RenderObject(
 					Material.GetOrLoad(
@@ -177,7 +185,7 @@ namespace Renderer
 					scale: new vec3(16)
 				)
 			);
-			
+
 			Context.ObjectContainer.Add(
 				new RenderObject(
 					Material.GetOrLoad(
@@ -190,11 +198,11 @@ namespace Renderer
 				)
 			);
 		}
-		
+
 		private static Camera TestCube()
 		{
 			Camera camera = new Camera(new vec3(2, 0, -1), new vec2(-60, 0));
-			
+
 			Context.LightManager.AddPointLight(
 				new PointLight(
 					new vec3(3, 2, 3),
@@ -202,7 +210,7 @@ namespace Renderer
 					10f
 				)
 			);
-			
+
 			Context.ObjectContainer.Add(
 				new RenderObject(
 					Material.GetOrLoad(
@@ -215,11 +223,11 @@ namespace Renderer
 
 			return camera;
 		}
-		
+
 		private static Camera TestSphere()
 		{
 			Camera camera = new Camera(new vec3(2, 0, -1), new vec2(-60, 0));
-			
+
 			Context.LightManager.AddPointLight(
 				new PointLight(
 					new vec3(4, 2, 4),
@@ -227,7 +235,7 @@ namespace Renderer
 					10f
 				)
 			);
-			
+
 			Context.ObjectContainer.Add(
 				new RenderObject(
 					Material.GetOrLoad(

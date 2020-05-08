@@ -1,36 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using GlmSharp;
-using OpenGL;
+using OpenToolkit.Graphics.OpenGL4;
 
 namespace Renderer.GLObject
 {
 	public class Renderbuffer : IDisposable
 	{
-		private uint _ID;
+		private int _ID;
 		
 		private static HashSet<Renderbuffer> _renderbuffers = new HashSet<Renderbuffer>();
 		
-		private static uint CurrentlyBound
-		{
-			get
-			{
-				Gl.GetInteger(GetPName.RenderbufferBinding, out uint value);
-				return value;
-			}
-		}
-		
-		public static implicit operator uint(Renderbuffer renderbuffer) => renderbuffer._ID;
+		private static int CurrentlyBound => GL.GetInteger(GetPName.RenderbufferBinding);
 
-		public Renderbuffer(ivec2 size, InternalFormat internalFormat)
+		public static implicit operator int(Renderbuffer renderbuffer) => renderbuffer._ID;
+
+		public Renderbuffer(ivec2 size, RenderbufferStorage internalFormat)
 		{
-			uint previousBuffer = CurrentlyBound;
+			int previousBuffer = CurrentlyBound;
 			
-			_ID = Gl.GenRenderbuffer();
+			_ID = GL.GenRenderbuffer();
 			
 			Bind();
 			
-			Gl.RenderbufferStorage(RenderbufferTarget.Renderbuffer, internalFormat, size.x, size.y);
+			GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, internalFormat, size.x, size.y);
 
 			_renderbuffers.Add(this);
 			
@@ -42,14 +35,14 @@ namespace Renderer.GLObject
 			Bind(this);
 		}
 		
-		private static void Bind(uint renderbuffer)
+		private static void Bind(int renderbuffer)
 		{
-			Gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, renderbuffer);
+			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, renderbuffer);
 		}
 
 		public void Dispose()
 		{
-			Gl.DeleteRenderbuffers(_ID);
+			GL.DeleteRenderbuffer(_ID);
 			_ID = 0;
 		}
 		

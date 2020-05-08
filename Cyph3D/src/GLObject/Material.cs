@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using GlmSharp;
-using OpenGL;
-using Renderer.GLObject;
+using OpenToolkit.Graphics.OpenGL4;
 using Renderer.Misc;
 
 namespace Renderer.GLObject
@@ -32,6 +31,8 @@ namespace Renderer.GLObject
 			_shaderProgram.SetValue("displacementMap", 3);
 			_shaderProgram.SetValue("metallicMap", 4);
 			_shaderProgram.SetValue("emissiveMap", 5);
+			
+			_shaderProgram.Unbind();
 
 			_colorMap = Texture.FromFile($"{name}/col", true, true);
 			if (_colorMap == null)
@@ -76,23 +77,24 @@ namespace Renderer.GLObject
 			}
 
 			_isLit = isLit;
+			_materials.Add(name, this);
 		}
 
 		public void Bind(mat4 model, mat4 view, mat4 projection, vec3 cameraPos)
 		{
 			_shaderProgram.Bind();
 
-			Gl.ActiveTexture(TextureUnit.Texture0);
+			GL.ActiveTexture(TextureUnit.Texture0);
 			_colorMap.Bind();
-			Gl.ActiveTexture(TextureUnit.Texture1);
+			GL.ActiveTexture(TextureUnit.Texture1);
 			_normalMap.Bind();
-			Gl.ActiveTexture(TextureUnit.Texture2);
+			GL.ActiveTexture(TextureUnit.Texture2);
 			_roughnessMap.Bind();
-			Gl.ActiveTexture(TextureUnit.Texture3);
+			GL.ActiveTexture(TextureUnit.Texture3);
 			_displacementMap.Bind();
-			Gl.ActiveTexture(TextureUnit.Texture4);
+			GL.ActiveTexture(TextureUnit.Texture4);
 			_metallicMap.Bind();
-			Gl.ActiveTexture(TextureUnit.Texture5);
+			GL.ActiveTexture(TextureUnit.Texture5);
 			_emissiveMap.Bind();
 			
 			_shaderProgram.SetValue("model", model);
@@ -109,7 +111,8 @@ namespace Renderer.GLObject
 			if (!_materials.ContainsKey(name))
 			{
 				Logger.Info($"Loading material \"{name}\"");
-				_materials.Add(name, new Material(name, isLit));
+				// ReSharper disable once ObjectCreationAsStatement
+				new Material(name, isLit);
 				Logger.Info($"Material \"{name}\" loaded");
 			}
 
