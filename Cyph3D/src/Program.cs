@@ -3,6 +3,8 @@ using System.Runtime.InteropServices;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 using OpenToolkit.Windowing.GraphicsLibraryFramework;
+using ImGuiNET;
+using ImGuiNET.Impl;
 using Renderer.GLObject;
 using Renderer.Misc;
 
@@ -49,6 +51,8 @@ namespace Renderer
 
 
 			Camera camera = Dungeon();
+			
+			ImGuiHelper.Init();
 
 			while (!Context.Window.ShouldClose)
 			{
@@ -62,6 +66,10 @@ namespace Renderer
 				Context.ObjectContainer.ForEach(o => o.Update(deltaTime));
 
 				camera.Render();
+				
+				ImGuiHelper.Update();
+
+				ImGuiHelper.Render();
 
 				Context.Window.SwapBuffers();
 			}
@@ -75,6 +83,8 @@ namespace Renderer
 			Mesh.DisposeAll();
 			Framebuffer.DisposeAll();
 
+			ImGuiHelper.Shutdown();
+			
 			GLFW.Terminate();
 		}
 

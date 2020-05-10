@@ -53,6 +53,14 @@ namespace Renderer.GLObject
 			GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, _size.x, _size.y, format, type, data);
 			Bind(previousTexture);
 		}
+		
+		public void PutData(IntPtr data, PixelFormat format = PixelFormat.Rgb, PixelType type = PixelType.UnsignedByte)
+		{
+			int previousTexture = CurrentlyBound;
+			Bind();
+			GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, _size.x, _size.y, format, type, data);
+			Bind(previousTexture);
+		}
 
 		public void Dispose()
 		{

@@ -9,10 +9,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="CjClutter.ObjLoader" Version="1.0.0" />
-      <PackageReference Include="GlmSharp" Version="0.9.8" />
-      <PackageReference Include="OpenTK" Version="4.0.0-pre9.1" />
-      <PackageReference Include="StbImageSharp" Version="2.22.4" />
+        <PackageReference Include="CjClutter.ObjLoader" Version="1.0.0" />
+        <PackageReference Include="GlmSharp" Version="0.9.8" />
+        <PackageReference Include="OpenTK" Version="4.0.0-pre9.1" />
+        <PackageReference Include="ImGui.NET" Version="1.75.0" />
+        <PackageReference Include="StbImageSharp" Version="2.22.4" />
     </ItemGroup>
 
     <ItemGroup>
