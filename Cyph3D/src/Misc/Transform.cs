@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using GlmSharp;
 
@@ -11,8 +12,40 @@ namespace Renderer.Misc
 		protected vec3 _rotation;
 		protected vec3 _scale;
 		protected mat4 _matrix;
+		private Transform _parent;
+		private List<Transform> _children = new List<Transform>();
 
-		protected bool _shouldRecalculate = true;
+		private bool _matrixChanged;
+		private bool _worldMatrixChanged;
+		
+		private mat4 _cachedWorldMatrix;
+		
+		protected void MatrixChanged()
+		{
+			_matrixChanged = true;
+			WorldMatrixChanged();
+		}
+		
+		protected void WorldMatrixChanged()
+		{
+			_worldMatrixChanged = true;
+			int childrenCount = _children.Count;
+			for (int i = 0; i < childrenCount; i++)
+			{
+				_children[i].WorldMatrixChanged();
+			}
+		}
+
+		public Transform Parent
+		{
+			get => _parent;
+			set
+			{
+				_parent?._children.Remove(this);
+				_parent = value;
+				_parent?._children.Add(this);
+			}
+		}
 		
 		public vec3 Position
 		{
@@ -23,7 +56,7 @@ namespace Renderer.Misc
 				Debug.Assert(value.x != _position.x || value.y != _position.y || value.z != _position.z);
 				
 				_position = value;
-				_shouldRecalculate = true;
+				MatrixChanged();
 			}
 		}
 
@@ -36,7 +69,7 @@ namespace Renderer.Misc
 				Debug.Assert(value.x != _rotation.x || value.y != _rotation.y || value.z != _rotation.z);
 				
 				_rotation = value;
-				_shouldRecalculate = true;
+				MatrixChanged();
 			}
 		}
 
@@ -49,7 +82,7 @@ namespace Renderer.Misc
 				Debug.Assert(value.x != _scale.x || value.y != _scale.y || value.z != _scale.z);
 				
 				_scale = value;
-				_shouldRecalculate = true;
+				MatrixChanged();
 			}
 		}
 
@@ -58,17 +91,30 @@ namespace Renderer.Misc
 			get
 			{
 				// ReSharper disable once InvertIf
-				if (_shouldRecalculate)
+				if (_matrixChanged)
 				{
 					_matrix = mat4.Translate(_position) *
 					         mat4.RotateZ(glm.Radians(_rotation.z)) *
 					         mat4.RotateY(glm.Radians(_rotation.y)) *
 					         mat4.RotateX(glm.Radians(_rotation.x)) *
 					         mat4.Scale(_scale);
-					_shouldRecalculate = false;
+					_matrixChanged = false;
 				}
 
 				return _matrix;
+			}
+		}
+
+		public mat4 WorldMatrix
+		{
+			get
+			{
+				if (_worldMatrixChanged)
+				{
+					_cachedWorldMatrix = Parent != null ? Parent.WorldMatrix * Matrix : Matrix;
+					_worldMatrixChanged = false;
+				}
+				return _cachedWorldMatrix;
 			}
 		}
 
@@ -77,6 +123,8 @@ namespace Renderer.Misc
 			Position = position ?? vec3.Zero;
 			Rotation = rotation ?? vec3.Zero;
 			Scale = scale ?? vec3.Ones;
+			
+			MatrixChanged();
 		}
 	}
 }

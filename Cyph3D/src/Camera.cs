@@ -144,7 +144,7 @@ namespace Renderer
 				new RenderObject(
 					Material.GetOrLoad("Sci-Fi/SpaceCase1", true),
 					Mesh.GetOrLoad("cube"),
-					Position + Orientation,
+					position: Position + Orientation,
 					angularVelocity: new vec3(0, 5f, 0),
 					scale: new vec3(0.5f)
 				)
@@ -159,7 +159,7 @@ namespace Renderer
 				new RenderObject(
 					Material.GetOrLoad("Metals/OrnateBrass", true),
 					Mesh.GetOrLoad("teapot"),
-					Position + Orientation,
+					position: Position + Orientation,
 					angularVelocity: new vec3(0, 0, 0)
 				)
 			);

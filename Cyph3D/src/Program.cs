@@ -174,8 +174,10 @@ namespace Renderer
 			return camera;
 		}
 
-		private static void TestQuat()
+		private static Camera TestQuat()
 		{
+			Camera camera = new Camera(new vec3(0, 0, -4));
+			
 			Context.LightManager.AddPointLight(
 				new PointLight(
 					new vec3(0, 5, 8),
@@ -207,6 +209,48 @@ namespace Renderer
 					angularVelocity: new vec3(30f, 0, 0)
 				)
 			);
+
+			return camera;
+		}
+		
+		private static Camera TextHierarchy()
+		{
+			Camera camera = new Camera(new vec3(0, 0, -6));
+
+			RenderObject root = new RenderObject(
+				Material.GetOrLoad(
+					"Sun",
+					false
+				),
+				Mesh.GetOrLoad("simple_cube")
+			);
+
+			RenderObject elem1 = new RenderObject(
+				Material.GetOrLoad(
+					"Sun",
+					false
+				),
+				Mesh.GetOrLoad("simple_cube"),
+				root,
+				position: new vec3(-2, 2, 0)
+			);
+
+			RenderObject elem2 = new RenderObject(
+				Material.GetOrLoad(
+					"Sun",
+					false
+				),
+				Mesh.GetOrLoad("simple_cube"),
+				elem1,
+				position: new vec3(-2, 2, 0),
+				angularVelocity: new vec3(0, 20, 0)
+			);
+			
+			Context.ObjectContainer.Add(root);
+			Context.ObjectContainer.Add(elem1);
+			Context.ObjectContainer.Add(elem2);
+
+			return camera;
 		}
 
 		private static Camera TestCube()

@@ -14,6 +14,8 @@ namespace Renderer.Misc
 			Scale = scale ?? vec3.Ones;
 			Velocity = velocity ?? vec3.Zero;
 			AngularVelocity = angularVelocity ?? vec3.Zero;
+			
+			MatrixChanged();
 		}
 
 		public void Update(double deltaTime)
