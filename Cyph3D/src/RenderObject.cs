@@ -24,10 +24,7 @@ namespace Renderer
 			_material = material;
 			_mesh = mesh;
 
-			Transform = new ActiveTransform(position, rotation, scale, velocity, angularVelocity)
-			{
-				Parent = parent?.Transform
-			};
+			Transform = new ActiveTransform(parent?.Transform, rotation, scale, velocity, angularVelocity);
 		}
 
 		public void Render(mat4 view, mat4 projection, vec3 cameraPos)

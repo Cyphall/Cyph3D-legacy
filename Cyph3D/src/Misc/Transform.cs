@@ -41,8 +41,10 @@ namespace Renderer.Misc
 			get => _parent;
 			set
 			{
+				if (this != Context.SceneRoot) return;
+				
 				_parent?._children.Remove(this);
-				_parent = value;
+				_parent = value ?? Context.SceneRoot;
 				_parent?._children.Add(this);
 			}
 		}
@@ -118,8 +120,9 @@ namespace Renderer.Misc
 			}
 		}
 
-		public Transform(vec3? position = null, vec3? rotation = null, vec3? scale = null)
+		public Transform(Transform parent = null, vec3? position = null, vec3? rotation = null, vec3? scale = null)
 		{
+			Parent = parent;
 			Position = position ?? vec3.Zero;
 			Rotation = rotation ?? vec3.Zero;
 			Scale = scale ?? vec3.Ones;

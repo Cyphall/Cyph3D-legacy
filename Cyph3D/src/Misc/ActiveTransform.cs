@@ -7,8 +7,9 @@ namespace Renderer.Misc
 		public vec3 Velocity { get; set; }
 		public vec3 AngularVelocity { get; set; }
 
-		public ActiveTransform(vec3? position = null, vec3? rotation = null, vec3? scale = null, vec3? velocity = null, vec3? angularVelocity = null)
+		public ActiveTransform(Transform parent = null, vec3? position = null, vec3? rotation = null, vec3? scale = null, vec3? velocity = null, vec3? angularVelocity = null)
 		{
+			Parent = parent;
 			Position = position ?? vec3.Zero;
 			Rotation = rotation ?? vec3.Zero;
 			Scale = scale ?? vec3.Ones;
