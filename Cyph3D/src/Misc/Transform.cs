@@ -123,9 +123,9 @@ namespace Renderer.Misc
 			}
 		}
 
-		public Transform(string name = "Object", Transform parent = null, vec3? position = null, vec3? rotation = null, vec3? scale = null)
+		public Transform(string name = null, Transform parent = null, vec3? position = null, vec3? rotation = null, vec3? scale = null)
 		{
-			Name = name;
+			Name = name ?? "Object";
 			Parent = parent;
 			Position = position ?? vec3.Zero;
 			Rotation = rotation ?? vec3.Zero;
