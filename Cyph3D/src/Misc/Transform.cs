@@ -13,12 +13,14 @@ namespace Renderer.Misc
 		protected vec3 _scale;
 		protected mat4 _matrix;
 		private Transform _parent;
-		private List<Transform> _children = new List<Transform>();
+		public List<Transform> Children { get; } = new List<Transform>();
 
 		private bool _matrixChanged;
 		private bool _worldMatrixChanged;
 		
 		private mat4 _cachedWorldMatrix;
+
+		public string Name { get; protected set; }
 		
 		protected void MatrixChanged()
 		{
@@ -29,10 +31,10 @@ namespace Renderer.Misc
 		protected void WorldMatrixChanged()
 		{
 			_worldMatrixChanged = true;
-			int childrenCount = _children.Count;
+			int childrenCount = Children.Count;
 			for (int i = 0; i < childrenCount; i++)
 			{
-				_children[i].WorldMatrixChanged();
+				Children[i].WorldMatrixChanged();
 			}
 		}
 
@@ -41,11 +43,11 @@ namespace Renderer.Misc
 			get => _parent;
 			set
 			{
-				if (this != Context.SceneRoot) return;
+				if (this == Context.SceneRoot) return;
 				
-				_parent?._children.Remove(this);
+				_parent?.Children.Remove(this);
 				_parent = value ?? Context.SceneRoot;
-				_parent?._children.Add(this);
+				_parent?.Children.Add(this);
 			}
 		}
 		
@@ -120,8 +122,9 @@ namespace Renderer.Misc
 			}
 		}
 
-		public Transform(Transform parent = null, vec3? position = null, vec3? rotation = null, vec3? scale = null)
+		public Transform(string name = "Object", Transform parent = null, vec3? position = null, vec3? rotation = null, vec3? scale = null)
 		{
+			Name = name;
 			Parent = parent;
 			Position = position ?? vec3.Zero;
 			Rotation = rotation ?? vec3.Zero;

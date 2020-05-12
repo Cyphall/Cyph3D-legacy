@@ -14,6 +14,7 @@ namespace Renderer
 		public RenderObject(
 			Material material,
 			Mesh mesh,
+			string name = null,
 			RenderObject parent = null,
 			vec3? position = null,
 			vec3? rotation = null,
@@ -24,7 +25,7 @@ namespace Renderer
 			_material = material;
 			_mesh = mesh;
 
-			Transform = new ActiveTransform(parent?.Transform, rotation, scale, velocity, angularVelocity);
+			Transform = new ActiveTransform(name, parent?.Transform, rotation, scale, velocity, angularVelocity);
 		}
 
 		public void Render(mat4 view, mat4 projection, vec3 cameraPos)

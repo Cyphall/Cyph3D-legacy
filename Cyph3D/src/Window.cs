@@ -27,10 +27,10 @@ namespace Renderer
 		public ivec2 Center => Size / 2;
 
 		private bool _guiMode = true;
-		private bool GuiMode
+		public bool GuiMode
 		{
 			get => _guiMode;
-			set
+			private set
 			{
 				_guiMode = value;
 				switch (value)

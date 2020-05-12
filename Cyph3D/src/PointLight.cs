@@ -6,7 +6,7 @@ namespace Renderer
 {
 	public class PointLight
 	{
-		public Transform Transform { get; } = new Transform();
+		public Transform Transform { get; }
 		private vec3 _sRGBColor;
 		private vec3 _linearColor;
 
@@ -21,9 +21,9 @@ namespace Renderer
 		}
 		public float Intensity { get; }
 
-		public PointLight(vec3 position, vec3 color, float intensity)
+		public PointLight(vec3? position, vec3 color, float intensity)
 		{
-			Transform.Position = position;
+			Transform = new Transform("PointLight", position: position);
 			Color = color;
 			Intensity = intensity;
 		}

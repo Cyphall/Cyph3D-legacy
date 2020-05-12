@@ -167,7 +167,8 @@ namespace Renderer
 						"Tiles/WallBrick",
 						true
 					),
-					Mesh.GetOrLoad("dungeon")
+					Mesh.GetOrLoad("dungeon"),
+					"Dungeon"
 				)
 			);
 
@@ -231,7 +232,7 @@ namespace Renderer
 					false
 				),
 				Mesh.GetOrLoad("simple_cube"),
-				root,
+				parent: root,
 				position: new vec3(-2, 2, 0)
 			);
 
@@ -241,7 +242,7 @@ namespace Renderer
 					false
 				),
 				Mesh.GetOrLoad("simple_cube"),
-				elem1,
+				parent: elem1,
 				position: new vec3(-2, 2, 0),
 				angularVelocity: new vec3(0, 20, 0)
 			);
