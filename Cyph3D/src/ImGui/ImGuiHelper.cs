@@ -68,7 +68,11 @@ namespace ImGuiNET.Impl
 				{
 					if (ImGui.TreeNode(transform.Name))
 					{
-						transform.Children.ForEach( c => AddToTree(c));
+						int childrenCount = transform.Children.Count;
+						for (int i = 0; i < childrenCount; i++)
+						{
+							AddToTree(transform.Children[i]);
+						}
 						ImGui.TreePop();
 					}
 				}
