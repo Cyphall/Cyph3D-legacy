@@ -150,7 +150,7 @@ vec4 lighting()
 		Lo += (kD * color / PI + specular) * radiance * NdotL;
 	}
 
-	return reinhard_tone_mapping(max(Lo, saturate(color) * emissiveIntensity));
+	return reinhard_tone_mapping(Lo + saturate(color) * emissiveIntensity);
 }
 
 vec3 getPosition()
