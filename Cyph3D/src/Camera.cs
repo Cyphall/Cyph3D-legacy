@@ -30,7 +30,7 @@ namespace Renderer
 			}
 		}
 
-		private ivec2 _winCenter;
+		private vec2 _previousMousePos;
 
 		private mat4 Projection { get; }
 		private mat4 View => mat4.LookAt(Position,  Position + Orientation, new vec3(0, 1, 0));
@@ -69,8 +69,7 @@ namespace Renderer
 
 			Projection = MathExt.Perspective(100, (float)Context.Window.Size.x / Context.Window.Size.y, 0.0001f, 1000f);
 
-			_winCenter = Context.Window.Size / 2;
-			Context.Window.CursorPos = _winCenter;
+			_previousMousePos = Context.Window.CursorPos;
 		}
 
 		private void RecalculateOrientation()
@@ -97,6 +96,12 @@ namespace Renderer
 
 		public void Update(double deltaTime)
 		{
+			if (Context.Window.GuiOpen)
+			{
+				_previousMousePos = Context.Window.CursorPos;
+				return;
+			}
+			
 			float ratio = (float)deltaTime * 2;
 
 			if (Context.Window.GetKey(Keys.LeftControl) == InputAction.Press)
@@ -128,12 +133,12 @@ namespace Renderer
 			// Context.Window.LeftClickCallback = LeftClick;
 			// Context.Window.RightClickCallback = RightClick;
 			
-			vec2 mouseOffset = Context.Window.CursorPos;
-			mouseOffset -= _winCenter;
-
-			SphericalCoords += new vec2(-mouseOffset.x / 12, -mouseOffset.y / 12);
+			vec2 currentMousePos = Context.Window.CursorPos;
 			
-			Context.Window.CursorPos = _winCenter;
+			vec2 mouseOffset = currentMousePos - _previousMousePos;
+			SphericalCoords -= mouseOffset / 12;
+			
+			_previousMousePos = currentMousePos;
 		}
 
 		private void LeftClick(InputAction action, KeyModifiers mods)

@@ -1,5 +1,6 @@
 ﻿using GlmSharp;
 using OpenToolkit.Windowing.GraphicsLibraryFramework;
+using Renderer.Misc;
 using GLFWWindow = OpenToolkit.Windowing.GraphicsLibraryFramework.Window;
 
 namespace Renderer
@@ -25,23 +26,24 @@ namespace Renderer
 
 		public ivec2 Center => Size / 2;
 
-		private bool _guiMode = true;
-		public bool GuiMode
+		private bool _guiOpen = true;
+		public bool GuiOpen
 		{
-			get => _guiMode;
+			get => _guiOpen;
 			private set
 			{
-				_guiMode = value;
+				_guiOpen = value;
 				switch (value)
 				{
 					case true:
 						GLFW.SetInputMode(_glfwWindow, CursorStateAttribute.Cursor, CursorModeValue.CursorNormal);
+						CursorPos = Center;
 						break;
 					case false:
-						CursorPos = Center;
 						GLFW.SetInputMode(_glfwWindow, CursorStateAttribute.Cursor, CursorModeValue.CursorDisabled);
 						break;
 				}
+				
 			}
 		}
 
@@ -49,17 +51,10 @@ namespace Renderer
 		{
 			get
 			{
-				if (GuiMode)
-					return Center;
-				
 				GLFW.GetCursorPos(_glfwWindow, out double x, out double y);
 				return new vec2((float)x, (float)y);
 			}
-			set
-			{
-				if (!GuiMode)
-					GLFW.SetCursorPos(_glfwWindow, value.x, value.y);
-			}
+			set => GLFW.SetCursorPos(_glfwWindow, value.x, value.y);
 		}
 
 		public bool ShouldClose
@@ -81,32 +76,49 @@ namespace Renderer
 
 		private GLFWCallbacks.MouseButtonCallback _mouseButtonCallback;
 		private GLFWCallbacks.KeyCallback _keyCallback;
+		private GLFWCallbacks.CursorPosCallback _cursorPosCallback;
 		
-		public Window()
+		public Window(ivec2? size = null)
 		{
-			Monitor* monitor = GLFW.GetPrimaryMonitor();
-			VideoMode* mode = GLFW.GetVideoMode(monitor);
-			_glfwWindow = GLFW.CreateWindow(mode->Width, mode->Height, "Cyph3D", monitor, null);
-			
-			GLFW.MakeContextCurrent(_glfwWindow);
-			GuiMode = false;
-			
-			SetCallbacks();
-		}
-		
-		public Window(ivec2 size)
-		{
-			_glfwWindow = GLFW.CreateWindow(size.x, size.y, "Cyph3D", null, null);
-			
-			GLFW.MakeContextCurrent(_glfwWindow);
-			GuiMode = false;
-			
-			VideoMode* vidmode = GLFW.GetVideoMode(GLFW.GetPrimaryMonitor());
-			if (vidmode != null)
+			GLFW.Init();
+
+			GLFW.SetErrorCallback((code, message) => Logger.Error(message, "GLFW"));
+
+			GLFW.WindowHint(WindowHintInt.ContextVersionMajor, 4);
+			GLFW.WindowHint(WindowHintInt.ContextVersionMinor, 6);
+			GLFW.WindowHint(WindowHintBool.OpenGLDebugContext, true);
+			GLFW.WindowHint(WindowHintInt.DepthBits, 0);
+			GLFW.WindowHint(WindowHintInt.StencilBits, 0);
+			GLFW.WindowHint(WindowHintOpenGlProfile.OpenGlProfile, OpenGlProfile.Core);
+
+			if (size != null)
 			{
-				GLFW.SetWindowPos(_glfwWindow, (vidmode->Width - size.x) / 2, (vidmode->Height- size.y) / 2);
+				_glfwWindow = GLFW.CreateWindow(size.Value.x, size.Value.y, "Cyph3D", null, null);
 			}
+			else
+			{
+				Monitor* monitor = GLFW.GetPrimaryMonitor();
+				VideoMode* mode = GLFW.GetVideoMode(monitor);
+				_glfwWindow = GLFW.CreateWindow(mode->Width, mode->Height, "Cyph3D", monitor, null);
+			}
+
+			GLFW.MakeContextCurrent(_glfwWindow);
+			GuiOpen = false;
 			
+			GLFW.GetVersion(out int major, out int minor, out int revision);
+			Logger.Info($"Version {major}.{minor}.{revision}", "GLFW");
+			
+			GLFW.SetInputMode(_glfwWindow, (StickyAttributes)0x00033005, true); // Enable raw mouse
+
+			if (size != null)
+			{
+				VideoMode* vidmode = GLFW.GetVideoMode(GLFW.GetPrimaryMonitor());
+				if (vidmode != null)
+				{
+					GLFW.SetWindowPos(_glfwWindow, (vidmode->Width - size.Value.x) / 2, (vidmode->Height- size.Value.y) / 2);
+				}
+			}
+
 			SetCallbacks();
 		}
 
@@ -118,9 +130,12 @@ namespace Renderer
 			_keyCallback = KeyCallback;
 			GLFW.SetKeyCallback(_glfwWindow, _keyCallback);
 
+			_cursorPosCallback = CursorPosCallback;
+			GLFW.SetCursorPosCallback(_glfwWindow, _cursorPosCallback);
+
 			KeyEvent += (key, action, mods) => {
 				if (key == Keys.LeftAlt && action == InputAction.Press)
-					GuiMode = !GuiMode;
+					GuiOpen = !GuiOpen;
 			};
 		}
 
@@ -156,6 +171,11 @@ namespace Renderer
 		private void KeyCallback(GLFWWindow* window, Keys key, int scancode, InputAction action, KeyModifiers mods)
 		{
 			KeyEvent?.Invoke(key, action, mods);
+		}
+		
+		private void CursorPosCallback(GLFWWindow* window, double x, double y)
+		{
+			CursorPos = new vec2((float)x, (float)y);
 		}
 	}
 }

@@ -13,17 +13,7 @@ namespace Renderer
 	{
 		private static void Main()
 		{
-			GLFW.Init();
-
-			GLFW.SetErrorCallback((code, message) => Logger.Error(message, "GLFW"));
-
-
-			GLFW.WindowHint(WindowHintInt.ContextVersionMajor, 4);
-			GLFW.WindowHint(WindowHintInt.ContextVersionMinor, 6);
-			GLFW.WindowHint(WindowHintBool.OpenGLDebugContext, true);
-			GLFW.WindowHint(WindowHintInt.DepthBits, 0);
-			GLFW.WindowHint(WindowHintInt.StencilBits, 0);
-			GLFW.WindowHint(WindowHintOpenGlProfile.OpenGlProfile, OpenGlProfile.Core);
+			
 
 			Context.Window = new Window();
 

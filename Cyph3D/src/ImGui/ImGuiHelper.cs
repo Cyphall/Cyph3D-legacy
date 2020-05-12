@@ -46,7 +46,7 @@ namespace ImGuiNET.Impl
 
 		private static void HierarchyWindow()
 		{
-			if (!Context.Window.GuiMode) return;
+			if (!Context.Window.GuiOpen) return;
 			
 			ImGui.SetNextWindowSize(new Vector2(200, 500));
 			ImGui.SetNextWindowPos(new Vector2(0));
