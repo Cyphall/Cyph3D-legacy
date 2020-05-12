@@ -1,8 +1,8 @@
-﻿using GlmSharp;
-using Renderer.GLObject;
-using Renderer.Misc;
+﻿using Cyph3D.GLObject;
+using Cyph3D.Misc;
+using GlmSharp;
 
-namespace Renderer
+namespace Cyph3D
 {
 	public class RenderObject
 	{

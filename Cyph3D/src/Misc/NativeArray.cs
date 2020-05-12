@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Renderer.Misc
+namespace Cyph3D.Misc
 {
 	public unsafe class NativeArray<T> : IDisposable where T : unmanaged
 	{

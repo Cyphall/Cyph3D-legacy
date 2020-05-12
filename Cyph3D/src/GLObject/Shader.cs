@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Cyph3D.Misc;
 using OpenToolkit.Graphics.OpenGL4;
-using Renderer.Misc;
 
-namespace Renderer.GLObject
+namespace Cyph3D.GLObject
 {
 	public class Shader : IDisposable
 	{

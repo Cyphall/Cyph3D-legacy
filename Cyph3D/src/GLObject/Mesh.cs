@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Cyph3D.Misc;
 using GlmSharp;
 using ObjLoader.Loader.Data.Elements;
 using ObjLoader.Loader.Data.VertexData;
 using ObjLoader.Loader.Loaders;
 using OpenToolkit.Graphics.OpenGL4;
-using Renderer.Misc;
 using OBJTexture = ObjLoader.Loader.Data.VertexData.Texture;
 
-namespace Renderer.GLObject
+namespace Cyph3D.GLObject
 {
 	public class Mesh : IDisposable
 	{

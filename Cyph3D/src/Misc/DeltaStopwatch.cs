@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Renderer.Misc
+namespace Cyph3D.Misc
 {
 	public class DeltaStopwatch : Stopwatch
 	{

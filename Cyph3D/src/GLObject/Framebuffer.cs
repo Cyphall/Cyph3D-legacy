@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cyph3D.Enum;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
-using Renderer.Enum;
 
-namespace Renderer.GLObject
+namespace Cyph3D.GLObject
 {
 	public class Framebuffer : IDisposable
 	{

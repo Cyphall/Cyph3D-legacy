@@ -2,10 +2,10 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
+using Cyph3D.Enum;
+using Cyph3D.GLObject;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
-using Renderer.Enum;
-using Renderer.GLObject;
 
 namespace ImGuiNET.Impl
 {

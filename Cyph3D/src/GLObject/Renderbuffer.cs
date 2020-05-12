@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 
-namespace Renderer.GLObject
+namespace Cyph3D.GLObject
 {
 	public class Renderbuffer : IDisposable
 	{

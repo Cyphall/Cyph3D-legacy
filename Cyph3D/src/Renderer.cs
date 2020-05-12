@@ -1,10 +1,10 @@
 ﻿using System;
+using Cyph3D.Enum;
+using Cyph3D.GLObject;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
-using Renderer.Enum;
-using Renderer.GLObject;
 
-namespace Renderer
+namespace Cyph3D
 {
 	public class Renderer
 	{

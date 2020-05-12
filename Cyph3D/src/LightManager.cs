@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Renderer.Misc;
+using Cyph3D.Misc;
 
-namespace Renderer
+namespace Cyph3D
 {
 	public class LightManager : IDisposable
 	{

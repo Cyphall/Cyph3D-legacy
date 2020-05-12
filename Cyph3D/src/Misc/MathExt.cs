@@ -1,6 +1,6 @@
 ﻿using GlmSharp;
 
-namespace Renderer.Misc
+namespace Cyph3D.Misc
 {
 	public static class MathExt
 	{

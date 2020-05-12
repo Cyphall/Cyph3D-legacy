@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Cyph3D.Enum;
+using Cyph3D.Misc;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
-using Renderer.Enum;
-using Renderer.Misc;
 using StbImageSharp;
 
-namespace Renderer.GLObject
+namespace Cyph3D.GLObject
 {
 	public class Texture : IDisposable
 	{

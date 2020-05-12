@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using GlmSharp;
 
-namespace Renderer.Misc
+namespace Cyph3D.Misc
 {
 	[SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
 	public class Transform

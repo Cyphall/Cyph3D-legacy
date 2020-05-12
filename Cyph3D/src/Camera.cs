@@ -1,10 +1,10 @@
 ﻿using System;
+using Cyph3D.GLObject;
+using Cyph3D.Misc;
 using GlmSharp;
 using OpenToolkit.Windowing.GraphicsLibraryFramework;
-using Renderer.GLObject;
-using Renderer.Misc;
 
-namespace Renderer
+namespace Cyph3D
 {
 	public class Camera
 	{

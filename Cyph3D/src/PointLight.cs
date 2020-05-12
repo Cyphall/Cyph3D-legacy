@@ -1,8 +1,8 @@
 ﻿using System.Runtime.InteropServices;
+using Cyph3D.Misc;
 using GlmSharp;
-using Renderer.Misc;
 
-namespace Renderer
+namespace Cyph3D
 {
 	public class PointLight
 	{

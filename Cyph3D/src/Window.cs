@@ -1,9 +1,9 @@
-﻿using GlmSharp;
+﻿using Cyph3D.Misc;
+using GlmSharp;
 using OpenToolkit.Windowing.GraphicsLibraryFramework;
-using Renderer.Misc;
 using GLFWWindow = OpenToolkit.Windowing.GraphicsLibraryFramework.Window;
 
-namespace Renderer
+namespace Cyph3D
 {
 	public unsafe class Window
 	{

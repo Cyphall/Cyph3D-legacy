@@ -1,20 +1,18 @@
 using System;
 using System.Runtime.InteropServices;
+using Cyph3D.GLObject;
+using Cyph3D.Misc;
 using GlmSharp;
 using ImGuiNET.Impl;
 using OpenToolkit.Graphics.OpenGL4;
 using OpenToolkit.Windowing.GraphicsLibraryFramework;
-using Renderer.GLObject;
-using Renderer.Misc;
 
-namespace Renderer
+namespace Cyph3D
 {
 	internal static class Program
 	{
 		private static void Main()
 		{
-			
-
 			Context.Window = new Window();
 
 			GL.LoadBindings(new GLFWBindingsContext());
@@ -37,7 +35,6 @@ namespace Renderer
 					}
 				}, IntPtr.Zero
 			);
-
 
 			Camera camera = Dungeon();
 			

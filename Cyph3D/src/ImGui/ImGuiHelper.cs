@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
-using Renderer;
-using Renderer.Misc;
+using Cyph3D;
+using Cyph3D.Misc;
 
 namespace ImGuiNET.Impl
 {
