@@ -44,6 +44,7 @@ namespace Renderer.Misc
 			set
 			{
 				if (this == Context.SceneRoot) return;
+				if (this == value) return;
 				
 				_parent?.Children.Remove(this);
 				_parent = value ?? Context.SceneRoot;
