@@ -55,8 +55,6 @@ vec2 POM(vec2 texCoords, vec3 viewDir)
 	const int   layerCount           = 8;
 	const int   resamplingLoopCount  = 6;
 	
-	if (viewDir.z <= 0) discard;
-	
 	// Initial sampling pass
 	vec2 currentTexCoords = texCoords;
 
@@ -64,6 +62,8 @@ vec2 POM(vec2 texCoords, vec3 viewDir)
 	float previousTexDepth;
 
 	if (currentTexDepth == 0 || layerCount == 0) return texCoords;
+
+	if (viewDir.z <= 0) discard;
 
 	// Offsets applied at each steps
 	vec2  texCoordsStepOffset = -(viewDir.xy / viewDir.z) / layerCount * depthScale;
