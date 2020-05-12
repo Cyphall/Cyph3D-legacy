@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
-using OpenToolkit.Mathematics;
 using Renderer.Misc;
 
 namespace Renderer.GLObject

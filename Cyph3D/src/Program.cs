@@ -1,10 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 using GlmSharp;
+using ImGuiNET.Impl;
 using OpenToolkit.Graphics.OpenGL4;
 using OpenToolkit.Windowing.GraphicsLibraryFramework;
-using ImGuiNET;
-using ImGuiNET.Impl;
 using Renderer.GLObject;
 using Renderer.Misc;
 

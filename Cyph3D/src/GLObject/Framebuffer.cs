@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 using Renderer.Enum;
