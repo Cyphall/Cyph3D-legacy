@@ -20,7 +20,7 @@ namespace Cyph3D
 
 		public Renderer()
 		{
-			_gbuffer = new Framebuffer(out _positionTexture, Context.Window.Size, (InternalFormat) All.Rgb32f);
+			_gbuffer = new Framebuffer(out _positionTexture, Engine.Window.Size, (InternalFormat) All.Rgb32f);
 			_normalTexture = _gbuffer.AddTexture(FramebufferAttachment.ColorAttachment1, InternalFormat.Rgb8);
 			_colorTexture = _gbuffer.AddTexture(FramebufferAttachment.ColorAttachment2, InternalFormat.Rgb16f);
 			_materialTexture = _gbuffer.AddTexture(FramebufferAttachment.ColorAttachment3, InternalFormat.Rgba8);
@@ -89,17 +89,17 @@ namespace Cyph3D
 
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-			int objectCount = Context.ObjectContainer.Count;
+			int objectCount = Engine.ObjectContainer.Count;
 			for (int i = 0; i < objectCount; i++)
 			{
-				Context.ObjectContainer[i].Render(view, projection, viewPos);
+				Engine.ObjectContainer[i].Render(view, projection, viewPos);
 			}
 		}
 
 		private void LightingPass(vec3 viewPos)
 		{
-			if (Context.LightManager.PointLightsChanged)
-				_lightsBuffer.PutData(Context.LightManager.PointLightsNative);
+			if (Engine.LightManager.PointLightsChanged)
+				_lightsBuffer.PutData(Engine.LightManager.PointLightsNative);
 
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 

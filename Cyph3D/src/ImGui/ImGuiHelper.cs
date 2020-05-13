@@ -14,7 +14,7 @@ namespace ImGuiNET.Impl
 			_context = ImGui.CreateContext();
 			ImGui.SetCurrentContext(_context);
 			
-			ImplGlfw.Init(Context.Window);
+			ImplGlfw.Init(Cyph3D.Engine.Window);
 			ImplOpenGL.Init();
 			
 			ImGui.StyleColorsDark();
@@ -46,7 +46,7 @@ namespace ImGuiNET.Impl
 
 		private static void HierarchyWindow()
 		{
-			if (!Context.Window.GuiOpen) return;
+			if (!Cyph3D.Engine.Window.GuiOpen) return;
 			
 			ImGui.SetNextWindowSize(new Vector2(200, 500));
 			ImGui.SetNextWindowPos(new Vector2(0));
@@ -55,7 +55,7 @@ namespace ImGuiNET.Impl
 			{
 				ImGui.SetNextItemOpen(true, ImGuiCond.Appearing);
 				
-				AddToTree(Context.SceneRoot);
+				AddToTree(Cyph3D.Engine.SceneRoot);
 			
 				ImGui.End();
 			}

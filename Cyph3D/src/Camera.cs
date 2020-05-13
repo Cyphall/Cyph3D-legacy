@@ -67,9 +67,9 @@ namespace Cyph3D
 
 			SphericalCoords = sphericalCoords;
 
-			Projection = MathExt.Perspective(100, (float)Context.Window.Size.x / Context.Window.Size.y, 0.0001f, 1000f);
+			Projection = MathExt.Perspective(100, (float)Engine.Window.Size.x / Engine.Window.Size.y, 0.0001f, 1000f);
 
-			_previousMousePos = Context.Window.CursorPos;
+			_previousMousePos = Engine.Window.CursorPos;
 		}
 
 		private void RecalculateOrientation()
@@ -96,36 +96,36 @@ namespace Cyph3D
 
 		public void Update(double deltaTime)
 		{
-			if (Context.Window.GuiOpen)
+			if (Engine.Window.GuiOpen)
 			{
-				_previousMousePos = Context.Window.CursorPos;
+				_previousMousePos = Engine.Window.CursorPos;
 				return;
 			}
 			
 			float ratio = (float)deltaTime * 2;
 
-			if (Context.Window.GetKey(Keys.LeftControl) == InputAction.Press)
+			if (Engine.Window.GetKey(Keys.LeftControl) == InputAction.Press)
 			{
 				ratio /= 20;
 			}
-			if (Context.Window.GetKey(Keys.LeftShift) == InputAction.Press)
+			if (Engine.Window.GetKey(Keys.LeftShift) == InputAction.Press)
 			{
 				ratio *= 5;
 			}
 
-			if (Context.Window.GetKey(Keys.W) == InputAction.Press)
+			if (Engine.Window.GetKey(Keys.W) == InputAction.Press)
 			{
 				Position += Orientation * ratio;
 			}
-			if (Context.Window.GetKey(Keys.S) == InputAction.Press)
+			if (Engine.Window.GetKey(Keys.S) == InputAction.Press)
 			{
 				Position -= Orientation * ratio;
 			}
-			if (Context.Window.GetKey(Keys.A) == InputAction.Press)
+			if (Engine.Window.GetKey(Keys.A) == InputAction.Press)
 			{
 				Position += SideOrientation * ratio;
 			}
-			if (Context.Window.GetKey(Keys.D) == InputAction.Press)
+			if (Engine.Window.GetKey(Keys.D) == InputAction.Press)
 			{
 				Position -= SideOrientation * ratio;
 			}
@@ -133,7 +133,7 @@ namespace Cyph3D
 			// Context.Window.LeftClickCallback = LeftClick;
 			// Context.Window.RightClickCallback = RightClick;
 			
-			vec2 currentMousePos = Context.Window.CursorPos;
+			vec2 currentMousePos = Engine.Window.CursorPos;
 			
 			vec2 mouseOffset = currentMousePos - _previousMousePos;
 			SphericalCoords -= mouseOffset / 12;
@@ -145,7 +145,7 @@ namespace Cyph3D
 		{
 			if (action != InputAction.Press) return;
 			
-			Context.ObjectContainer.Add(
+			Engine.ObjectContainer.Add(
 				new RenderObject(
 					Material.GetOrLoad("Sci-Fi/SpaceCase1", true),
 					Mesh.GetOrLoad("cube"),
@@ -160,7 +160,7 @@ namespace Cyph3D
 		{
 			if (action != InputAction.Press) return;
 			
-			Context.ObjectContainer.Add(
+			Engine.ObjectContainer.Add(
 				new RenderObject(
 					Material.GetOrLoad("Metals/OrnateBrass", true),
 					Mesh.GetOrLoad("teapot"),

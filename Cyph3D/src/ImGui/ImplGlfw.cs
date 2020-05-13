@@ -143,8 +143,8 @@ namespace ImGuiNET.Impl
             _prevUserCallbackScroll = null;
             _prevUserCallbackChar = null;
             
-            Context.Window.MouseButtonEvent += MouseButtonCallback;
-            Context.Window.KeyEvent += KeyCallback;
+            Cyph3D.Engine.Window.MouseButtonEvent += MouseButtonCallback;
+            Cyph3D.Engine.Window.KeyEvent += KeyCallback;
 
             _callbackScroll = ScrollCallback;
             funcPointer = GLFW.SetScrollCallback(window, _callbackScroll);

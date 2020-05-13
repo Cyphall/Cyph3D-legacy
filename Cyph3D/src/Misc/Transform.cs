@@ -43,11 +43,11 @@ namespace Cyph3D.Misc
 			get => _parent;
 			set
 			{
-				if (this == Context.SceneRoot) return;
+				if (this == Engine.SceneRoot) return;
 				if (this == value) return;
 				
 				_parent?.Children.Remove(this);
-				_parent = value ?? Context.SceneRoot;
+				_parent = value ?? Engine.SceneRoot;
 				_parent?.Children.Add(this);
 			}
 		}
