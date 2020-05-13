@@ -32,8 +32,8 @@ namespace Cyph3D
 
 		private vec2 _previousMousePos;
 
-		private mat4 Projection { get; }
-		private mat4 View => mat4.LookAt(Position,  Position + Orientation, new vec3(0, 1, 0));
+		public mat4 Projection { get; }
+		public mat4 View => mat4.LookAt(Position,  Position + Orientation, new vec3(0, 1, 0));
 
 		// x: phi (horizontal) 0 to 360
 		// y: theta (vertical) -89 to 89
@@ -49,7 +49,7 @@ namespace Cyph3D
 		}
 
 		private vec3 _position;
-		private vec3 Position
+		public vec3 Position
 		{
 			get => _position;
 			set
@@ -58,8 +58,6 @@ namespace Cyph3D
 				_orientationChanged = true;
 			}
 		}
-
-		private Renderer _renderer = new Renderer();
 
 		public Camera(vec3 position = default, vec2 sphericalCoords = default)
 		{
@@ -168,11 +166,6 @@ namespace Cyph3D
 					angularVelocity: new vec3(0, 0, 0)
 				)
 			);
-		}
-
-		public void Render()
-		{
-			_renderer.Render(View, Projection, Position);
 		}
 	}
 }

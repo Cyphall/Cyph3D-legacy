@@ -16,6 +16,7 @@ namespace Cyph3D
 		public static Transform SceneRoot { get; } = new Transform("Root");
 		public static LightManager LightManager { get; } = new LightManager();
 		public static Camera Camera { get; private set; }
+		public static Renderer Renderer { get; private set; }
 
 		public static void Init()
 		{
@@ -41,6 +42,8 @@ namespace Cyph3D
 					}
 				}, IntPtr.Zero
 			);
+			
+			Renderer = new Renderer();
 
 			Camera = ScenePreset.Dungeon();
 			
@@ -53,17 +56,14 @@ namespace Cyph3D
 			{
 				GLFW.PollEvents();
 
-				if (Window.GetKey(Keys.Escape) == InputAction.Press) Window.ShouldClose = true;
-
 				double deltaTime = Logger.Time.DeltaTime;
 
 				Camera.Update(deltaTime);
 				ObjectContainer.ForEach(o => o.Update(deltaTime));
-
-				Camera.Render();
+				
+				Renderer.Render(Camera);
 				
 				ImGuiHelper.Update();
-
 				ImGuiHelper.Render();
 
 				Window.SwapBuffers();

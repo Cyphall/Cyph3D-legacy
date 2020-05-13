@@ -134,8 +134,18 @@ namespace Cyph3D
 			GLFW.SetCursorPosCallback(_glfwWindow, _cursorPosCallback);
 
 			KeyEvent += (key, action, mods) => {
-				if (key == Keys.LeftAlt && action == InputAction.Press)
-					GuiOpen = !GuiOpen;
+				if (action == InputAction.Press)
+				{
+					switch (key)
+					{
+						case Keys.LeftAlt:
+							GuiOpen = !GuiOpen;
+							break;
+						case Keys.Escape:
+							ShouldClose = true;
+							break;
+					}
+				}
 			};
 		}
 

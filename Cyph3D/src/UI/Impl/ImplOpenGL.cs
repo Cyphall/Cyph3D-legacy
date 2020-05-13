@@ -8,7 +8,7 @@ using GlmSharp;
 using ImGuiNET;
 using OpenToolkit.Graphics.OpenGL4;
 
-namespace Cyph3D.UI
+namespace Cyph3D.UI.Impl
 {
 	public static unsafe class ImplOpenGL
 	{

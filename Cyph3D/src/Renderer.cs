@@ -77,10 +77,10 @@ namespace Cyph3D
 			_lightsBuffer = new ShaderStorageBuffer(0);
 		}
 
-		public void Render(mat4 view, mat4 projection, vec3 viewPos)
+		public void Render(Camera camera)
 		{
-			FirstPass(view, projection, viewPos);
-			LightingPass(viewPos);
+			FirstPass(camera.View, camera.Projection, camera.Position);
+			LightingPass(camera.Position);
 		}
 
 		private void FirstPass(mat4 view, mat4 projection, vec3 viewPos)
