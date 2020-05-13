@@ -4,9 +4,9 @@ using ImGuiNET;
 
 namespace Cyph3D.UI.Window
 {
-	public static class UIHierarchy
+	public class UIHierarchy : IUIWindow
 	{
-		public static void Show()
+		public void Show()
 		{
 			ImGui.SetNextWindowSize(new Vector2(200, 500));
 			ImGui.SetNextWindowPos(new Vector2(0));

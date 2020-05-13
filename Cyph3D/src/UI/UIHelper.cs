@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cyph3D.UI.Impl;
 using Cyph3D.UI.Window;
 using ImGuiNET;
@@ -8,6 +9,7 @@ namespace Cyph3D.UI
 	public static unsafe class ImGuiHelper
 	{
 		private static IntPtr _context = IntPtr.Zero;
+		private static List<IUIWindow> _windows = new List<IUIWindow>();
 		
 		public static void Init()
 		{
@@ -18,6 +20,9 @@ namespace Cyph3D.UI
 			ImplOpenGL.Init();
 			
 			ImGui.StyleColorsDark();
+			
+			_windows.Add(new UIHierarchy());
+			_windows.Add(new UIDebug());
 		}
 
 		public static void Render()
@@ -33,8 +38,11 @@ namespace Cyph3D.UI
 			ImGui.NewFrame();
 			
 			if (!Engine.Window.GuiOpen) return;
-			
-			UIHierarchy.Show();
+
+			for (int i = 0; i < _windows.Count; i++)
+			{
+				_windows[i].Show();
+			}
 		}
 
 		public static void Shutdown()
