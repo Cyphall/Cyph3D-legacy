@@ -17,6 +17,8 @@ namespace Cyph3D
 		private int _quadVAO;
 		private ShaderProgram _lightingPassShader;
 		private ShaderStorageBuffer _lightsBuffer;
+		
+		public bool Debug { get; set; }
 
 		public Renderer()
 		{
@@ -109,7 +111,7 @@ namespace Cyph3D
 
 			_lightingPassShader.SetValue("viewPos", viewPos);
 
-			_lightingPassShader.SetValue("debug", 0);
+			_lightingPassShader.SetValue("debug", Debug ? 1 : 0);
 
 			GL.ActiveTexture(TextureUnit.Texture0);
 			_positionTexture.Bind();
