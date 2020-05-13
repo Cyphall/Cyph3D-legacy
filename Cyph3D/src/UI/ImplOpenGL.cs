@@ -5,9 +5,10 @@ using System.Text;
 using Cyph3D.Enum;
 using Cyph3D.GLObject;
 using GlmSharp;
+using ImGuiNET;
 using OpenToolkit.Graphics.OpenGL4;
 
-namespace ImGuiNET.Impl
+namespace Cyph3D.UI
 {
 	public static unsafe class ImplOpenGL
 	{

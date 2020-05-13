@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Numerics;
-using Cyph3D;
 using Cyph3D.Misc;
+using ImGuiNET;
 
-namespace ImGuiNET.Impl
+namespace Cyph3D.UI
 {
 	public static unsafe class ImGuiHelper
 	{
@@ -14,7 +14,7 @@ namespace ImGuiNET.Impl
 			_context = ImGui.CreateContext();
 			ImGui.SetCurrentContext(_context);
 			
-			ImplGlfw.Init(Cyph3D.Engine.Window);
+			ImplGlfw.Init(Engine.Window);
 			ImplOpenGL.Init();
 			
 			ImGui.StyleColorsDark();
@@ -46,7 +46,7 @@ namespace ImGuiNET.Impl
 
 		private static void HierarchyWindow()
 		{
-			if (!Cyph3D.Engine.Window.GuiOpen) return;
+			if (!Engine.Window.GuiOpen) return;
 			
 			ImGui.SetNextWindowSize(new Vector2(200, 500));
 			ImGui.SetNextWindowPos(new Vector2(0));
@@ -55,7 +55,7 @@ namespace ImGuiNET.Impl
 			{
 				ImGui.SetNextItemOpen(true, ImGuiCond.Appearing);
 				
-				AddToTree(Cyph3D.Engine.SceneRoot);
+				AddToTree(Engine.SceneRoot);
 			
 				ImGui.End();
 			}

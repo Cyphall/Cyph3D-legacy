@@ -3,17 +3,17 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
-using Cyph3D;
+using ImGuiNET;
 using OpenToolkit.Windowing.GraphicsLibraryFramework;
-using Window = OpenToolkit.Windowing.GraphicsLibraryFramework.Window;
+using GLFWWindow = OpenToolkit.Windowing.GraphicsLibraryFramework.Window;
 
-namespace ImGuiNET.Impl
+namespace Cyph3D.UI
 {
 	public static unsafe class ImplGlfw
 	{
 		// Data
         
-        private static Window*   _window = null; // Main window
+        private static GLFWWindow*   _window = null; // Main window
         private static double    _time;
         private static bool[]    _mouseJustPressed = { false, false, false, false, false };
         private static Cursor*[] _mouseCursors = new Cursor*[(int)ImGuiMouseCursor.COUNT];
@@ -28,13 +28,13 @@ namespace ImGuiNET.Impl
         public delegate string GetClipboardTextDelegate(IntPtr userData);
         public static string GetClipboardText(IntPtr userData)
         {
-            return GLFW.GetClipboardString((Window*)userData);
+            return GLFW.GetClipboardString((GLFWWindow*)userData);
         }
 
         public delegate void SetClipboardTextDelegate(IntPtr userData, IntPtr text);
         public static void SetClipboardText(IntPtr userData, IntPtr text)
         {
-            GLFW.SetClipboardString((Window*)userData, Marshal.PtrToStringAnsi(text));
+            GLFW.SetClipboardString((GLFWWindow*)userData, Marshal.PtrToStringAnsi(text));
         }
 
         public static void MouseButtonCallback(MouseButton button, InputAction action, KeyModifiers mods)
@@ -43,7 +43,7 @@ namespace ImGuiNET.Impl
                 _mouseJustPressed[(int)button] = true;
         }
 
-        public static void ScrollCallback(Window* window, double xoffset, double yoffset)
+        public static void ScrollCallback(GLFWWindow* window, double xoffset, double yoffset)
         {
             _prevUserCallbackScroll?.Invoke(window, xoffset, yoffset);
 
@@ -71,7 +71,7 @@ namespace ImGuiNET.Impl
             io.KeySuper = false;
         }
 
-        public static void CharCallback(Window* window, uint c)
+        public static void CharCallback(GLFWWindow* window, uint c)
         {
             _prevUserCallbackChar?.Invoke(window, c);
 
@@ -79,7 +79,7 @@ namespace ImGuiNET.Impl
             io.AddInputCharacter(c);
         }
 
-        public static void Init(Window* window)
+        public static void Init(GLFWWindow* window)
         {
             _window = window;
             _time = 0.0;
@@ -143,8 +143,8 @@ namespace ImGuiNET.Impl
             _prevUserCallbackScroll = null;
             _prevUserCallbackChar = null;
             
-            Cyph3D.Engine.Window.MouseButtonEvent += MouseButtonCallback;
-            Cyph3D.Engine.Window.KeyEvent += KeyCallback;
+            Engine.Window.MouseButtonEvent += MouseButtonCallback;
+            Engine.Window.KeyEvent += KeyCallback;
 
             _callbackScroll = ScrollCallback;
             funcPointer = GLFW.SetScrollCallback(window, _callbackScroll);
