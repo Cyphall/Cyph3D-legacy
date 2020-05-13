@@ -11,8 +11,10 @@ namespace Cyph3D.UI.Impl
 {
 	public static unsafe class ImplGlfw
 	{
-		// Data
+        public delegate string GetClipboardTextDelegate(IntPtr userData);
+        public delegate void SetClipboardTextDelegate(IntPtr userData, IntPtr text);
         
+		// Data
         private static GLFWWindow*   _window = null; // Main window
         private static double    _time;
         private static bool[]    _mouseJustPressed = { false, false, false, false, false };
@@ -24,14 +26,15 @@ namespace Cyph3D.UI.Impl
         
         private static GLFWCallbacks.ScrollCallback        _callbackScroll;
         private static GLFWCallbacks.CharCallback          _callbackChar;
+
+        private static GetClipboardTextDelegate _getClipboardText;
+        private static SetClipboardTextDelegate _setClipboardText;
         
-        public delegate string GetClipboardTextDelegate(IntPtr userData);
         public static string GetClipboardText(IntPtr userData)
         {
             return GLFW.GetClipboardString((GLFWWindow*)userData);
         }
 
-        public delegate void SetClipboardTextDelegate(IntPtr userData, IntPtr text);
         public static void SetClipboardText(IntPtr userData, IntPtr text)
         {
             GLFW.SetClipboardString((GLFWWindow*)userData, Marshal.PtrToStringAnsi(text));
@@ -117,8 +120,11 @@ namespace Cyph3D.UI.Impl
             io.KeyMap[(int)ImGuiKey.Y] = (int)Keys.Y;
             io.KeyMap[(int)ImGuiKey.Z] = (int)Keys.Z;
 
-            io.NativePtr->SetClipboardTextFn = Marshal.GetFunctionPointerForDelegate((SetClipboardTextDelegate)SetClipboardText);
-            io.GetClipboardTextFn = Marshal.GetFunctionPointerForDelegate((GetClipboardTextDelegate)GetClipboardText);
+            _setClipboardText = SetClipboardText;
+            io.SetClipboardTextFn = Marshal.GetFunctionPointerForDelegate(_setClipboardText);
+            _getClipboardText = GetClipboardText;
+            io.GetClipboardTextFn = Marshal.GetFunctionPointerForDelegate(_getClipboardText);
+            
             io.ClipboardUserData = (IntPtr)_window;
             io.ImeWindowHandle = (IntPtr)_window;
 
