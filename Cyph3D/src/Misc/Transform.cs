@@ -65,6 +65,8 @@ namespace Cyph3D.Misc
 			}
 		}
 
+		public vec3 WorldPosition => (WorldMatrix * new vec4(0, 0, 0, 1)).xyz;
+
 		public vec3 Rotation
 		{
 			get => _rotation;

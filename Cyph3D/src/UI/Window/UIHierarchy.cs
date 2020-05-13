@@ -4,11 +4,14 @@ using ImGuiNET;
 
 namespace Cyph3D.UI.Window
 {
-	public class UIHierarchy : IUIWindow
+	public static class UIHierarchy
 	{
-		public void Show()
+		private const ImGuiTreeNodeFlags BASE_FLAGS = ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick | ImGuiTreeNodeFlags.SpanAvailWidth;
+		public static Transform Selected { get; private set; }
+
+		public static void Show()
 		{
-			ImGui.SetNextWindowSize(new Vector2(200, 500));
+			ImGui.SetNextWindowSize(new Vector2(300, 500));
 			ImGui.SetNextWindowPos(new Vector2(0));
 
 			if (ImGui.Begin("Hierarchy", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize))
@@ -23,17 +26,39 @@ namespace Cyph3D.UI.Window
 		
 		private static void AddToTree(Transform transform)
 		{
+			ImGuiTreeNodeFlags flags = BASE_FLAGS;
+			
 			if (transform.Children.Count == 0)
-				ImGui.BulletText(transform.Name);
+			{
+				flags |= ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen;
+				if (Selected == transform)
+					flags |= ImGuiTreeNodeFlags.Selected;
+				
+				ImGui.TreeNodeEx(transform.Name, flags);
+
+				if (ImGui.IsItemClicked())
+				{
+					Selected = transform;
+				}
+			}
 			else
 			{
-				if (ImGui.TreeNode(transform.Name))
+				if (Selected == transform)
+					flags |= ImGuiTreeNodeFlags.Selected;
+				
+				if (ImGui.TreeNodeEx(transform.Name, flags))
 				{
+					if (ImGui.IsItemClicked())
+					{
+						Selected = transform;
+					}
+					
 					int childrenCount = transform.Children.Count;
 					for (int i = 0; i < childrenCount; i++)
 					{
 						AddToTree(transform.Children[i]);
 					}
+
 					ImGui.TreePop();
 				}
 			}

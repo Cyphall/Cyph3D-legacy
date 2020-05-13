@@ -21,9 +21,9 @@ namespace Cyph3D
 		}
 		public float Intensity { get; }
 
-		public PointLight(vec3? position, vec3 color, float intensity)
+		public PointLight(vec3? position, vec3 color, float intensity, Transform parent = null)
 		{
-			Transform = new Transform("PointLight", position: position);
+			Transform = new Transform("PointLight", parent, position);
 			Color = color;
 			Intensity = intensity;
 		}
@@ -40,7 +40,7 @@ namespace Cyph3D
 		public NativePointLight GLLight =>
 			new NativePointLight
 			{
-				Pos = Transform.Position,
+				Pos = Transform.WorldPosition,
 				Color = _linearColor,
 				Intensity = Intensity
 			};

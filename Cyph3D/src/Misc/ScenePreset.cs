@@ -9,38 +9,41 @@ namespace Cyph3D.Misc
 		{
 			Camera camera = new Camera(new vec3(0, 1.5f, -3));
 
-			Engine.ObjectContainer.Add(
-				new RenderObject(
-					Material.GetOrLoad(
-						"LinkedToMesh/corridor",
-						true
-					),
-					Mesh.GetOrLoad("corridor"),
-					rotation: new vec3(0, 270, 0)
+			RenderObject corridor = new RenderObject(
+				Material.GetOrLoad(
+					"LinkedToMesh/corridor",
+					true
+				),
+				Mesh.GetOrLoad("corridor"),
+				"Corridor",
+				rotation: new vec3(0, 270, 0)
+			);
+			Engine.ObjectContainer.Add(corridor);
+
+			Engine.LightManager.AddPointLight(
+				new PointLight(
+					new vec3(10.19f, 0.6f, -0.29f),
+					MathExt.FromRGB(245, 243, 255),
+					10f,
+					corridor.Transform
 				)
 			);
 
 			Engine.LightManager.AddPointLight(
 				new PointLight(
-					new vec3(-0.29f, 0.6f, 10.19f),
+					new vec3(10.6f, 0.6f, -0.1f),
 					MathExt.FromRGB(245, 243, 255),
-					1f
+					1f,
+					corridor.Transform
 				)
 			);
 
 			Engine.LightManager.AddPointLight(
 				new PointLight(
-					new vec3(-0.1f, 0.6f, 10.6f),
+					new vec3(10.83f, 0.6f, 0.21f),
 					MathExt.FromRGB(245, 243, 255),
-					1f
-				)
-			);
-
-			Engine.LightManager.AddPointLight(
-				new PointLight(
-					new vec3(0.21f, 0.6f, 10.83f),
-					MathExt.FromRGB(245, 243, 255),
-					1f
+					1f,
+					corridor.Transform
 				)
 			);
 
@@ -48,17 +51,19 @@ namespace Cyph3D.Misc
 			{
 				Engine.LightManager.AddPointLight(
 					new PointLight(
-						new vec3(0, 2.99f, -0.93f + i * 1.55f),
+						new vec3(-0.93f + i * 1.55f, 2.99f, 0),
 						MathExt.FromRGB(222, 215, 188),
-						0.2f
+						0.2f,
+						corridor.Transform
 					)
 				);
 
 				Engine.LightManager.AddPointLight(
 					new PointLight(
-						new vec3(0, 2.99f, -0.62f + i * 1.55f),
+						new vec3(-0.62f + i * 1.55f, 2.99f, 0),
 						MathExt.FromRGB(222, 215, 188),
-						0.2f
+						0.2f,
+						corridor.Transform
 					)
 				);
 			}
@@ -149,7 +154,7 @@ namespace Cyph3D.Misc
 					false
 				),
 				Mesh.GetOrLoad("simple_cube"),
-				parent: root,
+				parent: root.Transform,
 				position: new vec3(-2, 2, 0)
 			);
 
@@ -159,7 +164,7 @@ namespace Cyph3D.Misc
 					false
 				),
 				Mesh.GetOrLoad("simple_cube"),
-				parent: elem1,
+				parent: elem1.Transform,
 				position: new vec3(-2, 2, 0),
 				angularVelocity: new vec3(0, 20, 0)
 			);

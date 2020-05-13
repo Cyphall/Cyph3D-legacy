@@ -100,8 +100,7 @@ namespace Cyph3D
 
 		private void LightingPass(vec3 viewPos)
 		{
-			if (Engine.LightManager.PointLightsChanged)
-				_lightsBuffer.PutData(Engine.LightManager.PointLightsNative);
+			_lightsBuffer.PutData(Engine.LightManager.PointLightsNative);
 
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 

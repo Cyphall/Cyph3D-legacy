@@ -2,11 +2,11 @@
 
 namespace Cyph3D.UI.Window
 {
-	public class UIDebug : IUIWindow
+	public static class UIDebug
 	{
-		private bool _gbufferDebug;
+		private static bool _gbufferDebug;
 		
-		public void Show()
+		public static void Show()
 		{
 			if (ImGui.Checkbox("GBuffer Debug View", ref _gbufferDebug))
 			{
