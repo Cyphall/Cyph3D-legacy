@@ -1,4 +1,4 @@
-﻿using Cyph3D.GLObject;
+using Cyph3D.GLObject;
 using GlmSharp;
 
 namespace Cyph3D.Misc
@@ -24,7 +24,7 @@ namespace Cyph3D.Misc
 				new PointLight(
 					new vec3(10.19f, 0.6f, -0.29f),
 					MathExt.FromRGB(245, 243, 255),
-					10f,
+					1f,
 					corridor.Transform
 				)
 			);
