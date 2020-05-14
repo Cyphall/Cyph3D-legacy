@@ -45,14 +45,16 @@ namespace Cyph3D.UI.Window
 			{
 				if (Selected == transform)
 					flags |= ImGuiTreeNodeFlags.Selected;
+
+				bool open = ImGui.TreeNodeEx(transform.Name, flags);
 				
-				if (ImGui.TreeNodeEx(transform.Name, flags))
+				if (ImGui.IsItemClicked())
 				{
-					if (ImGui.IsItemClicked())
-					{
-						Selected = transform;
-					}
-					
+					Selected = transform;
+				}
+				
+				if (open)
+				{
 					int childrenCount = transform.Children.Count;
 					for (int i = 0; i < childrenCount; i++)
 					{
