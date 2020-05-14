@@ -5,6 +5,7 @@ namespace Cyph3D.UI.Window
 	public static class UIDebug
 	{
 		private static bool _gbufferDebug;
+		private static bool _showDemoWindow;
 		
 		public static void Show()
 		{
@@ -12,6 +13,11 @@ namespace Cyph3D.UI.Window
 			{
 				Engine.Renderer.Debug = _gbufferDebug;
 			}
+
+			ImGui.Checkbox("Show Demo Window", ref _showDemoWindow);
+			
+			if (_showDemoWindow)
+				ImGui.ShowDemoWindow();
 		}
 	}
 }
