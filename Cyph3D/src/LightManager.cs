@@ -43,6 +43,11 @@ namespace Cyph3D
 			}
 		}
 
+		public void ClearAll()
+		{
+			_pointLights.Clear();
+		}
+
 		public void Dispose()
 		{
 			PointLightsNative?.Dispose();

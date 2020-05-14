@@ -44,12 +44,10 @@ namespace Cyph3D.Misc
 			get => _parent;
 			set
 			{
-				if (Engine.SceneRoot == null) return;
-				if (Owner == Engine.SceneRoot) return;
 				if (this == value) return;
 				
 				_parent?.Children.Remove(this);
-				_parent = value ?? Engine.SceneRoot.Transform;
+				_parent = value;
 				_parent?.Children.Add(this);
 			}
 		}
@@ -127,7 +125,7 @@ namespace Cyph3D.Misc
 			}
 		}
 
-		public Transform(SceneObject owner, Transform parent = null, vec3? position = null, vec3? rotation = null, vec3? scale = null)
+		public Transform(SceneObject owner = null, Transform parent = null, vec3? position = null, vec3? rotation = null, vec3? scale = null)
 		{
 			Owner = owner;
 			Parent = parent;

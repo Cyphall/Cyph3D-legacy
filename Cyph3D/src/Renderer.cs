@@ -91,16 +91,17 @@ namespace Cyph3D
 
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-			int objectCount = Engine.ObjectContainer.Count;
+			int objectCount = Engine.Scene.Objects.Count;
 			for (int i = 0; i < objectCount; i++)
 			{
-				Engine.ObjectContainer[i].Render(view, projection, viewPos);
+				if (Engine.Scene.Objects[i] is MeshObject meshObject)
+					meshObject.Render(view, projection, viewPos);
 			}
 		}
 
 		private void LightingPass(vec3 viewPos)
 		{
-			_lightsBuffer.PutData(Engine.LightManager.PointLightsNative);
+			_lightsBuffer.PutData(Engine.Scene.LightManager.PointLightsNative);
 
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 

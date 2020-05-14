@@ -11,14 +11,18 @@ namespace Cyph3D.UI.Window
 
 		public static void Show()
 		{
+			if (Selected != null && !Selected.IsValid) Selected = null;
+			
 			ImGui.SetNextWindowSize(new Vector2(300, 500));
 			ImGui.SetNextWindowPos(new Vector2(0));
 
 			if (ImGui.Begin("Hierarchy", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize))
 			{
-				ImGui.SetNextItemOpen(true, ImGuiCond.Appearing);
-				
-				AddToTree(Engine.SceneRoot.Transform);
+				int childrenCount = Engine.Scene.Root.Children.Count;
+				for (int i = 0; i < childrenCount; i++)
+				{
+					AddToTree(Engine.Scene.Root.Children[i]);
+				}
 			
 				ImGui.End();
 			}

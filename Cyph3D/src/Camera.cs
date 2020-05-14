@@ -1,5 +1,4 @@
 ﻿using System;
-using Cyph3D.GLObject;
 using Cyph3D.Misc;
 using GlmSharp;
 using OpenToolkit.Windowing.GraphicsLibraryFramework;
@@ -137,35 +136,6 @@ namespace Cyph3D
 			SphericalCoords -= mouseOffset / 12;
 			
 			_previousMousePos = currentMousePos;
-		}
-
-		private void LeftClick(InputAction action, KeyModifiers mods)
-		{
-			if (action != InputAction.Press) return;
-			
-			Engine.ObjectContainer.Add(
-				new MeshObject(
-					Material.GetOrLoad("Sci-Fi/SpaceCase1", true),
-					Mesh.GetOrLoad("cube"),
-					position: Position + Orientation,
-					angularVelocity: new vec3(0, 5f, 0),
-					scale: new vec3(0.5f)
-				)
-			);
-		}
-
-		private void RightClick(InputAction action, KeyModifiers mods)
-		{
-			if (action != InputAction.Press) return;
-			
-			Engine.ObjectContainer.Add(
-				new MeshObject(
-					Material.GetOrLoad("Metals/OrnateBrass", true),
-					Mesh.GetOrLoad("teapot"),
-					position: Position + Orientation,
-					angularVelocity: new vec3(0, 0, 0)
-				)
-			);
 		}
 	}
 }

@@ -5,11 +5,12 @@ namespace Cyph3D.Misc
 {
 	public static class ScenePreset
 	{
-		public static Camera Spaceship()
+		public static Scene Spaceship()
 		{
-			Camera camera = new Camera(new vec3(0, 1.5f, -3));
+			Scene scene = new Scene(new Camera(new vec3(0, 1.5f, -3)));
 
 			MeshObject corridor = new MeshObject(
+				scene.Root,
 				Material.GetOrLoad(
 					"LinkedToMesh/corridor",
 					true
@@ -18,64 +19,65 @@ namespace Cyph3D.Misc
 				"Corridor",
 				rotation: new vec3(0, 270, 0)
 			);
-			Engine.ObjectContainer.Add(corridor);
+			scene.Add(corridor);
 
-			Engine.LightManager.AddPointLight(
+			scene.Add(
 				new PointLight(
+					corridor.Transform,
 					new vec3(10.19f, 0.6f, -0.29f),
 					MathExt.FromRGB(245, 243, 255),
-					1f,
-					corridor
+					1f
 				)
 			);
 
-			Engine.LightManager.AddPointLight(
+			scene.Add(
 				new PointLight(
+					corridor.Transform,
 					new vec3(10.6f, 0.6f, -0.1f),
 					MathExt.FromRGB(245, 243, 255),
-					1f,
-					corridor
+					1f
 				)
 			);
 
-			Engine.LightManager.AddPointLight(
+			scene.Add(
 				new PointLight(
+					corridor.Transform,
 					new vec3(10.83f, 0.6f, 0.21f),
 					MathExt.FromRGB(245, 243, 255),
-					1f,
-					corridor
+					1f
 				)
 			);
 
 			for (int i = 0; i < 10; i++)
 			{
-				Engine.LightManager.AddPointLight(
+				scene.Add(
 					new PointLight(
+						corridor.Transform,
 						new vec3(-0.93f + i * 1.55f, 2.99f, 0),
 						MathExt.FromRGB(222, 215, 188),
-						0.2f,
-						corridor
+						0.2f
 					)
 				);
 
-				Engine.LightManager.AddPointLight(
+				scene.Add(
 					new PointLight(
+						corridor.Transform,
 						new vec3(-0.62f + i * 1.55f, 2.99f, 0),
 						MathExt.FromRGB(222, 215, 188),
-						0.2f,
-						corridor
+						0.2f
 					)
 				);
 			}
 
-			return camera;
+			return scene;
 		}
 
-		public static Camera Dungeon()
+		public static Scene Dungeon()
 		{
-			Camera camera = new Camera(new vec3(-12, 1.8f, 0), new vec2(90, 0));
+			Scene scene = new Scene(new Camera(new vec3(-12, 1.8f, 0), new vec2(90, 0)));
 
 			MeshObject dungeon = new MeshObject(
+				scene.Root,
 				Material.GetOrLoad(
 					"Tiles/WallBrick",
 					true
@@ -83,34 +85,35 @@ namespace Cyph3D.Misc
 				Mesh.GetOrLoad("dungeon"),
 				"Dungeon"
 			);
-			Engine.ObjectContainer.Add(dungeon);
+			scene.Add(dungeon);
 
-			Engine.LightManager.AddPointLight(
+			scene.Add(
 				new PointLight(
+					dungeon.Transform,
 					new vec3(0, 1.5f, 0),
 					MathExt.FromRGB(255, 141, 35),
-					10f,
-					dungeon
+					10f
 				)
 			);
 
-			return camera;
+			return scene;
 		}
 
-		public static Camera TestQuat()
+		public static Scene TestQuat()
 		{
-			Camera camera = new Camera(new vec3(0, 0, -4));
-			
-			Engine.LightManager.AddPointLight(
+			Scene scene = new Scene(new Camera(new vec3(0, 0, -4)));
+			scene.Add(
 				new PointLight(
+					scene.Root,
 					new vec3(0, 5, 8),
 					MathExt.FromRGB(255, 255, 255),
 					10f
 				)
 			);
 
-			Engine.ObjectContainer.Add(
+			scene.Add(
 				new MeshObject(
+					scene.Root,
 					Material.GetOrLoad(
 						"Tiles/ModernTiles",
 						true
@@ -121,8 +124,9 @@ namespace Cyph3D.Misc
 				)
 			);
 
-			Engine.ObjectContainer.Add(
+			scene.Add(
 				new MeshObject(
+					scene.Root,
 					Material.GetOrLoad(
 						"Sun",
 						false
@@ -133,63 +137,25 @@ namespace Cyph3D.Misc
 				)
 			);
 
-			return camera;
+			return scene;
 		}
-		
-		public static Camera TextHierarchy()
+
+		public static Scene TestCube()
 		{
-			Camera camera = new Camera(new vec3(0, 0, -6));
-
-			MeshObject root = new MeshObject(
-				Material.GetOrLoad(
-					"Sun",
-					false
-				),
-				Mesh.GetOrLoad("simple_cube")
-			);
-
-			MeshObject elem1 = new MeshObject(
-				Material.GetOrLoad(
-					"Sun",
-					false
-				),
-				Mesh.GetOrLoad("simple_cube"),
-				parent: root,
-				position: new vec3(-2, 2, 0)
-			);
-
-			MeshObject elem2 = new MeshObject(
-				Material.GetOrLoad(
-					"Sun",
-					false
-				),
-				Mesh.GetOrLoad("simple_cube"),
-				parent: elem1,
-				position: new vec3(-2, 2, 0),
-				angularVelocity: new vec3(0, 20, 0)
-			);
+			Scene scene = new Scene(new Camera(new vec3(2, 0, -1), new vec2(-60, 0)));
 			
-			Engine.ObjectContainer.Add(root);
-			Engine.ObjectContainer.Add(elem1);
-			Engine.ObjectContainer.Add(elem2);
-
-			return camera;
-		}
-
-		public static Camera TestCube()
-		{
-			Camera camera = new Camera(new vec3(2, 0, -1), new vec2(-60, 0));
-
-			Engine.LightManager.AddPointLight(
+			scene.Add(
 				new PointLight(
+					scene.Root,
 					new vec3(3, 2, 3),
 					MathExt.FromRGB(255, 255, 255),
 					10f
 				)
 			);
 
-			Engine.ObjectContainer.Add(
+			scene.Add(
 				new MeshObject(
+					scene.Root,
 					Material.GetOrLoad(
 						"Metals/RustedMetal",
 						true
@@ -198,23 +164,25 @@ namespace Cyph3D.Misc
 				)
 			);
 
-			return camera;
+			return scene;
 		}
 
-		public static Camera TestSphere()
+		public static Scene TestSphere()
 		{
-			Camera camera = new Camera(new vec3(2, 0, -1), new vec2(-60, 0));
-
-			Engine.LightManager.AddPointLight(
+			Scene scene = new Scene(new Camera(new vec3(2, 0, -1), new vec2(-60, 0)));
+			
+			scene.Add(
 				new PointLight(
+					scene.Root,
 					new vec3(4, 2, 4),
 					MathExt.FromRGB(255, 255, 255),
 					10f
 				)
 			);
 
-			Engine.ObjectContainer.Add(
+			scene.Add(
 				new MeshObject(
+					scene.Root,
 					Material.GetOrLoad(
 						"Metals/OrnateBrass",
 						true
@@ -223,7 +191,7 @@ namespace Cyph3D.Misc
 				)
 			);
 
-			return camera;
+			return scene;
 		}
 	}
 }

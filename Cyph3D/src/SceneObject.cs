@@ -7,11 +7,22 @@ namespace Cyph3D
 	{
 		public Transform Transform { get; protected set; }
 		public string Name { get; set; }
+		public bool IsValid { get; private set; } = true;
 
-		public SceneObject(string name = null, SceneObject parent = null, vec3? position = null, vec3? rotation = null, vec3? scale = null)
+		public SceneObject(Transform parent, string name, vec3? position = null, vec3? rotation = null, vec3? scale = null)
 		{
-			Name = name ?? "Object";
-			Transform = new Transform(this, parent?.Transform, position, rotation, scale);
+			Name = name;
+			Transform = new Transform(this, parent, position, rotation, scale);
+		}
+
+		public virtual void Update(double deltaTime)
+		{
+			
+		}
+
+		public void Invalidate()
+		{
+			IsValid = false;
 		}
 	}
 }

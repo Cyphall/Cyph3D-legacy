@@ -1,4 +1,5 @@
 ﻿using Cyph3D.GLObject;
+using Cyph3D.Misc;
 using GlmSharp;
 
 namespace Cyph3D
@@ -10,17 +11,18 @@ namespace Cyph3D
 		
 		public vec3 Velocity { get; set; }
 		public vec3 AngularVelocity { get; set; }
-
+		
 		public MeshObject(
+			Transform parent,
 			Material material,
 			Mesh mesh,
 			string name = null,
-			SceneObject parent = null,
 			vec3? position = null,
 			vec3? rotation = null,
 			vec3? scale = null,
 			vec3? velocity = null,
-			vec3? angularVelocity = null) : base(name, parent, position, rotation, scale)
+			vec3? angularVelocity = null):
+			base(parent, name ?? "Object", position, rotation, scale)
 		{
 			_material = material;
 			_mesh = mesh;
@@ -34,7 +36,7 @@ namespace Cyph3D
 			_mesh.Render();
 		}
 
-		public void Update(double deltaTime)
+		public override void Update(double deltaTime)
 		{
 			Transform.Position += Velocity * (float)deltaTime;
 			Transform.Rotation += AngularVelocity * (float)deltaTime;
