@@ -1,4 +1,4 @@
-using Cyph3D.GLObject;
+﻿using Cyph3D.GLObject;
 using GlmSharp;
 
 namespace Cyph3D.Misc
@@ -75,22 +75,22 @@ namespace Cyph3D.Misc
 		{
 			Camera camera = new Camera(new vec3(-12, 1.8f, 0), new vec2(90, 0));
 
+			RenderObject dungeon = new RenderObject(
+				Material.GetOrLoad(
+					"Tiles/WallBrick",
+					true
+				),
+				Mesh.GetOrLoad("dungeon"),
+				"Dungeon"
+			);
+			Engine.ObjectContainer.Add(dungeon);
+
 			Engine.LightManager.AddPointLight(
 				new PointLight(
 					new vec3(0, 1.5f, 0),
 					MathExt.FromRGB(255, 141, 35),
-					10f
-				)
-			);
-
-			Engine.ObjectContainer.Add(
-				new RenderObject(
-					Material.GetOrLoad(
-						"Tiles/WallBrick",
-						true
-					),
-					Mesh.GetOrLoad("dungeon"),
-					"Dungeon"
+					10f,
+					dungeon.Transform
 				)
 			);
 
