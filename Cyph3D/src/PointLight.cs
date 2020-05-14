@@ -1,12 +1,10 @@
 ﻿using System.Runtime.InteropServices;
-using Cyph3D.Misc;
 using GlmSharp;
 
 namespace Cyph3D
 {
-	public class PointLight
+	public class PointLight : SceneObject
 	{
-		public Transform Transform { get; }
 		private vec3 _sRGBColor;
 		private vec3 _linearColor;
 
@@ -19,11 +17,12 @@ namespace Cyph3D
 				_linearColor = ToLinear(value);
 			}
 		}
-		public float Intensity { get; }
+		
+		public float Intensity { get; set; }
 
-		public PointLight(vec3? position, vec3 color, float intensity, Transform parent = null)
+		public PointLight(vec3? position, vec3 color, float intensity, SceneObject parent = null)
+			: base("PointLight", parent, position)
 		{
-			Transform = new Transform("PointLight", parent, position);
 			Color = color;
 			Intensity = intensity;
 		}

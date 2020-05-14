@@ -12,8 +12,8 @@ namespace Cyph3D
 	public static class Engine
 	{
 		public static Window Window { get; private set; }
-		public static List<RenderObject> ObjectContainer { get; } = new List<RenderObject>();
-		public static Transform SceneRoot { get; } = new Transform("Root");
+		public static List<MeshObject> ObjectContainer { get; } = new List<MeshObject>();
+		public static SceneObject SceneRoot { get; } = new SceneObject("Root");
 		public static LightManager LightManager { get; } = new LightManager();
 		public static Camera Camera { get; private set; }
 		public static Renderer Renderer { get; private set; }
@@ -45,7 +45,7 @@ namespace Cyph3D
 			
 			Renderer = new Renderer();
 
-			Camera = ScenePreset.Dungeon();
+			Camera = ScenePreset.Spaceship();
 			
 			ImGuiHelper.Init();
 		}

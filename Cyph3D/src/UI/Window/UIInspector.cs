@@ -1,7 +1,5 @@
-﻿using System.Globalization;
-using System.Numerics;
+﻿using System.Numerics;
 using Cyph3D.Misc;
-using GlmSharp;
 using ImGuiNET;
 
 namespace Cyph3D.UI.Window
@@ -17,22 +15,22 @@ namespace Cyph3D.UI.Window
 			{
 				if (UIHierarchy.Selected != null)
 				{
-					Vector3 imGuiPosition = ConvertHelper.Convert(UIHierarchy.Selected.Position);
+					Vector3 imGuiPosition = ConvertHelper.Convert(UIHierarchy.Selected.Transform.Position);
 					if (ImGui.InputFloat3("Position", ref imGuiPosition, "%.6g", ImGuiInputTextFlags.EnterReturnsTrue))
 					{
-						UIHierarchy.Selected.Position = ConvertHelper.Convert(imGuiPosition);
+						UIHierarchy.Selected.Transform.Position = ConvertHelper.Convert(imGuiPosition);
 					}
 					
-					Vector3 imGuiRotation = ConvertHelper.Convert(UIHierarchy.Selected.Rotation);
+					Vector3 imGuiRotation = ConvertHelper.Convert(UIHierarchy.Selected.Transform.Rotation);
 					if (ImGui.InputFloat3("Rotation", ref imGuiRotation, "%.6g", ImGuiInputTextFlags.EnterReturnsTrue))
 					{
-						UIHierarchy.Selected.Rotation = ConvertHelper.Convert(imGuiRotation);
+						UIHierarchy.Selected.Transform.Rotation = ConvertHelper.Convert(imGuiRotation);
 					}
 					
-					Vector3 imGuiScale = ConvertHelper.Convert(UIHierarchy.Selected.Scale);
+					Vector3 imGuiScale = ConvertHelper.Convert(UIHierarchy.Selected.Transform.Scale);
 					if (ImGui.InputFloat3("Scale", ref imGuiScale, "%.6g", ImGuiInputTextFlags.EnterReturnsTrue))
 					{
-						UIHierarchy.Selected.Scale = ConvertHelper.Convert(imGuiScale);
+						UIHierarchy.Selected.Transform.Scale = ConvertHelper.Convert(imGuiScale);
 					}
 				}
 			}

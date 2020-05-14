@@ -144,7 +144,7 @@ namespace Cyph3D
 			if (action != InputAction.Press) return;
 			
 			Engine.ObjectContainer.Add(
-				new RenderObject(
+				new MeshObject(
 					Material.GetOrLoad("Sci-Fi/SpaceCase1", true),
 					Mesh.GetOrLoad("cube"),
 					position: Position + Orientation,
@@ -159,7 +159,7 @@ namespace Cyph3D
 			if (action != InputAction.Press) return;
 			
 			Engine.ObjectContainer.Add(
-				new RenderObject(
+				new MeshObject(
 					Material.GetOrLoad("Metals/OrnateBrass", true),
 					Mesh.GetOrLoad("teapot"),
 					position: Position + Orientation,

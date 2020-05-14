@@ -7,7 +7,7 @@ namespace Cyph3D.UI.Window
 	public static class UIHierarchy
 	{
 		private const ImGuiTreeNodeFlags BASE_FLAGS = ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick | ImGuiTreeNodeFlags.SpanAvailWidth;
-		public static Transform Selected { get; private set; }
+		public static SceneObject Selected { get; private set; }
 
 		public static void Show()
 		{
@@ -18,7 +18,7 @@ namespace Cyph3D.UI.Window
 			{
 				ImGui.SetNextItemOpen(true, ImGuiCond.Appearing);
 				
-				AddToTree(Engine.SceneRoot);
+				AddToTree(Engine.SceneRoot.Transform);
 			
 				ImGui.End();
 			}
@@ -31,26 +31,26 @@ namespace Cyph3D.UI.Window
 			if (transform.Children.Count == 0)
 			{
 				flags |= ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen;
-				if (Selected == transform)
+				if (Selected == transform.Owner)
 					flags |= ImGuiTreeNodeFlags.Selected;
 				
-				ImGui.TreeNodeEx(transform.Name, flags);
+				ImGui.TreeNodeEx(transform.Owner.Name, flags);
 
 				if (ImGui.IsItemClicked())
 				{
-					Selected = transform;
+					Selected = transform.Owner;
 				}
 			}
 			else
 			{
-				if (Selected == transform)
+				if (Selected == transform.Owner)
 					flags |= ImGuiTreeNodeFlags.Selected;
 
-				bool open = ImGui.TreeNodeEx(transform.Name, flags);
+				bool open = ImGui.TreeNodeEx(transform.Owner.Name, flags);
 				
 				if (ImGui.IsItemClicked())
 				{
-					Selected = transform;
+					Selected = transform.Owner;
 				}
 				
 				if (open)

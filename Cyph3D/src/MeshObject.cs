@@ -1,31 +1,31 @@
 ﻿using Cyph3D.GLObject;
-using Cyph3D.Misc;
 using GlmSharp;
 
 namespace Cyph3D
 {
-	public class RenderObject
+	public class MeshObject : SceneObject
 	{
 		private Material _material;
 		private Mesh _mesh;
 		
-		public ActiveTransform Transform { get; }
+		public vec3 Velocity { get; set; }
+		public vec3 AngularVelocity { get; set; }
 
-		public RenderObject(
+		public MeshObject(
 			Material material,
 			Mesh mesh,
 			string name = null,
-			Transform parent = null,
+			SceneObject parent = null,
 			vec3? position = null,
 			vec3? rotation = null,
 			vec3? scale = null,
 			vec3? velocity = null,
-			vec3? angularVelocity = null)
+			vec3? angularVelocity = null) : base(name, parent, position, rotation, scale)
 		{
 			_material = material;
 			_mesh = mesh;
-
-			Transform = new ActiveTransform(name, parent, position, rotation, scale, velocity, angularVelocity);
+			Velocity = velocity ?? vec3.Zero;
+			AngularVelocity = angularVelocity ?? vec3.Zero;
 		}
 
 		public void Render(mat4 view, mat4 projection, vec3 cameraPos)
@@ -36,7 +36,8 @@ namespace Cyph3D
 
 		public void Update(double deltaTime)
 		{
-			Transform.Update(deltaTime);
+			Transform.Position += Velocity * (float)deltaTime;
+			Transform.Rotation += AngularVelocity * (float)deltaTime;
 		}
 	}
 }

@@ -8,27 +8,28 @@ namespace Cyph3D.Misc
 	[SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
 	public class Transform
 	{
-		protected vec3 _position;
-		protected vec3 _rotation;
-		protected vec3 _scale;
-		protected mat4 _matrix;
+		private vec3 _position;
+		private vec3 _rotation;
+		private vec3 _scale;
+		private mat4 _matrix;
+		
 		private Transform _parent;
+		public SceneObject Owner { get; }
+		
 		public List<Transform> Children { get; } = new List<Transform>();
 
 		private bool _matrixChanged;
 		private bool _worldMatrixChanged;
 		
 		private mat4 _cachedWorldMatrix;
-
-		public string Name { get; protected set; }
 		
-		protected void MatrixChanged()
+		private void MatrixChanged()
 		{
 			_matrixChanged = true;
 			WorldMatrixChanged();
 		}
 		
-		protected void WorldMatrixChanged()
+		private void WorldMatrixChanged()
 		{
 			_worldMatrixChanged = true;
 			int childrenCount = Children.Count;
@@ -43,11 +44,12 @@ namespace Cyph3D.Misc
 			get => _parent;
 			set
 			{
-				if (this == Engine.SceneRoot) return;
+				if (Engine.SceneRoot == null) return;
+				if (Owner == Engine.SceneRoot) return;
 				if (this == value) return;
 				
 				_parent?.Children.Remove(this);
-				_parent = value ?? Engine.SceneRoot;
+				_parent = value ?? Engine.SceneRoot.Transform;
 				_parent?.Children.Add(this);
 			}
 		}
@@ -125,9 +127,9 @@ namespace Cyph3D.Misc
 			}
 		}
 
-		public Transform(string name = null, Transform parent = null, vec3? position = null, vec3? rotation = null, vec3? scale = null)
+		public Transform(SceneObject owner, Transform parent = null, vec3? position = null, vec3? rotation = null, vec3? scale = null)
 		{
-			Name = name ?? "Object";
+			Owner = owner;
 			Parent = parent;
 			Position = position ?? vec3.Zero;
 			Rotation = rotation ?? vec3.Zero;

@@ -9,7 +9,7 @@ namespace Cyph3D.Misc
 		{
 			Camera camera = new Camera(new vec3(0, 1.5f, -3));
 
-			RenderObject corridor = new RenderObject(
+			MeshObject corridor = new MeshObject(
 				Material.GetOrLoad(
 					"LinkedToMesh/corridor",
 					true
@@ -25,7 +25,7 @@ namespace Cyph3D.Misc
 					new vec3(10.19f, 0.6f, -0.29f),
 					MathExt.FromRGB(245, 243, 255),
 					1f,
-					corridor.Transform
+					corridor
 				)
 			);
 
@@ -34,7 +34,7 @@ namespace Cyph3D.Misc
 					new vec3(10.6f, 0.6f, -0.1f),
 					MathExt.FromRGB(245, 243, 255),
 					1f,
-					corridor.Transform
+					corridor
 				)
 			);
 
@@ -43,7 +43,7 @@ namespace Cyph3D.Misc
 					new vec3(10.83f, 0.6f, 0.21f),
 					MathExt.FromRGB(245, 243, 255),
 					1f,
-					corridor.Transform
+					corridor
 				)
 			);
 
@@ -54,7 +54,7 @@ namespace Cyph3D.Misc
 						new vec3(-0.93f + i * 1.55f, 2.99f, 0),
 						MathExt.FromRGB(222, 215, 188),
 						0.2f,
-						corridor.Transform
+						corridor
 					)
 				);
 
@@ -63,7 +63,7 @@ namespace Cyph3D.Misc
 						new vec3(-0.62f + i * 1.55f, 2.99f, 0),
 						MathExt.FromRGB(222, 215, 188),
 						0.2f,
-						corridor.Transform
+						corridor
 					)
 				);
 			}
@@ -75,7 +75,7 @@ namespace Cyph3D.Misc
 		{
 			Camera camera = new Camera(new vec3(-12, 1.8f, 0), new vec2(90, 0));
 
-			RenderObject dungeon = new RenderObject(
+			MeshObject dungeon = new MeshObject(
 				Material.GetOrLoad(
 					"Tiles/WallBrick",
 					true
@@ -90,7 +90,7 @@ namespace Cyph3D.Misc
 					new vec3(0, 1.5f, 0),
 					MathExt.FromRGB(255, 141, 35),
 					10f,
-					dungeon.Transform
+					dungeon
 				)
 			);
 
@@ -110,7 +110,7 @@ namespace Cyph3D.Misc
 			);
 
 			Engine.ObjectContainer.Add(
-				new RenderObject(
+				new MeshObject(
 					Material.GetOrLoad(
 						"Tiles/ModernTiles",
 						true
@@ -122,7 +122,7 @@ namespace Cyph3D.Misc
 			);
 
 			Engine.ObjectContainer.Add(
-				new RenderObject(
+				new MeshObject(
 					Material.GetOrLoad(
 						"Sun",
 						false
@@ -140,7 +140,7 @@ namespace Cyph3D.Misc
 		{
 			Camera camera = new Camera(new vec3(0, 0, -6));
 
-			RenderObject root = new RenderObject(
+			MeshObject root = new MeshObject(
 				Material.GetOrLoad(
 					"Sun",
 					false
@@ -148,23 +148,23 @@ namespace Cyph3D.Misc
 				Mesh.GetOrLoad("simple_cube")
 			);
 
-			RenderObject elem1 = new RenderObject(
+			MeshObject elem1 = new MeshObject(
 				Material.GetOrLoad(
 					"Sun",
 					false
 				),
 				Mesh.GetOrLoad("simple_cube"),
-				parent: root.Transform,
+				parent: root,
 				position: new vec3(-2, 2, 0)
 			);
 
-			RenderObject elem2 = new RenderObject(
+			MeshObject elem2 = new MeshObject(
 				Material.GetOrLoad(
 					"Sun",
 					false
 				),
 				Mesh.GetOrLoad("simple_cube"),
-				parent: elem1.Transform,
+				parent: elem1,
 				position: new vec3(-2, 2, 0),
 				angularVelocity: new vec3(0, 20, 0)
 			);
@@ -189,7 +189,7 @@ namespace Cyph3D.Misc
 			);
 
 			Engine.ObjectContainer.Add(
-				new RenderObject(
+				new MeshObject(
 					Material.GetOrLoad(
 						"Metals/RustedMetal",
 						true
@@ -214,7 +214,7 @@ namespace Cyph3D.Misc
 			);
 
 			Engine.ObjectContainer.Add(
-				new RenderObject(
+				new MeshObject(
 					Material.GetOrLoad(
 						"Metals/OrnateBrass",
 						true

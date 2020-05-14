@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Cyph3D.UI.Impl;
 using Cyph3D.UI.Window;
 using ImGuiNET;
