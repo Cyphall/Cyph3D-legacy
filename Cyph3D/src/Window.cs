@@ -138,7 +138,7 @@ namespace Cyph3D
 				{
 					switch (key)
 					{
-						case Keys.LeftAlt:
+						case Keys.F3:
 							GuiOpen = !GuiOpen;
 							break;
 						case Keys.Escape:
