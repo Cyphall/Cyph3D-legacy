@@ -1,4 +1,4 @@
-﻿namespace Cyph3D.Enum
+﻿namespace Cyph3D.Enumerable
 {
 	public enum TextureFiltering
 	{

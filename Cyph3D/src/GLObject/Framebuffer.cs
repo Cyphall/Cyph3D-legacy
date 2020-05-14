@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Cyph3D.Enum;
+using Cyph3D.Enumerable;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 

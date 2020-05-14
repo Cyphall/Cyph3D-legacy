@@ -1,5 +1,5 @@
 ﻿using System;
-using Cyph3D.Enum;
+using Cyph3D.Enumerable;
 using Cyph3D.GLObject;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;

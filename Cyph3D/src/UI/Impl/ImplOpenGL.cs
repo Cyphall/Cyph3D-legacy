@@ -2,7 +2,7 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
-using Cyph3D.Enum;
+using Cyph3D.Enumerable;
 using Cyph3D.GLObject;
 using GlmSharp;
 using ImGuiNET;
