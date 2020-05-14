@@ -15,6 +15,8 @@ namespace Cyph3D.UI.Window
 			{
 				if (UIHierarchy.Selected != null)
 				{
+					ImGui.Text("Transform");
+					
 					Vector3 imGuiPosition = ConvertHelper.Convert(UIHierarchy.Selected.Transform.Position);
 					if (ImGui.DragFloat3("Position", ref imGuiPosition, 0.01f, 0, 0, "%.6g"))
 					{
@@ -32,11 +34,14 @@ namespace Cyph3D.UI.Window
 					{
 						UIHierarchy.Selected.Transform.Scale = ConvertHelper.Convert(imGuiScale);
 					}
+					
+					ImGui.Separator();
+					
+					ImGui.Text("Properties");
 
 					switch (UIHierarchy.Selected)
 					{
 						case MeshObject meshObject:
-						{
 							Vector3 imGuiVelocity = ConvertHelper.Convert(meshObject.Velocity);
 							if (ImGui.DragFloat3("Velocity", ref imGuiVelocity, 0.01f, 0, 0, "%.6g"))
 							{
@@ -49,7 +54,6 @@ namespace Cyph3D.UI.Window
 								meshObject.AngularVelocity = ConvertHelper.Convert(imGuiAngularVelocity);
 							}
 							break;
-						}
 						case PointLight pointLight:
 							Vector3 imGuiColor = ConvertHelper.Convert(pointLight.Color);
 							if (ImGui.ColorEdit3("Color", ref imGuiColor))
