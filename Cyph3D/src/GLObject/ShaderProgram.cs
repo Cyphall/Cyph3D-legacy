@@ -40,6 +40,8 @@ namespace Cyph3D.GLObject
 	
 			GL.LinkProgram(_ID);
 			
+			GL.DetachShader(_ID, _vertex);
+			GL.DetachShader(_ID, _fragment);
 			
 			GL.GetProgram(_ID, GetProgramParameterName.LinkStatus, out int linkSuccess);
 			
