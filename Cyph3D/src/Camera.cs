@@ -37,7 +37,7 @@ namespace Cyph3D
 		// x: phi (horizontal) 0 to 360
 		// y: theta (vertical) -89 to 89
 		private vec2 _sphericalCoords = new vec2(0, 0);
-		private vec2 SphericalCoords
+		public vec2 SphericalCoords
 		{
 			get => _sphericalCoords;
 			set

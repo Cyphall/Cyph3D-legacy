@@ -16,8 +16,9 @@ namespace Cyph3D.GLObject
 		private Texture _metallicMap;
 		private Texture _emissiveMap;
 
-		private bool _isLit;
-		
+		public string Name { get; }
+		public bool IsLit { get; }
+
 		private static Dictionary<string, Material> _materials = new Dictionary<string, Material>();
 		
 		public Material(string name, bool isLit)
@@ -76,7 +77,8 @@ namespace Cyph3D.GLObject
 				_emissiveMap.PutData(new byte[]{0, 0, 0});
 			}
 
-			_isLit = isLit;
+			Name = name;
+			IsLit = isLit;
 			_materials.Add(name, this);
 		}
 
@@ -103,7 +105,7 @@ namespace Cyph3D.GLObject
 			
 			_shaderProgram.SetValue("viewPos", cameraPos);
 
-			_shaderProgram.SetValue("isLit", _isLit ? 1 : 0);
+			_shaderProgram.SetValue("isLit", IsLit ? 1 : 0);
 		}
 		
 		public static Material GetOrLoad(string name, bool isLit)

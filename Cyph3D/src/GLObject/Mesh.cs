@@ -22,6 +22,8 @@ namespace Cyph3D.GLObject
 		private int _vaoID;
 
 		private int _verticesCount;
+		
+		public string Name { get; }
 
 		private static ObjLoaderFactory _loaderFactory;
 
@@ -29,6 +31,8 @@ namespace Cyph3D.GLObject
 
 		private Mesh(string name)
 		{
+			Name = name;
+			
 			_verticesBufferID = GL.GenBuffer();
 			_uvsBufferID = GL.GenBuffer();
 			_normalsBufferID = GL.GenBuffer();

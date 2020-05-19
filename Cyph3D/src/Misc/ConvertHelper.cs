@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Json;
+using System.Numerics;
 using GlmSharp;
 
 namespace Cyph3D.Misc
@@ -23,6 +24,16 @@ namespace Cyph3D.Misc
 		public static Vector4 Convert(vec4 vec)
 		{
 			return new Vector4(vec.x, vec.y, vec.z, vec.w);
+		}
+		
+		public static JsonArray JsonConvert(vec3 vec)
+		{
+			return new JsonArray(vec.x, vec.y, vec.z);
+		}
+		
+		public static JsonArray JsonConvert(vec2 vec)
+		{
+			return new JsonArray(vec.x, vec.y);
 		}
 	}
 }

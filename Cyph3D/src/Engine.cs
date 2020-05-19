@@ -12,8 +12,21 @@ namespace Cyph3D
 	public static class Engine
 	{
 		public static Window Window { get; private set; }
-		public static Scene Scene { get; set; }
+
+		private static Scene _scene;
+		public static Scene Scene
+		{
+			get => _scene;
+			set
+			{
+				_scene = value;
+				SceneChanged?.Invoke();
+			}
+		}
+
 		public static Renderer Renderer { get; private set; }
+
+		public static event Action SceneChanged;
 
 		public static void Init()
 		{

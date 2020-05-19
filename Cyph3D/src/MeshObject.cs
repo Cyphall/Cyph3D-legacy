@@ -6,9 +6,9 @@ namespace Cyph3D
 {
 	public class MeshObject : SceneObject
 	{
-		private Material _material;
-		private Mesh _mesh;
-		
+		public Material Material { get; }
+		public Mesh Mesh { get; }
+
 		public vec3 Velocity { get; set; }
 		public vec3 AngularVelocity { get; set; }
 		
@@ -24,16 +24,16 @@ namespace Cyph3D
 			vec3? angularVelocity = null):
 			base(parent, name ?? "Object", position, rotation, scale)
 		{
-			_material = material;
-			_mesh = mesh;
+			Material = material;
+			Mesh = mesh;
 			Velocity = velocity ?? vec3.Zero;
 			AngularVelocity = angularVelocity ?? vec3.Zero;
 		}
 
 		public void Render(mat4 view, mat4 projection, vec3 cameraPos)
 		{
-			_material.Bind(Transform.WorldMatrix, view, projection, cameraPos);
-			_mesh.Render();
+			Material.Bind(Transform.WorldMatrix, view, projection, cameraPos);
+			Mesh.Render();
 		}
 
 		public override void Update(double deltaTime)

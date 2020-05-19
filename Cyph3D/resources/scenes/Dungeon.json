@@ -1,0 +1,47 @@
+{
+	"camera":
+	{
+		"position": [-12, 1.8, 0],
+		"spherical_coords": [90, 0]
+	},
+	"objects":
+	[
+		{
+			"position": [0, 0, 0],
+			"rotation": [0, 0, 0],
+			"scale": [1, 1, 1],
+			"name": "Dungeon",
+			"type": "mesh_object",
+			"data":
+			{
+				"velocity": [0, 0, 0],
+				"angular_velocity": [0, 0, 0],
+				"mesh": "dungeon",
+				"material":
+				{
+					"name": "Tiles/WallBrick",
+					"is_lit": true
+				}
+			},
+			"children":
+			[
+				{
+					"position": [0, 1.5, 0],
+					"rotation": [0, 0, 0],
+					"scale": [1, 1, 1],
+					"name": "PointLight",
+					"type": "point_light",
+					"data":
+					{
+						"color": [1, 0.5529412, 0.13725491],
+						"intensity": 10
+					},
+					"children":
+					[
+						
+					]
+				}
+			]
+		}
+	]
+}

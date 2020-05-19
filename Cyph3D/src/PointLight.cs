@@ -21,8 +21,8 @@ namespace Cyph3D
 		
 		public float Intensity { get; set; }
 		
-		public PointLight(Transform parent, vec3? position, vec3 color, float intensity):
-			base(parent, "PointLight", position)
+		public PointLight(Transform parent, vec3 color, float intensity, string name = "PointLight", vec3? position = null):
+			base(parent, name, position)
 		{
 			Color = color;
 			Intensity = intensity;
