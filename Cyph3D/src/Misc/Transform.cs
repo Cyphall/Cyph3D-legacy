@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using GlmSharp;
 
@@ -25,15 +25,17 @@ namespace Cyph3D.Misc
 		
 		private void MatrixChanged()
 		{
+			if (_matrixChanged) return;
 			_matrixChanged = true;
 			WorldMatrixChanged();
 		}
 		
 		private void WorldMatrixChanged()
 		{
+			if (_worldMatrixChanged) return;
 			_worldMatrixChanged = true;
-			int childrenCount = Children.Count;
-			for (int i = 0; i < childrenCount; i++)
+			
+			for (int i = 0; i < Children.Count; i++)
 			{
 				Children[i].WorldMatrixChanged();
 			}
@@ -45,10 +47,14 @@ namespace Cyph3D.Misc
 			set
 			{
 				if (this == value) return;
+				if (Parent == value) return;
+				if (value == null) throw new InvalidOperationException("Cannot remove Transform parent, only changing it is allowed");
 				
 				_parent?.Children.Remove(this);
 				_parent = value;
-				_parent?.Children.Add(this);
+				_parent.Children.Add(this);
+				
+				WorldMatrixChanged();
 			}
 		}
 		
@@ -58,7 +64,6 @@ namespace Cyph3D.Misc
 			set
 			{
 				if (value == _position) return;
-				Debug.Assert(value.x != _position.x || value.y != _position.y || value.z != _position.z);
 				
 				_position = value;
 				MatrixChanged();
@@ -73,7 +78,6 @@ namespace Cyph3D.Misc
 			set
 			{
 				if (value == _rotation) return;
-				Debug.Assert(value.x != _rotation.x || value.y != _rotation.y || value.z != _rotation.z);
 				
 				_rotation = value;
 				MatrixChanged();
@@ -86,7 +90,6 @@ namespace Cyph3D.Misc
 			set
 			{
 				if (value == _scale) return;
-				Debug.Assert(value.x != _scale.x || value.y != _scale.y || value.z != _scale.z);
 				
 				_scale = value;
 				MatrixChanged();

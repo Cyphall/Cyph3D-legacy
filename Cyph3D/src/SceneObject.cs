@@ -1,4 +1,5 @@
-﻿using Cyph3D.Misc;
+﻿using System;
+using Cyph3D.Misc;
 using GlmSharp;
 
 namespace Cyph3D
@@ -7,6 +8,7 @@ namespace Cyph3D
 	{
 		public Transform Transform { get; protected set; }
 		public string Name { get; set; }
+		public string GUID { get; } = Guid.NewGuid().ToString();
 
 		public SceneObject(Transform parent, string name, vec3? position = null, vec3? rotation = null, vec3? scale = null)
 		{
