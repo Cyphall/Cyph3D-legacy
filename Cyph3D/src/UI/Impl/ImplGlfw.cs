@@ -89,6 +89,9 @@ namespace Cyph3D.UI.Impl
 
             // Setup back-end capabilities flags
             ImGuiIOPtr io = ImGui.GetIO();
+            
+            io.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard;
+            
             io.BackendFlags |= ImGuiBackendFlags.HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
             io.BackendFlags |= ImGuiBackendFlags.HasSetMousePos;    
             fixed(byte* p = &Encoding.ASCII.GetBytes("imgui_impl_glfw")[0])
