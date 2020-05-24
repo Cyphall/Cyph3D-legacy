@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Cyph3D.Enumerable;
-using Cyph3D.Misc;
+using Cyph3D.Extension;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 using StbImageSharp;

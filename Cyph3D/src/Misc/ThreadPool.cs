@@ -2,11 +2,10 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using OpenToolkit.Graphics.OpenGL4;
 using OpenToolkit.Windowing.GraphicsLibraryFramework;
 using GLFWWindow = OpenToolkit.Windowing.GraphicsLibraryFramework.Window;
 
-namespace Cyph3D.Misc
+namespace Cyph3D.Extension
 {
 	public unsafe class ThreadPool : IDisposable
 	{

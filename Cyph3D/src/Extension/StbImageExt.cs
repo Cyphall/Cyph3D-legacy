@@ -1,7 +1,8 @@
 ﻿using System.IO;
 using GlmSharp;
+using StbImageSharp;
 
-namespace StbImageSharp
+namespace Cyph3D.Extension
 {
 	public static unsafe class StbImageExt
 	{

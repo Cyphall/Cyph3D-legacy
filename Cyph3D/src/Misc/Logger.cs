@@ -1,7 +1,7 @@
 ﻿using System;
 using ObjLoader.Loader.Common;
 
-namespace Cyph3D.Misc
+namespace Cyph3D.Extension
 {
 	public static class Logger
 	{

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Cyph3D.Misc;
+using Cyph3D.Extension;
 using ImGuiNET;
 
 namespace Cyph3D.UI.Window

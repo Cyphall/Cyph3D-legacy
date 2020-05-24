@@ -1,5 +1,5 @@
 ﻿using System;
-using Cyph3D.Misc;
+using Cyph3D.Extension;
 using GlmSharp;
 
 namespace Cyph3D

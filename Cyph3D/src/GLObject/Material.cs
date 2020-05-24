@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Cyph3D.Misc;
+using Cyph3D.Extension;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 

@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
+using Cyph3D.Extension;
 using Cyph3D.GLObject;
-using Cyph3D.Misc;
 using ImGuiNET;
 
 namespace Cyph3D.UI.Window

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Management;
 using System.Runtime.InteropServices;
+using Cyph3D.Extension;
 using Cyph3D.GLObject;
-using Cyph3D.Misc;
 using Cyph3D.UI;
 using OpenToolkit.Graphics.OpenGL4;
 using OpenToolkit.Windowing.GraphicsLibraryFramework;
