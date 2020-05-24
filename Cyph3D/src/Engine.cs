@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Management;
 using System.Runtime.InteropServices;
 using Cyph3D.GLObject;
 using Cyph3D.Misc;
@@ -25,6 +25,8 @@ namespace Cyph3D
 		}
 
 		public static Renderer Renderer { get; private set; }
+		
+		public static ThreadPool ThreadPool { get; private set; }
 
 		public static event Action SceneChanged;
 
@@ -33,6 +35,14 @@ namespace Cyph3D
 			Window = new Window();
 
 			GL.LoadBindings(new GLFWBindingsContext());
+			
+			int coreCount = 0;
+			foreach (ManagementBaseObject item in new ManagementObjectSearcher("Select NumberOfCores from Win32_Processor").Get())
+			{
+				coreCount += int.Parse(item["NumberOfCores"].ToString());
+			}
+			
+			ThreadPool = new ThreadPool(Math.Max(coreCount-1, 1));
 
 			GL.DebugMessageCallback(
 				(source, type, id, severity, length, message, param) => {

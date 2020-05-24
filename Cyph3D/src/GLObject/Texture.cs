@@ -14,13 +14,15 @@ namespace Cyph3D.GLObject
 		private int _ID;
 		private ivec2 _size;
 		
+		public bool IsReady { get; private set; }
+		
 		private static HashSet<Texture> _textures = new HashSet<Texture>();
 		
 		private static int CurrentlyBound => GL.GetInteger(GetPName.TextureBinding2D);
 		
 		public static implicit operator int(Texture texture) => texture._ID;
 
-		public Texture(ivec2 size, InternalFormat internalFormat, TextureFiltering filtering = TextureFiltering.Nearest)
+		public Texture(ivec2 size, InternalFormat internalFormat, TextureFiltering filtering = TextureFiltering.Nearest, bool defaultReady = true)
 		{
 			int previousTexture = CurrentlyBound;
 			
@@ -44,6 +46,8 @@ namespace Cyph3D.GLObject
 			_textures.Add(this);
 			
 			Bind(previousTexture);
+
+			IsReady = defaultReady;
 		}
 
 		public void PutData(byte[] data, PixelFormat format = PixelFormat.Rgb, PixelType type = PixelType.UnsignedByte)
@@ -89,31 +93,31 @@ namespace Cyph3D.GLObject
 		public static Texture FromFile(string name, bool sRGB = false, bool compressed = false)
 		{
 			Logger.Info($"Loading texture \"{name}\"");
-			
-			ImageResult image;
 
+			ivec2 size;
+			ColorComponents comp;
+			
 			try
 			{
 				using Stream stream = File.OpenRead($"resources/textures/{name}.png");
-				image = ImageResult.FromStream(stream);
+				StbImageExt.StbImageInfo(stream, out size, out comp);
 			}
 			catch (IOException)
 			{
 				try
 				{
 					using Stream stream = File.OpenRead($"resources/textures/{name}.jpg");
-					image = ImageResult.FromStream(stream);
+					StbImageExt.StbImageInfo(stream, out size, out comp);
 				}
 				catch (IOException)
 				{
-					Logger.Info($"Texture \"{name}\" doesn't exists, skipping...");
-					return null;
+					throw new IOException($"Unable to load image {name} from disk");
 				}
 			}
 
 			InternalFormat internalFormat;
 			PixelFormat pixelFormat;
-			switch (image.Comp)
+			switch (comp)
 			{
 				case ColorComponents.Grey:
 					pixelFormat = PixelFormat.Luminance;
@@ -144,17 +148,49 @@ namespace Cyph3D.GLObject
 						internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba8;
 					break;
 				default:
-					throw new NotSupportedException($"The colors format {image.Comp} is not supported");
+					throw new NotSupportedException($"The colors format {comp} is not supported");
 			}
-
-			ivec2 size = new ivec2(image.Width, image.Height);
 			
-			Texture texture = new Texture(size, internalFormat, TextureFiltering.Linear);
-			texture.PutData(image.Data, pixelFormat);
+			Texture texture = new Texture(size, internalFormat, TextureFiltering.Linear, false);
+			
+			GL.Finish();
+			
+			Engine.ThreadPool.Schedule(() => {
+				ImageResult image;
 
-			Logger.Info($"Texture \"{name}\" loaded (id: {texture._ID})");
+				try
+				{
+					using Stream stream = File.OpenRead($"resources/textures/{name}.png");
+					image = ImageResult.FromStream(stream, comp);
+				}
+				catch (IOException)
+				{
+					try
+					{
+						using Stream stream = File.OpenRead($"resources/textures/{name}.jpg");
+						image = ImageResult.FromStream(stream, comp);
+					}
+					catch (IOException)
+					{
+						throw new IOException($"Unable to load image {name} from disk");
+					}
+				}
+				
+				texture.PutData(image.Data, pixelFormat);
+				
+				GL.Finish();
+				
+				Logger.Info($"Texture \"{name}\" loaded (id: {texture._ID})");
+				
+				texture.IsReady = true;
+			});
 			
 			return texture;
+		}
+
+		public static bool ExistsOnDisk(string name)
+		{
+			return File.Exists($"resources/textures/{name}.png") || File.Exists($"resources/textures/{name}.jpg");
 		}
 
 		static Texture()

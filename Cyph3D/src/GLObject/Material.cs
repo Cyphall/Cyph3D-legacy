@@ -34,44 +34,62 @@ namespace Cyph3D.GLObject
 			_shaderProgram.SetValue("emissiveMap", 5);
 			
 			_shaderProgram.Unbind();
-
-			_colorMap = Texture.FromFile($"{name}/col", true, true);
-			if (_colorMap == null)
+			
+			if (Texture.ExistsOnDisk($"{name}/col"))
+			{
+				_colorMap = Texture.FromFile($"{name}/col", true, true);
+			}
+			else
 			{
 				_colorMap = new Texture(new ivec2(1), InternalFormat.CompressedSrgbS3tcDxt1Ext);
 				_colorMap.PutData(new byte[]{255, 0, 255});
 			}
 			
-			_normalMap = Texture.FromFile($"{name}/nrm");
-			if (_normalMap == null)
+			if (Texture.ExistsOnDisk($"{name}/nrm"))
+			{
+				_normalMap = Texture.FromFile($"{name}/nrm");
+			}
+			else
 			{
 				_normalMap = new Texture(new ivec2(1), InternalFormat.Rgb8);
 				_normalMap.PutData(new byte[]{128, 128, 255});
 			}
 			
-			_roughnessMap = Texture.FromFile($"{name}/rgh", compressed: true);
-			if (_roughnessMap == null)
+			if (Texture.ExistsOnDisk($"{name}/rgh"))
+			{
+				_roughnessMap = Texture.FromFile($"{name}/rgh", compressed: true);
+			}
+			else
 			{
 				_roughnessMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext);
 				_roughnessMap.PutData(new byte[]{128}, PixelFormat.Luminance);
 			}
 			
-			_displacementMap = Texture.FromFile($"{name}/disp", compressed: true);
-			if (_displacementMap == null)
+			if (Texture.ExistsOnDisk($"{name}/disp"))
+			{
+				_displacementMap = Texture.FromFile($"{name}/disp", compressed: true);
+			}
+			else
 			{
 				_displacementMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext);
 				_displacementMap.PutData(new byte[]{255}, PixelFormat.Luminance);
 			}
 			
-			_metallicMap = Texture.FromFile($"{name}/met", compressed: true);
-			if (_metallicMap == null)
+			if (Texture.ExistsOnDisk($"{name}/met"))
+			{
+				_metallicMap = Texture.FromFile($"{name}/met", compressed: true);
+			}
+			else
 			{
 				_metallicMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext);
 				_metallicMap.PutData(new byte[]{0, 0, 0});
 			}
 			
-			_emissiveMap = Texture.FromFile($"{name}/emis", compressed: true);
-			if (_emissiveMap == null)
+			if (Texture.ExistsOnDisk($"{name}/emis"))
+			{
+				_emissiveMap = Texture.FromFile($"{name}/emis", compressed: true);
+			}
+			else
 			{
 				_emissiveMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext);
 				_emissiveMap.PutData(new byte[]{0, 0, 0});
@@ -82,8 +100,18 @@ namespace Cyph3D.GLObject
 			_materials.Add(name, this);
 		}
 
-		public void Bind(mat4 model, mat4 view, mat4 projection, vec3 cameraPos)
+		public bool Bind(mat4 model, mat4 view, mat4 projection, vec3 cameraPos)
 		{
+			if (!_colorMap.IsReady ||
+			    !_normalMap.IsReady ||
+			    !_roughnessMap.IsReady ||
+			    !_displacementMap.IsReady ||
+			    !_metallicMap.IsReady ||
+			    !_emissiveMap.IsReady)
+			{
+				return false;
+			}
+			
 			_shaderProgram.Bind();
 
 			GL.ActiveTexture(TextureUnit.Texture0);
@@ -106,6 +134,8 @@ namespace Cyph3D.GLObject
 			_shaderProgram.SetValue("viewPos", cameraPos);
 
 			_shaderProgram.SetValue("isLit", IsLit ? 1 : 0);
+
+			return true;
 		}
 		
 		public static Material GetOrLoad(string name, bool isLit)
