@@ -86,10 +86,12 @@ namespace Cyph3D
 
 			GLFW.WindowHint(WindowHintInt.ContextVersionMajor, 4);
 			GLFW.WindowHint(WindowHintInt.ContextVersionMinor, 6);
-			GLFW.WindowHint(WindowHintBool.OpenGLDebugContext, true);
 			GLFW.WindowHint(WindowHintInt.DepthBits, 0);
 			GLFW.WindowHint(WindowHintInt.StencilBits, 0);
 			GLFW.WindowHint(WindowHintOpenGlProfile.OpenGlProfile, OpenGlProfile.Core);
+#if DEBUG
+			GLFW.WindowHint(WindowHintBool.OpenGLDebugContext, true);
+#endif
 
 			if (size != null)
 			{
