@@ -39,7 +39,12 @@ namespace Cyph3D
 		public override void Update(double deltaTime)
 		{
 			Transform.Position += Velocity * (float)deltaTime;
-			Transform.Rotation += AngularVelocity * (float)deltaTime;
+			
+			vec3 rotationOffset = AngularVelocity * (float)deltaTime;
+			Transform.Rotation = Transform.Rotation
+				.Rotate(glm.Radians(rotationOffset.x), new vec3(1, 0, 0))
+				.Rotate(glm.Radians(rotationOffset.y), new vec3(0, 1, 0))
+				.Rotate(glm.Radians(rotationOffset.z), new vec3(0, 0, 1));
 		}
 	}
 }

@@ -41,19 +41,30 @@ namespace Cyph3D.UI.Window
 			ImGui.Text("Transform");
             
             Vector3 imGuiPosition = ConvertHelper.Convert(selected.Transform.Position);
-            if (ImGui.DragFloat3("Position", ref imGuiPosition, 0.01f, 0, 0, "%.6g"))
+            if (ImGui.DragFloat3("Position", ref imGuiPosition, 0.01f, 0, 0, "%.3g"))
             {
 	            selected.Transform.Position = ConvertHelper.Convert(imGuiPosition);
             }
-            
-            Vector3 imGuiRotation = ConvertHelper.Convert(selected.Transform.Rotation);
-            if (ImGui.DragFloat3("Rotation", ref imGuiRotation, 0.01f, 0, 0, "%.6g"))
+
+            if (UIMisc.ShowRawQuaternion)
             {
-	            selected.Transform.Rotation = ConvertHelper.Convert(imGuiRotation);
+	            Vector4 imGuiQuaternion = ConvertHelper.QuatConvert(selected.Transform.Rotation);
+	            if (ImGui.DragFloat4("Quaternion", ref imGuiQuaternion, 0.01f, 0, 0, "%.3g"))
+	            {
+		            selected.Transform.Rotation = ConvertHelper.QuatConvert(imGuiQuaternion);
+	            }
+            }
+            else
+            {
+	            Vector3 imGuiRotation = ConvertHelper.Convert(selected.Transform.EulerRotation);
+	            if (ImGui.DragFloat3("Rotation", ref imGuiRotation, 0.01f, 0, 0, "%.3g"))
+	            {
+		            selected.Transform.EulerRotation = ConvertHelper.Convert(imGuiRotation);
+	            }
             }
             
             Vector3 imGuiScale = ConvertHelper.Convert(selected.Transform.Scale);
-            if (ImGui.DragFloat3("Scale", ref imGuiScale, 0.01f, 0, 0, "%.6g"))
+            if (ImGui.DragFloat3("Scale", ref imGuiScale, 0.01f, 0, 0, "%.3g"))
             {
 	            selected.Transform.Scale = ConvertHelper.Convert(imGuiScale);
             }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using GlmSharp;
+using Renderer.Misc;
 
 namespace Cyph3D.Extension
 {
@@ -9,7 +10,7 @@ namespace Cyph3D.Extension
 	public class Transform
 	{
 		private vec3 _position;
-		private vec3 _rotation;
+		private Quaternion _rotation;
 		private vec3 _scale;
 		private mat4 _matrix;
 		
@@ -72,7 +73,7 @@ namespace Cyph3D.Extension
 
 		public vec3 WorldPosition => (WorldMatrix * new vec4(0, 0, 0, 1)).xyz;
 
-		public vec3 Rotation
+		public Quaternion Rotation
 		{
 			get => _rotation;
 			set
@@ -95,6 +96,12 @@ namespace Cyph3D.Extension
 				MatrixChanged();
 			}
 		}
+		
+		public vec3 EulerRotation
+		{
+			get => glm.Degrees(Rotation.EulerAngles);
+			set => Rotation = new Quaternion(glm.Radians(value)).Normalized;
+		}
 
 		public mat4 Matrix
 		{
@@ -104,9 +111,7 @@ namespace Cyph3D.Extension
 				if (_matrixChanged)
 				{
 					_matrix = mat4.Translate(_position) *
-					         mat4.RotateZ(glm.Radians(_rotation.z)) *
-					         mat4.RotateY(glm.Radians(_rotation.y)) *
-					         mat4.RotateX(glm.Radians(_rotation.x)) *
+					         _rotation.ToMat4 *
 					         mat4.Scale(_scale);
 					_matrixChanged = false;
 				}
@@ -133,7 +138,7 @@ namespace Cyph3D.Extension
 			Owner = owner;
 			Parent = parent;
 			Position = position ?? vec3.Zero;
-			Rotation = rotation ?? vec3.Zero;
+			EulerRotation = rotation ?? vec3.Zero;
 			Scale = scale ?? vec3.Ones;
 			
 			MatrixChanged();

@@ -55,6 +55,8 @@ namespace Cyph3D
 		public static Scene Load(string name)
 		{
 			JsonObject jsonRoot = (JsonObject)JsonValue.Parse(File.ReadAllText($"resources/scenes/{name}.json"));
+
+			int version = jsonRoot["version"];
 			
 
 			JsonArray cameraPosArray = (JsonArray)jsonRoot["camera"]["position"];
@@ -72,13 +74,13 @@ namespace Cyph3D
 
 			foreach (JsonValue value in jsonSceneObjects)
 			{
-				ParseSceneObject((JsonObject)value, scene, scene.Root);
+				ParseSceneObject((JsonObject)value, scene, scene.Root, version);
 			}
 
 			return scene;
 		}
 
-		private static void ParseSceneObject(JsonObject jsonObject, Scene scene, Transform parent)
+		private static void ParseSceneObject(JsonObject jsonObject, Scene scene, Transform parent, int version)
 		{
 			JsonObject jsonData = (JsonObject)jsonObject["data"];
 			
@@ -126,7 +128,7 @@ namespace Cyph3D
 
 			foreach (JsonValue value in jsonObject["children"])
 			{
-				ParseSceneObject((JsonObject)value, scene, sceneObject.Transform);
+				ParseSceneObject((JsonObject)value, scene, sceneObject.Transform, version);
 			}
 		}
 
@@ -162,7 +164,7 @@ namespace Cyph3D
 			JsonObject jsonObject = new JsonObject();
 			
 			jsonObject.Add("position", ConvertHelper.JsonConvert(sceneObject.Transform.Position));
-			jsonObject.Add("rotation", ConvertHelper.JsonConvert(sceneObject.Transform.Rotation));
+			jsonObject.Add("rotation", ConvertHelper.JsonConvert(sceneObject.Transform.EulerRotation));
 			jsonObject.Add("scale", ConvertHelper.JsonConvert(sceneObject.Transform.Scale));
 			jsonObject.Add("name", sceneObject.Name);
 			

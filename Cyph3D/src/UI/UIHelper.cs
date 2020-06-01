@@ -5,7 +5,7 @@ using ImGuiNET;
 
 namespace Cyph3D.UI
 {
-	public static unsafe class ImGuiHelper
+	public static unsafe class UIHelper
 	{
 		private static IntPtr _context = IntPtr.Zero;
 		
@@ -35,7 +35,7 @@ namespace Cyph3D.UI
 			if (!Engine.Window.GuiOpen) return;
 
 			UIHierarchy.Show();
-			UIDebug.Show();
+			UIMisc.Show();
 			UIInspector.Show();
 		}
 

@@ -67,7 +67,7 @@ namespace Cyph3D
 			
 			Scene = new Scene();
 			
-			ImGuiHelper.Init();
+			UIHelper.Init();
 		}
 
 		public static void Run()
@@ -83,8 +83,8 @@ namespace Cyph3D
 			
 				Renderer.Render(Scene.Camera);
 
-				ImGuiHelper.Update();
-				ImGuiHelper.Render();
+				UIHelper.Update();
+				UIHelper.Render();
 
 				Window.SwapBuffers();
 			}
@@ -101,7 +101,7 @@ namespace Cyph3D
 			Mesh.DisposeAll();
 			Framebuffer.DisposeAll();
 
-			ImGuiHelper.Shutdown();
+			UIHelper.Shutdown();
 			
 			GLFW.Terminate();
 		}
