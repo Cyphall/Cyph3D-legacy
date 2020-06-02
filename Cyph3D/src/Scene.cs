@@ -137,6 +137,8 @@ namespace Cyph3D
 		{
 			JsonObject jsonRoot = new JsonObject();
 			
+			jsonRoot.Add("version", 1);
+			
 
 			JsonObject jsonCamera = new JsonObject
 			{
