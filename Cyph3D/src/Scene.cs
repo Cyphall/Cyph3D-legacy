@@ -4,6 +4,7 @@ using System.IO;
 using System.Json;
 using Cyph3D.Extension;
 using Cyph3D.GLObject;
+using Cyph3D.Light;
 using GlmSharp;
 
 namespace Cyph3D

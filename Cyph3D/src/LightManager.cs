@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cyph3D.Extension;
+using Cyph3D.Light;
 
 namespace Cyph3D
 {

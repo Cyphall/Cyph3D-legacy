@@ -2,7 +2,7 @@
 using Cyph3D.Extension;
 using GlmSharp;
 
-namespace Cyph3D
+namespace Cyph3D.Light
 {
 	public class PointLight : SceneObject
 	{
