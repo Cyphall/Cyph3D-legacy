@@ -36,6 +36,11 @@ namespace Cyph3D
 
 			GL.LoadBindings(new GLFWBindingsContext());
 			
+			GLFW.GetVersion(out int major, out int minor, out int revision);
+			Logger.Info($"GLFW Version: {major}.{minor}.{revision}", "GLFW");
+			Logger.Info($"OpenGL Version: {GL.GetString(StringName.Version)}", "OPGL");
+			Logger.Info($"GPU: {GL.GetString(StringName.Renderer)}", "OPGL");
+			
 			int coreCount = 0;
 			foreach (ManagementBaseObject item in new ManagementObjectSearcher("Select NumberOfCores from Win32_Processor").Get())
 			{

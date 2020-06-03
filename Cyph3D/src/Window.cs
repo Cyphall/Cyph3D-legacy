@@ -107,9 +107,6 @@ namespace Cyph3D
 			GLFW.MakeContextCurrent(_glfwWindow);
 			GuiOpen = false;
 			
-			GLFW.GetVersion(out int major, out int minor, out int revision);
-			Logger.Info($"Version {major}.{minor}.{revision}", "GLFW");
-			
 			GLFW.SetInputMode(_glfwWindow, (StickyAttributes)0x00033005, true); // Enable raw mouse
 
 			if (size != null)
