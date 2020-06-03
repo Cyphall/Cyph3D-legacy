@@ -4,54 +4,28 @@ using GlmSharp;
 
 namespace Cyph3D.Light
 {
-	public class PointLight : SceneObject
+	public class PointLight : Light<PointLight.NativePointLight>
 	{
-		private vec3 _sRGBColor;
-		private vec3 _linearColor;
-
-		public vec3 Color
+		public PointLight(Transform parent, vec3 srgbColor, float intensity, string name = "PointLight", vec3? position = null, vec3? rotation = null):
+			base(parent, srgbColor, intensity, name, position, rotation)
 		{
-			get => _sRGBColor;
-			set
-			{
-				_sRGBColor = value;
-				_linearColor = ToLinear(value);
-			}
 		}
 		
-		public float Intensity { get; set; }
-		
-		public PointLight(Transform parent, vec3 color, float intensity, string name = "PointLight", vec3? position = null):
-			base(parent, name, position)
-		{
-			Color = color;
-			Intensity = intensity;
-		}
-		
-		private static vec3 ToLinear(vec3 sRGB)
-		{
-			bvec3 cutoff = vec3.LesserThan(sRGB, new vec3(0.04045f));
-			vec3 higher = vec3.Pow((sRGB + new vec3(0.055f)) / new vec3(1.055f), new vec3(2.4f));
-			vec3 lower = sRGB / new vec3(12.92f);
-
-			return vec3.Mix(higher, lower, new vec3(cutoff.x ? 1 : 0, cutoff.y ? 1 : 0, cutoff.z ? 1 : 0));
-		}
-
-		public NativePointLight GLLight =>
+		public override NativePointLight NativeLight =>
 			new NativePointLight
 			{
 				Pos = Transform.WorldPosition,
-				Color = _linearColor,
+				Color = LinearColor,
 				Intensity = Intensity
 			};
 
-		[StructLayout(LayoutKind.Explicit)]
+		[StructLayout(LayoutKind.Sequential)]
 		public struct NativePointLight
 		{
-			[FieldOffset(0)] public vec3  Pos;
-			[FieldOffset(12)]public float Intensity;
-			[FieldOffset(16)]public vec3  Color;
-			[FieldOffset(28)]public float Padding28;
+			public vec3  Pos;
+			public float Intensity;
+			public vec3  Color;
+			public float Padding28;
 		}
 	}
 }

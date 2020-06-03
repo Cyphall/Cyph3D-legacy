@@ -21,7 +21,7 @@ namespace Cyph3D
 				_pointLightsNative = new NativeArray<PointLight.NativePointLight>(count);
 				for (int i = 0; i < count; i++)
 				{
-					_pointLightsNative[i] = _pointLights[i].GLLight;
+					_pointLightsNative[i] = _pointLights[i].NativeLight;
 				}
 
 				return _pointLightsNative;

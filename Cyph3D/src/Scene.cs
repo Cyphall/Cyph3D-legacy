@@ -115,11 +115,11 @@ namespace Cyph3D
 					break;
 				case "point_light":
 					JsonArray colorArray = (JsonArray)jsonData["color"];
-					vec3 color = new vec3(colorArray[0], colorArray[1], colorArray[2]);
+					vec3 srgbColor = new vec3(colorArray[0], colorArray[1], colorArray[2]);
 					
 					float intensity = jsonData["intensity"];
 					
-					sceneObject = new PointLight(parent, color, intensity, name, position);
+					sceneObject = new PointLight(parent, srgbColor, intensity, name, position);
 					break;
 				default:
 					throw new InvalidOperationException($"The object type {jsonObject["type"]} is not recognized");
@@ -193,7 +193,7 @@ namespace Cyph3D
 				case PointLight pointLight:
 					jsonObject.Add("type", "point_light");
 					
-					jsonData.Add("color", ConvertHelper.JsonConvert(pointLight.Color));
+					jsonData.Add("color", ConvertHelper.JsonConvert(pointLight.SrgbColor));
 					jsonData.Add("intensity", pointLight.Intensity);
 					break;
 				default:

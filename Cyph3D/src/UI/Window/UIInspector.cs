@@ -90,10 +90,10 @@ namespace Cyph3D.UI.Window
             		}
             		break;
             	case PointLight pointLight:
-            		Vector3 imGuiColor = ConvertHelper.Convert(pointLight.Color);
-            		if (ImGui.ColorEdit3("Color", ref imGuiColor))
+            		Vector3 imGuiSrgbColor = ConvertHelper.Convert(pointLight.SrgbColor);
+            		if (ImGui.ColorEdit3("Color", ref imGuiSrgbColor))
             		{
-            			pointLight.Color = ConvertHelper.Convert(imGuiColor);
+            			pointLight.SrgbColor = ConvertHelper.Convert(imGuiSrgbColor);
             		}
             		
             		float intensity = pointLight.Intensity;
