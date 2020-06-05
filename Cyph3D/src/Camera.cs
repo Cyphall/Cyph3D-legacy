@@ -64,7 +64,7 @@ namespace Cyph3D
 
 			SphericalCoords = sphericalCoords;
 
-			Projection = MathExt.Perspective(100, (float)Engine.Window.Size.x / Engine.Window.Size.y, 0.0001f, 1000f);
+			Projection = MathExt.Perspective(100, (float)Engine.Window.Size.x / Engine.Window.Size.y, 0.02f, 1000f);
 
 			_previousMousePos = Engine.Window.CursorPos;
 		}
