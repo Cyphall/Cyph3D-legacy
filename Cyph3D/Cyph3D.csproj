@@ -20,7 +20,7 @@
 
     <ItemGroup>
         <None Include="resources/**">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 
