@@ -20,7 +20,8 @@ namespace Cyph3D.GLObject
 		public bool IsLit { get; }
 
 		private static Dictionary<string, Material> _materials = new Dictionary<string, Material>();
-		
+		private bool _loadedMessageDisplayed;
+
 		public Material(string name, bool isLit)
 		{
 			_shaderProgram = ShaderProgram.Get("deferred/firstPass");
@@ -111,6 +112,12 @@ namespace Cyph3D.GLObject
 			{
 				return false;
 			}
+
+			if (!_loadedMessageDisplayed)
+			{
+				Logger.Info($"Material \"{Name}\" loaded");
+				_loadedMessageDisplayed = true;
+			}
 			
 			_shaderProgram.Bind();
 
@@ -145,7 +152,6 @@ namespace Cyph3D.GLObject
 				Logger.Info($"Loading material \"{name}\"");
 				// ReSharper disable once ObjectCreationAsStatement
 				new Material(name, isLit);
-				Logger.Info($"Material \"{name}\" loaded");
 			}
 
 			return _materials[name];
