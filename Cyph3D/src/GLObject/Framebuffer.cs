@@ -10,6 +10,11 @@ namespace Cyph3D.GLObject
 	{
 		private int _ID;
 		private ivec2 _size;
+		private bool _completed;
+		private int _previouslyBound;
+
+		private List<DrawBuffersEnum> _drawBuffers = new List<DrawBuffersEnum>();
+		private List<FramebufferAttachment> _usedAttachments = new List<FramebufferAttachment>();
 		
 		private static HashSet<Framebuffer> _framebuffers = new HashSet<Framebuffer>();
 		
@@ -17,97 +22,84 @@ namespace Cyph3D.GLObject
 
 		public static implicit operator int(Framebuffer framebuffer) => framebuffer._ID;
 
-		public Framebuffer(out Texture texture, ivec2 size, InternalFormat internalFormat)
+		public Framebuffer(ivec2 size)
 		{
-			int previousFramebuffer = CurrentlyBound;
+			_previouslyBound = CurrentlyBound;
 			
 			_size = size;
 			_ID = GL.GenFramebuffer();
 			
-			Bind();
-			
-			texture = AddTexture(FramebufferAttachment.ColorAttachment0, internalFormat);
-
-			CheckStatus();
-			
-			Bind(previousFramebuffer);
-
-			_framebuffers.Add(this);
-		}
-		
-		public Framebuffer(out Renderbuffer renderbuffer, ivec2 size, RenderbufferStorage internalFormat)
-		{
-			int previousFramebuffer = CurrentlyBound;
-			
-			_size = size;
-			_ID = GL.GenFramebuffer();
-			
-			Bind();
-			
-			renderbuffer = AddRenderbuffer(FramebufferAttachment.ColorAttachment0, internalFormat);
-
-			CheckStatus();
-			
-			Bind(previousFramebuffer);
+			BindUnsafe(this);
 
 			_framebuffers.Add(this);
 		}
 
-		public Texture AddTexture(FramebufferAttachment attachment, InternalFormat internalFormat, TextureFiltering filtering = TextureFiltering.Nearest)
+		public Framebuffer WithTexture(FramebufferAttachment attachment, InternalFormat internalFormat, out Texture texture, TextureFiltering filtering = TextureFiltering.Nearest)
 		{
-			int previousFramebuffer = CurrentlyBound;
-			Bind();
-
-			Texture texture = new Texture(_size, internalFormat, filtering);
+			if (_usedAttachments.Contains(attachment))
+			{
+				throw new InvalidOperationException("This framebuffer attachment is alreay used");
+			}
+				
+			texture = new Texture(_size, internalFormat, filtering);
 			
 			GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, attachment, TextureTarget.Texture2D, texture, 0);
 			
-			CheckStatus();
+			_usedAttachments.Add(attachment);
 			
-			Bind(previousFramebuffer);
-
-			return texture;
+			if (IsDrawBuffer(attachment))
+				_drawBuffers.Add((DrawBuffersEnum)attachment);
+			
+			return this;
+		}
+		
+		public Framebuffer WithTexture(FramebufferAttachment attachment, InternalFormat internalFormat, TextureFiltering filtering = TextureFiltering.Nearest)
+		{
+			return WithTexture(attachment, internalFormat, out _, filtering);
 		}
 
-		public Renderbuffer AddRenderbuffer(FramebufferAttachment attachment, RenderbufferStorage internalFormat)
+		public Framebuffer WithRenderbuffer(FramebufferAttachment attachment, RenderbufferStorage internalFormat, out Renderbuffer renderbuffer)
 		{
-			int previousFramebuffer = CurrentlyBound;
-			Bind();
+			if (_usedAttachments.Contains(attachment))
+			{
+				throw new InvalidOperationException("This framebuffer attachment is alreay used");
+			}
 			
-			Renderbuffer renderbuffer = new Renderbuffer(_size, internalFormat);
+			renderbuffer = new Renderbuffer(_size, internalFormat);
 			
 			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, attachment, RenderbufferTarget.Renderbuffer, renderbuffer);
 			
-			CheckStatus();
+			if (IsDrawBuffer(attachment))
+				_drawBuffers.Add((DrawBuffersEnum)attachment);
 			
-			Bind(previousFramebuffer);
-
-			return renderbuffer;
+			return this;
+		}
+		
+		public Framebuffer WithRenderbuffer(FramebufferAttachment attachment, RenderbufferStorage internalFormat)
+		{
+			return WithRenderbuffer(attachment, internalFormat, out _);
 		}
 
-		public void SetDrawBuffers(params DrawBuffersEnum[] buffers)
+		public Framebuffer Complete()
 		{
-			int previousFramebuffer = CurrentlyBound;
-			Bind();
-			
-			GL.DrawBuffers(buffers.Length, buffers);
-			
-			Bind(previousFramebuffer);
-		}
-
-		private void CheckStatus()
-		{
-			int previousFramebuffer = CurrentlyBound;
-			Bind();
+			GL.DrawBuffers(_drawBuffers.Count, _drawBuffers.ToArray());
 			
 			FramebufferErrorCode state = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
-
 			if (state != FramebufferErrorCode.FramebufferComplete)
 			{
 				throw new InvalidOperationException($"Error while creating framebuffer: {state}");
 			}
 			
-			Bind(previousFramebuffer);
+			BindUnsafe(_previouslyBound);
+
+			_completed = true;
+
+			return this;
+		}
+
+		private static bool IsDrawBuffer(FramebufferAttachment attachment)
+		{
+			return attachment >= FramebufferAttachment.ColorAttachment0 && attachment <= FramebufferAttachment.ColorAttachment31;
 		}
 
 		public void Dispose()
@@ -126,10 +118,13 @@ namespace Cyph3D.GLObject
 
 		public void Bind()
 		{
-			Bind(this);
+			if (!_completed)
+				throw new InvalidOperationException("An incomplete framebuffer has been bound.");
+			
+			BindUnsafe(this);
 		}
 
-		private static void Bind(int framebuffer)
+		private static void BindUnsafe(int framebuffer)
 		{
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
 		}
