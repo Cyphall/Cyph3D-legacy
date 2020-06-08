@@ -23,5 +23,9 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
+    
+    <ItemGroup>
+        <None Remove="screenshots/*" />
+    </ItemGroup>
 
 </Project>
