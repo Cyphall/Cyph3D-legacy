@@ -36,3 +36,7 @@ F3: Show UI
 ![](Cyph3D/screenshots/01.jpg?raw=true "Dungeon Scene")
 ![](Cyph3D/screenshots/02.jpg?raw=true "Spaceship Scene")
 ![](Cyph3D/screenshots/03.jpg?raw=true "ImGui Interface")
+
+## License
+
+This work by [Cyphall](https://github.com/Cyphall) is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0).
