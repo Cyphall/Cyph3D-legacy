@@ -117,7 +117,7 @@ vec4 lighting()
 	vec3  color             = getColor();
 	float emissiveIntensity = getEmissive();
 
-	// Modified version of the code at learnopengl.com/PBR/Lighting
+	// Modified version of the code at https://learnopengl.com/PBR/Lighting by Joey de Vries (https://twitter.com/JoeyDeVriez)
 	vec3 F0 = vec3(0.04);
 	F0 = mix(F0, color, metalness);
 
