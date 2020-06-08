@@ -1,7 +1,7 @@
 
 This is a simple 3D engine which aims to implement modern photorealistic features.
 
-It uses the OpenGL and GLFW bindings from OpenTK.
+It uses the OpenGL and GLFW bindings from [OpenTK](https://github.com/opentk/opentk).
 
 ## Controls
 
