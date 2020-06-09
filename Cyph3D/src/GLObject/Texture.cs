@@ -18,18 +18,13 @@ namespace Cyph3D.GLObject
 		
 		private static HashSet<Texture> _textures = new HashSet<Texture>();
 		
-		private static int CurrentlyBound => GL.GetInteger(GetPName.TextureBinding2D);
-		
 		public static implicit operator int(Texture texture) => texture._ID;
 
 		public Texture(ivec2 size, InternalFormat internalFormat, TextureFiltering filtering = TextureFiltering.Nearest, bool defaultReady = true)
 		{
-			int previousTexture = CurrentlyBound;
-			
 			_size = size;
 			
-			_ID = GL.GenTexture();
-			Bind();
+			GL.CreateTextures(TextureTarget.Texture2D, 1, out _ID);
 
 			int finteringRaw = filtering switch
 			{
@@ -38,32 +33,24 @@ namespace Cyph3D.GLObject
 				_ => throw new ArgumentOutOfRangeException(nameof(filtering), filtering, null)
 			};
 			
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, finteringRaw);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, finteringRaw);
+			GL.TextureParameter(_ID, TextureParameterName.TextureMinFilter, finteringRaw);
+			GL.TextureParameter(_ID, TextureParameterName.TextureMagFilter, finteringRaw);
 			
-			GL.TexStorage2D(TextureTarget2d.Texture2D, 1, (SizedInternalFormat)internalFormat, size.x, size.y);
+			GL.TextureStorage2D(_ID, 1, (SizedInternalFormat)internalFormat, size.x, size.y);
 
 			_textures.Add(this);
-			
-			Bind(previousTexture);
 
 			IsReady = defaultReady;
 		}
 
 		public void PutData(byte[] data, PixelFormat format = PixelFormat.Rgb, PixelType type = PixelType.UnsignedByte)
 		{
-			int previousTexture = CurrentlyBound;
-			Bind();
-			GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, _size.x, _size.y, format, type, data);
-			Bind(previousTexture);
+			GL.TextureSubImage2D(_ID, 0, 0, 0, _size.x, _size.y, format, type, data);
 		}
 		
 		public void PutData(IntPtr data, PixelFormat format = PixelFormat.Rgb, PixelType type = PixelType.UnsignedByte)
 		{
-			int previousTexture = CurrentlyBound;
-			Bind();
-			GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, _size.x, _size.y, format, type, data);
-			Bind(previousTexture);
+			GL.TextureSubImage2D(_ID, 0, 0, 0, _size.x, _size.y, format, type, data);
 		}
 
 		public void Dispose()
@@ -80,14 +67,9 @@ namespace Cyph3D.GLObject
 			}
 		}
 
-		public void Bind()
+		public void Bind(int unit)
 		{
-			Bind(this);
-		}
-		
-		private static void Bind(int texture)
-		{
-			GL.BindTexture(TextureTarget.Texture2D, texture);
+			GL.BindTextureUnit(unit, _ID);
 		}
 		
 		public static Texture FromFile(string name, bool sRGB = false, bool compressed = false)

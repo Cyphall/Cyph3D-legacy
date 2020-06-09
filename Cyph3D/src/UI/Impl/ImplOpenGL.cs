@@ -115,9 +115,10 @@ namespace Cyph3D.UI.Impl
 				(r+l)/(l-r),  (t+b)/(b-t),  0.0f,   1.0f
 			);
 			
-			_shaderProgram.Bind();
 			_shaderProgram.SetValue("Texture", 0);
 			_shaderProgram.SetValue("ProjMtx", orthoProjection);
+			
+			_shaderProgram.Bind();
 			
 			GL.BindSampler(0, 0);
 		}

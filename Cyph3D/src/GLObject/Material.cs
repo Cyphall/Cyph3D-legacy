@@ -25,7 +25,6 @@ namespace Cyph3D.GLObject
 		public Material(string name, bool isLit)
 		{
 			_shaderProgram = ShaderProgram.Get("deferred/firstPass");
-			_shaderProgram.Bind();
 			
 			_shaderProgram.SetValue("colorMap", 0);
 			_shaderProgram.SetValue("normalMap", 1);
@@ -33,8 +32,6 @@ namespace Cyph3D.GLObject
 			_shaderProgram.SetValue("displacementMap", 3);
 			_shaderProgram.SetValue("metallicMap", 4);
 			_shaderProgram.SetValue("emissiveMap", 5);
-			
-			_shaderProgram.Unbind();
 			
 			if (Texture.ExistsOnDisk($"{name}/col"))
 			{
@@ -118,29 +115,22 @@ namespace Cyph3D.GLObject
 				Logger.Info($"Material \"{Name}\" loaded");
 				_loadedMessageDisplayed = true;
 			}
-			
-			_shaderProgram.Bind();
 
-			GL.ActiveTexture(TextureUnit.Texture0);
-			_colorMap.Bind();
-			GL.ActiveTexture(TextureUnit.Texture1);
-			_normalMap.Bind();
-			GL.ActiveTexture(TextureUnit.Texture2);
-			_roughnessMap.Bind();
-			GL.ActiveTexture(TextureUnit.Texture3);
-			_displacementMap.Bind();
-			GL.ActiveTexture(TextureUnit.Texture4);
-			_metallicMap.Bind();
-			GL.ActiveTexture(TextureUnit.Texture5);
-			_emissiveMap.Bind();
+			_colorMap.Bind(0);
+			_normalMap.Bind(1);
+			_roughnessMap.Bind(2);
+			_displacementMap.Bind(3);
+			_metallicMap.Bind(4);
+			_emissiveMap.Bind(5);
 			
 			_shaderProgram.SetValue("model", model);
 			_shaderProgram.SetValue("view", view);
 			_shaderProgram.SetValue("projection", projection);
-			
 			_shaderProgram.SetValue("viewPos", cameraPos);
-
 			_shaderProgram.SetValue("isLit", IsLit ? 1 : 0);
+			
+			
+			_shaderProgram.Bind();
 
 			return true;
 		}

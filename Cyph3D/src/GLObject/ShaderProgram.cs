@@ -15,8 +15,6 @@ namespace Cyph3D.GLObject
 		private Shader _fragment;
 		
 		private Dictionary<string, int> _locations = new Dictionary<string, int>();
-
-		private static int CurrentlyBound => GL.GetInteger(GetPName.CurrentProgram);
 		
 		public static implicit operator int(ShaderProgram shaderProgram) => shaderProgram._ID;
 		
@@ -24,8 +22,6 @@ namespace Cyph3D.GLObject
 		
 		private ShaderProgram(string shadersName)
 		{
-			int previousProgram = CurrentlyBound;
-			
 			_vertex = Shader.Get($"{shadersName}.vert", ShaderType.VertexShader);
 			_fragment = Shader.Get($"{shadersName}.frag", ShaderType.FragmentShader);
 			
@@ -55,8 +51,6 @@ namespace Cyph3D.GLObject
 			}
 			
 			_shaderPrograms.Add(shadersName, this);
-			
-			Bind(previousProgram);
 		}
 		
 		public static ShaderProgram Get(string name)
@@ -100,53 +94,36 @@ namespace Cyph3D.GLObject
 		
 		public void Bind()
 		{
-			Bind(this);
-		}
-
-		public void Unbind()
-		{
-			Bind(0);
-		}
-		
-		private static void Bind(int shaderProgram)
-		{
-			GL.UseProgram(shaderProgram);
+			GL.UseProgram(_ID);
 		}
 		
 		public void SetValue(string variableName, float data)
 		{
-			Bind();
-			GL.Uniform1(GetLocation(variableName), data);
+			GL.ProgramUniform1(_ID, GetLocation(variableName), data);
 		}
 		public void SetValue(string variableName, vec2 data)
 		{
-			Bind();
-			GL.Uniform2(GetLocation(variableName), data.x, data.y);
+			GL.ProgramUniform2(_ID, GetLocation(variableName), data.x, data.y);
 		}
 		public void SetValue(string variableName, vec3 data)
 		{
-			Bind();
-			GL.Uniform3(GetLocation(variableName), data.x, data.y, data.z);
+			GL.ProgramUniform3(_ID, GetLocation(variableName), data.x, data.y, data.z);
 		}
 		public void SetValue(string variableName, int data)
 		{
-			Bind();
-			GL.Uniform1(GetLocation(variableName), data);
+			GL.ProgramUniform1(_ID, GetLocation(variableName), data);
 		}
 		public void SetValue(string variableName, ivec2 data)
 		{
-			Bind();
-			GL.Uniform2(GetLocation(variableName), data.x, data.y);
+			GL.ProgramUniform2(_ID, GetLocation(variableName), data.x, data.y);
 		}
 		public void SetValue(string variableName, ivec3 data)
 		{
-			Bind();
-			GL.Uniform3(GetLocation(variableName), data.x, data.y, data.z);
+			GL.ProgramUniform3(_ID, GetLocation(variableName), data.x, data.y, data.z);
 		}
 		public void SetValue(string variableName, mat4 data)
 		{
-			Bind();
-			GL.UniformMatrix4(GetLocation(variableName), 1, false, data.ToArray());
+			GL.ProgramUniformMatrix4(_ID, GetLocation(variableName), 1, false, data.ToArray());
 		}
 	}
 }

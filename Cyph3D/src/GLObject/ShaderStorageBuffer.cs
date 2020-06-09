@@ -14,45 +14,22 @@ namespace Cyph3D.GLObject
 		
 		private static HashSet<ShaderStorageBuffer> _shaderStorageBuffers = new HashSet<ShaderStorageBuffer>();
 		
-		private static int CurrentlyBound => GL.GetInteger((GetPName)All.ShaderStorageBufferBinding);
-		
 		public static implicit operator int(ShaderStorageBuffer shaderStorageBuffer) => shaderStorageBuffer._ID;
 
 		public ShaderStorageBuffer(int index)
 		{
-			int previous = CurrentlyBound;
-			
-			_ID = GL.GenBuffer();
+			GL.CreateBuffers(1, out _ID);
 			_index = index;
 			_usedIndexes.Add(index);
-			
-			Bind();
 			
 			GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, _index, _ID);
 
 			_shaderStorageBuffers.Add(this);
-			
-			Bind(previous);
 		}
 
 		public void PutData<T>(NativeArray<T> array) where T : unmanaged
 		{
-			int previous = CurrentlyBound;
-			Bind();
-			
-			GL.BufferData(BufferTarget.ShaderStorageBuffer, array.ByteSize, array, BufferUsageHint.DynamicDraw);
-			
-			Bind(previous);
-		}
-		
-		public void Bind()
-		{
-			Bind(this);
-		}
-		
-		private static void Bind(int shaderStorageBuffer)
-		{
-			GL.BindBuffer(BufferTarget.ShaderStorageBuffer, shaderStorageBuffer);
+			GL.NamedBufferData(_ID, array.ByteSize, array, BufferUsageHint.DynamicDraw);
 		}
 
 		public void Dispose()

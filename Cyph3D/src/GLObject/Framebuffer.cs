@@ -11,25 +11,18 @@ namespace Cyph3D.GLObject
 		private int _ID;
 		private ivec2 _size;
 		private bool _completed;
-		private int _previouslyBound;
 
 		private List<DrawBuffersEnum> _drawBuffers = new List<DrawBuffersEnum>();
 		private List<FramebufferAttachment> _usedAttachments = new List<FramebufferAttachment>();
 		
 		private static HashSet<Framebuffer> _framebuffers = new HashSet<Framebuffer>();
-		
-		private static int CurrentlyBound => GL.GetInteger(GetPName.FramebufferBinding);
 
 		public static implicit operator int(Framebuffer framebuffer) => framebuffer._ID;
 
 		public Framebuffer(ivec2 size)
 		{
-			_previouslyBound = CurrentlyBound;
-			
 			_size = size;
-			_ID = GL.GenFramebuffer();
-			
-			BindUnsafe(this);
+			GL.CreateFramebuffers(1, out _ID);
 
 			_framebuffers.Add(this);
 		}
@@ -43,7 +36,7 @@ namespace Cyph3D.GLObject
 				
 			texture = new Texture(_size, internalFormat, filtering);
 			
-			GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, attachment, TextureTarget.Texture2D, texture, 0);
+			GL.NamedFramebufferTexture(_ID, attachment, texture, 0);
 			
 			_usedAttachments.Add(attachment);
 			
@@ -67,7 +60,7 @@ namespace Cyph3D.GLObject
 			
 			renderbuffer = new Renderbuffer(_size, internalFormat);
 			
-			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, attachment, RenderbufferTarget.Renderbuffer, renderbuffer);
+			GL.NamedFramebufferRenderbuffer(_ID, attachment, RenderbufferTarget.Renderbuffer, renderbuffer);
 			
 			if (IsDrawBuffer(attachment))
 				_drawBuffers.Add((DrawBuffersEnum)attachment);
@@ -82,15 +75,13 @@ namespace Cyph3D.GLObject
 
 		public Framebuffer Complete()
 		{
-			GL.DrawBuffers(_drawBuffers.Count, _drawBuffers.ToArray());
+			GL.NamedFramebufferDrawBuffers(_ID, _drawBuffers.Count, _drawBuffers.ToArray());
 			
 			FramebufferErrorCode state = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
 			if (state != FramebufferErrorCode.FramebufferComplete)
 			{
 				throw new InvalidOperationException($"Error while creating framebuffer: {state}");
 			}
-			
-			BindUnsafe(_previouslyBound);
 
 			_completed = true;
 

@@ -68,8 +68,6 @@ namespace Cyph3D
 			_lightingPassShader.SetValue("materialTexture", 3);
 			_lightingPassShader.SetValue("depthTexture", 4);
 			
-			_lightingPassShader.Unbind();
-			
 			
 			_lightsBuffer = new ShaderStorageBuffer(0);
 		}
@@ -108,22 +106,15 @@ namespace Cyph3D
 
 			_lightingPassShader.SetValue("debug", Debug ? 1 : 0);
 
-			GL.ActiveTexture(TextureUnit.Texture0);
-			_positionTexture.Bind();
-			GL.ActiveTexture(TextureUnit.Texture1);
-			_normalTexture.Bind();
-			GL.ActiveTexture(TextureUnit.Texture2);
-			_colorTexture.Bind();
-			GL.ActiveTexture(TextureUnit.Texture3);
-			_materialTexture.Bind();
-			GL.ActiveTexture(TextureUnit.Texture4);
-			_depthTexture.Bind();
+			_positionTexture.Bind(0);
+			_normalTexture.Bind(1);
+			_colorTexture.Bind(2);
+			_materialTexture.Bind(3);
+			_depthTexture.Bind(4);
 
 			GL.BindVertexArray(_quadVAO);
 
 			GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
-			
-			_lightingPassShader.Unbind();
 		}
 	}
 }

@@ -10,24 +10,16 @@ namespace Cyph3D.GLObject
 		private int _ID;
 		
 		private static HashSet<Renderbuffer> _renderbuffers = new HashSet<Renderbuffer>();
-		
-		private static int CurrentlyBound => GL.GetInteger(GetPName.RenderbufferBinding);
 
 		public static implicit operator int(Renderbuffer renderbuffer) => renderbuffer._ID;
 
 		public Renderbuffer(ivec2 size, RenderbufferStorage internalFormat)
 		{
-			int previousBuffer = CurrentlyBound;
+			GL.CreateRenderbuffers(1, out _ID);
 			
-			_ID = GL.GenRenderbuffer();
-			
-			Bind();
-			
-			GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, internalFormat, size.x, size.y);
+			GL.NamedRenderbufferStorage(_ID, internalFormat, size.x, size.y);
 
 			_renderbuffers.Add(this);
-			
-			Bind(previousBuffer);
 		}
 		
 		public void Bind()
