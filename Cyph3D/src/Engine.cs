@@ -49,6 +49,7 @@ namespace Cyph3D
 			
 			ThreadPool = new ThreadPool(Math.Max(coreCount-1, 1));
 
+			GL.Enable(EnableCap.DebugOutput);
 			GL.DebugMessageCallback(
 				(source, type, id, severity, length, message, param) => {
 					string logMessage = $"{Marshal.PtrToStringAnsi(message, length)} \n id: {id} \n source: {source}";
