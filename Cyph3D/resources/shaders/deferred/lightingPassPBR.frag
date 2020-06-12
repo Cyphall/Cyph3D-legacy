@@ -4,10 +4,10 @@
 const float PI = 3.14159265359;
 
 /* ------ inputs from vertex shader ------ */
-in FRAG {
+in VERT2FRAG {
 	vec2  TexCoords;
 	vec3  ViewPos;
-} frag;
+} vert2frag;
 
 /* ------ data structures ------ */
 struct Light
@@ -17,8 +17,20 @@ struct Light
 	vec3  color;
 };
 
+struct FragData
+{
+	vec3  pos;
+	vec3  viewDir;
+	vec3  normal;
+	float roughness;
+	float metalness;
+	vec3  color;
+	float emissiveIntensity;
+	vec3  F0;
+} fragData;
+
 /* ------ uniforms ------ */
-layout(std430, binding = 0) buffer Lights
+layout(std430, binding = 0) buffer UselessNameBecauseItIsNeverUsedAnywhere1
 {
 	Light lights[];
 };
@@ -37,6 +49,8 @@ out vec4 out_Color;
 /* ------ function declarations ------ */
 vec4 debugView();
 vec4 lighting();
+
+vec3 calculateLighting(vec3 radiance, vec3 L, vec3 H);
 
 vec3 getPosition();
 vec3 getColor();
@@ -79,7 +93,7 @@ void main()
 
 vec4 debugView()
 {
-	vec2 texCoords = frag.TexCoords;
+	vec2 texCoords = vert2frag.TexCoords;
 	if (texCoords.x >= 0.5 && texCoords.y >= 0.5)
 	{
 		texCoords.x = (texCoords.x - 0.5) * 2;
@@ -106,91 +120,94 @@ vec4 debugView()
 	}
 }
 
+// Based on the code at https://learnopengl.com/PBR/Lighting by Joey de Vries (https://twitter.com/JoeyDeVriez)
 vec4 lighting()
 {
-	// setup
-	vec3  fragPos           = getPosition();
-	vec3  viewDir           = normalize(frag.ViewPos - fragPos);
-	vec3  normal            = getNormal();
-	float roughness         = getRoughness();
-	float metalness         = getMetallic();
-	vec3  color             = getColor();
-	float emissiveIntensity = getEmissive();
-
-	// Modified version of the code at https://learnopengl.com/PBR/Lighting by Joey de Vries (https://twitter.com/JoeyDeVriez)
-	vec3 F0 = vec3(0.04);
-	F0 = mix(F0, color, metalness);
-
+	// Fragment parameters initialization
+	fragData.pos               = getPosition();
+	fragData.viewDir           = normalize(vert2frag.ViewPos - fragData.pos);
+	fragData.normal            = getNormal();
+	fragData.roughness         = getRoughness();
+	fragData.metalness         = getMetallic();
+	fragData.color             = getColor();
+	fragData.emissiveIntensity = getEmissive();
+	fragData.F0                = mix(vec3(0.04), fragData.color, fragData.metalness);
+	
 	// reflectance equation
-	vec3 Lo = vec3(0.0);
+	vec3 Lo = saturate(fragData.color) * fragData.emissiveIntensity;
 	for(int i = 0; i < lights.length(); ++i)
 	{
-		// calculate per-light radiance
-		vec3 L = normalize(lights[i].pos - fragPos);
-		vec3 H = normalize(viewDir + L);
-		float distance    = length(lights[i].pos - fragPos);
+		// calculate light parameters
+		vec3  lightDir    = normalize(lights[i].pos - fragData.pos);
+		vec3  halfwayDir  = normalize(fragData.viewDir + lightDir);
+		float distance    = length(lights[i].pos - fragData.pos);
 		float attenuation = 1.0 / (1 + distance * distance);
-		vec3 radiance     = lights[i].color * lights[i].intensity * attenuation;
-
-		// cook-torrance brdf
-		float NDF = DistributionGGX(normal, H, roughness);
-		float G   = GeometrySmith(normal, viewDir, L, roughness);
-		vec3 F    = fresnelSchlick(max(dot(H, viewDir), 0.0), F0);
-
-		vec3 kS = F;
-		vec3 kD = vec3(1.0) - kS;
-		kD *= 1.0 - metalness;
-
-		vec3 numerator    = NDF * G * F;
-		float denominator = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, L), 0.0);
-		vec3 specular     = numerator / max(denominator, 0.001);
-
-		// add to outgoing radiance Lo
-		float NdotL = max(dot(normal, L), 0.0);
-		Lo += (kD * color / PI + specular) * radiance * NdotL;
+		vec3  radiance    = lights[i].color * lights[i].intensity * attenuation;
+		
+		Lo += calculateLighting(radiance, lightDir, halfwayDir);
 	}
 
-	return reinhard_tone_mapping(Lo + saturate(color) * emissiveIntensity);
+	return reinhard_tone_mapping(Lo);
+}
+
+vec3 calculateLighting(vec3 radiance, vec3 L, vec3 H)
+{
+	// cook-torrance brdf
+	float NDF = DistributionGGX(fragData.normal, H, fragData.roughness);
+	float G   = GeometrySmith(fragData.normal, fragData.viewDir, L, fragData.roughness);
+	vec3 F    = fresnelSchlick(max(dot(H, fragData.viewDir), 0.0), fragData.F0);
+
+	vec3 kS = F;
+	vec3 kD = vec3(1.0) - kS;
+	kD *= 1.0 - fragData.metalness;
+
+	vec3  numerator    = NDF * G * F;
+	float denominator = 4.0 * max(dot(fragData.normal, fragData.viewDir), 0.0) * max(dot(fragData.normal, L), 0.0);
+	vec3  specular     = numerator / max(denominator, 0.001);
+
+	// add to outgoing radiance Lo
+	float NdotL = max(dot(fragData.normal, L), 0.0);
+	return (kD * fragData.color / PI + specular) * radiance * NdotL;
 }
 
 vec3 getPosition()
 {
-	return texture(positionTexture, frag.TexCoords).rgb;
+	return texture(positionTexture, vert2frag.TexCoords).rgb;
 }
 
 vec3 getColor()
 {
-	return texture(colorTexture, frag.TexCoords).rgb;
+	return texture(colorTexture, vert2frag.TexCoords).rgb;
 }
 
 vec3 getNormal()
 {
-	return normalize(texture(normalTexture, frag.TexCoords).rgb * 2.0 - 1.0);
+	return normalize(texture(normalTexture, vert2frag.TexCoords).rgb * 2.0 - 1.0);
 }
 
 float getRoughness()
 {
-	return texture(materialTexture, frag.TexCoords).r;
+	return texture(materialTexture, vert2frag.TexCoords).r;
 }
 
 float getMetallic()
 {
-	return texture(materialTexture, frag.TexCoords).g;
+	return texture(materialTexture, vert2frag.TexCoords).g;
 }
 
 float getEmissive()
 {
-	return texture(materialTexture, frag.TexCoords).b;
+	return texture(materialTexture, vert2frag.TexCoords).b;
 }
 
 float getDepth()
 {
-	return texture(depthTexture, frag.TexCoords).r;
+	return texture(depthTexture, vert2frag.TexCoords).r;
 }
 
 int isLit()
 {
-	return int(texture(materialTexture, frag.TexCoords).a);
+	return int(texture(materialTexture, vert2frag.TexCoords).a);
 }
 
 vec3 saturate(vec3 color)
