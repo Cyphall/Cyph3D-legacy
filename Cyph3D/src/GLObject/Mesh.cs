@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Cyph3D.Extension;
 using GlmSharp;
@@ -15,14 +16,10 @@ namespace Cyph3D.GLObject
 	public class Mesh : IDisposable
 	{
 		private int _verticesDataBufferID;
-		private int _uvsBufferID;
-		private int _normalsBufferID;
-		private int _tangentsBufferID;
-		private int _bitangentsBufferID;
 
 		private int _vaoID;
 
-		private int _verticesCount;
+		private int[] _indices;
 		
 		public string Name { get; }
 
@@ -64,73 +61,74 @@ namespace Cyph3D.GLObject
 			{
 				rawMesh = _loaderFactory.Create().Load(stream);
 			}
+			
+			Dictionary<ivec3, int> indexMapping = new Dictionary<ivec3, int>();
 
-			_verticesCount = rawMesh.Groups[0].Faces.Count * 3;
-			NativeArray<VertexData> vertexData = new NativeArray<VertexData>(_verticesCount * 3);
+			List<VertexData> vertexData = new List<VertexData>();
+			List<int> indices = new List<int>();
 
 			for (int i = 0; i < rawMesh.Groups[0].Faces.Count; i++)
 			{
 				Face f = rawMesh.Groups[0].Faces[i];
-
-				VertexData vData1 = new VertexData();
-				VertexData vData2 = new VertexData();
-				VertexData vData3 = new VertexData();
-
-				Vertex v0 = rawMesh.Vertices[f[0].VertexIndex - 1];
-				vData1.Position = *(vec3*) &v0;
-
-				Vertex v1 = rawMesh.Vertices[f[1].VertexIndex - 1];
-				vData2.Position = *(vec3*) &v1;
-
-				Vertex v2 = rawMesh.Vertices[f[2].VertexIndex - 1];
-				vData3.Position = *(vec3*) &v2;
-
-
-				OBJTexture t0 = rawMesh.Textures[f[0].TextureIndex - 1];
-				vData1.UV = *(vec2*) &t0;
-
-				OBJTexture t1 = rawMesh.Textures[f[1].TextureIndex - 1];
-				vData2.UV = *(vec2*) &t1;
-
-				OBJTexture t2 = rawMesh.Textures[f[2].TextureIndex - 1];
-				vData3.UV = *(vec2*) &t2;
-
-
-				Normal n0 = rawMesh.Normals[f[0].NormalIndex - 1];
-				vData1.Normal = *(vec3*) &n0;
-
-				Normal n1 = rawMesh.Normals[f[1].NormalIndex - 1];
-				vData2.Normal = *(vec3*) &n1;
-
-				Normal n2 = rawMesh.Normals[f[2].NormalIndex - 1];
-				vData3.Normal = *(vec3*) &n2;
-
-				vec3 deltaPos1 = new vec3(v1.X, v1.Y, v1.Z) - new vec3(v0.X, v0.Y, v0.Z);
-				vec3 deltaPos2 = new vec3(v2.X, v2.Y, v2.Z) - new vec3(v0.X, v0.Y, v0.Z);
-
-				vec2 deltaUV1 = new vec2(t1.X, t1.Y) - new vec2(t0.X, t0.Y);
-				vec2 deltaUV2 = new vec2(t2.X, t2.Y) - new vec2(t0.X, t0.Y);
-
-				float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
-				vec3 tangent = ((deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r).Normalized;
-
-				vData1.Tangent = tangent;
-				vData2.Tangent = tangent;
-				vData3.Tangent = tangent;
-
-				vertexData[i * 3 + 0] = vData1;
-				vertexData[i * 3 + 1] = vData2;
-				vertexData[i * 3 + 2] = vData3;
+				
+				indices.Add(GetIndex(f, 0));
+				indices.Add(GetIndex(f, 1));
+				indices.Add(GetIndex(f, 2));
 			}
 
 			GL.BindBuffer(BufferTarget.ArrayBuffer, _verticesDataBufferID);
 			
-			GL.BufferData(BufferTarget.ArrayBuffer, vertexData.Count * sizeof(VertexData), vertexData, BufferUsageHint.DynamicDraw);
+			GL.BufferData(BufferTarget.ArrayBuffer, vertexData.Count * sizeof(VertexData), vertexData.ToArray(), BufferUsageHint.DynamicDraw);
 			
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
+			_indices = indices.ToArray();
 
-			vertexData.Dispose();
+			int GetIndex(Face face, int index)
+			{
+				ivec3 comboIndex = new ivec3(face[index].VertexIndex - 1, face[index].TextureIndex - 1, face[index].NormalIndex - 1);
+				
+				if (!indexMapping.Keys.Contains(comboIndex))
+				{
+					VertexData vData = new VertexData();
+					
+
+					Vertex v = rawMesh.Vertices[comboIndex[0]];
+					vData.Position = *(vec3*) &v;
+					Vertex v0 = rawMesh.Vertices[face[0].VertexIndex - 1];
+					Vertex v1 = rawMesh.Vertices[face[1].VertexIndex - 1];
+					Vertex v2 = rawMesh.Vertices[face[2].VertexIndex - 1];
+
+
+					OBJTexture t = rawMesh.Textures[comboIndex[1]];
+					vData.UV = *(vec2*) &t;
+					OBJTexture t0 = rawMesh.Textures[face[0].TextureIndex - 1];
+					OBJTexture t1 = rawMesh.Textures[face[1].TextureIndex - 1];
+					OBJTexture t2 = rawMesh.Textures[face[2].TextureIndex - 1];
+					
+					
+					Normal n = rawMesh.Normals[comboIndex[2]];
+					vData.Normal = (*(vec3*) &n).Normalized;
+					
+
+					vec3 deltaPos1 = new vec3(v1.X, v1.Y, v1.Z) - new vec3(v0.X, v0.Y, v0.Z);
+					vec3 deltaPos2 = new vec3(v2.X, v2.Y, v2.Z) - new vec3(v0.X, v0.Y, v0.Z);
+
+					vec2 deltaUV1 = new vec2(t1.X, t1.Y) - new vec2(t0.X, t0.Y);
+					vec2 deltaUV2 = new vec2(t2.X, t2.Y) - new vec2(t0.X, t0.Y);
+
+					float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
+					vec3 tangent = ((deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r).Normalized;
+
+					vData.Tangent = (tangent - vec3.Dot(vData.Normal, tangent) * vData.Normal).Normalized;
+					
+					
+					vertexData.Add(vData);
+					indexMapping.Add(comboIndex, vertexData.Count - 1);
+				}
+
+				return indexMapping[comboIndex];
+			}
 		}
 
 		public static Mesh GetOrLoad(string name)
@@ -148,7 +146,7 @@ namespace Cyph3D.GLObject
 		public void Render()
 		{
 			GL.BindVertexArray(_vaoID);
-			GL.DrawArrays(PrimitiveType.Triangles, 0, _verticesCount);
+			GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, _indices);
 		}
 
 		public void Dispose()

@@ -2,8 +2,9 @@
 
 in FRAG {
 	vec2 TexCoords;
-	mat3 TangentToWorld;
-	mat3 WorldToTangent;
+	vec3 T;
+	vec3 B;
+	vec3 N;
 	vec3 FragPos;
 } frag;
 
@@ -28,14 +29,17 @@ vec2 POM(vec2 texCoords, vec3 viewDir);
 
 void main()
 {
-	vec2 texCoords = POM(frag.TexCoords, normalize(frag.WorldToTangent * (viewPos - frag.FragPos)));
+	mat3 TangentToWorld = mat3(frag.T, frag.B, frag.N);
+	mat3 WorldToTangent = transpose(TangentToWorld);
+	
+	vec2 texCoords = POM(frag.TexCoords, normalize(WorldToTangent * (viewPos - frag.FragPos)));
 
 	color = texture(colorMap, texCoords).rgb;
 	
 	position = frag.FragPos;
 
 	normal = normalize(texture(normalMap, texCoords).rgb * 2.0 - 1.0);
-	normal = frag.TangentToWorld * normal;
+	normal = TangentToWorld * normal;
 	normal = (normal + 1) * 0.5;
 
 	material.r = texture(roughnessMap, texCoords).r;
