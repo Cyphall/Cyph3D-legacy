@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Cyph3D.Extension;
 using Cyph3D.GLObject;
-using Cyph3D.Light;
+using Cyph3D.Lighting;
 using ImGuiNET;
 
 namespace Cyph3D.UI.Window
@@ -89,7 +89,7 @@ namespace Cyph3D.UI.Window
             			meshObject.AngularVelocity = ConvertHelper.Convert(imGuiAngularVelocity);
             		}
             		break;
-            	case PointLight pointLight:
+            	case Light pointLight:
             		Vector3 imGuiSrgbColor = ConvertHelper.Convert(pointLight.SrgbColor);
             		if (ImGui.ColorEdit3("Color", ref imGuiSrgbColor))
             		{

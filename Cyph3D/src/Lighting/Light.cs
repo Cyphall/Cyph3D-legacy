@@ -1,9 +1,9 @@
 ﻿using Cyph3D.Extension;
 using GlmSharp;
 
-namespace Cyph3D.Light
+namespace Cyph3D.Lighting
 {
-	public abstract class Light<T> : SceneObject where T: struct
+	public abstract class Light : SceneObject
 	{
 		private vec3 _sRGBColor;
 		private vec3 _linearColor;
@@ -36,8 +36,6 @@ namespace Cyph3D.Light
 				_sRGBColor = ToSrgb(value);
 			}
 		}
-		
-		public abstract T NativeLight { get; }
 		
 		private static vec3 ToLinear(vec3 sRGB)
 		{

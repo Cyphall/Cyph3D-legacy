@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cyph3D.Extension;
-using Cyph3D.Light;
+using Cyph3D.Lighting;
 
 namespace Cyph3D
 {
 	public class LightManager : IDisposable
 	{
+#region PointLight
 		private List<PointLight> _pointLights = new List<PointLight>();
 
-		private NativeArray<PointLight.NativePointLight> _pointLightsNative = new NativeArray<PointLight.NativePointLight>(0);
-		public NativeArray<PointLight.NativePointLight> PointLightsNative
+		private NativeArray<PointLight.NativeLightData> _pointLightsNative = new NativeArray<PointLight.NativeLightData>(0);
+		public NativeArray<PointLight.NativeLightData> PointLightsNative
 		{
 			get
 			{
@@ -18,7 +19,7 @@ namespace Cyph3D
 		
 				int count = _pointLights.Count;
 		
-				_pointLightsNative = new NativeArray<PointLight.NativePointLight>(count);
+				_pointLightsNative = new NativeArray<PointLight.NativeLightData>(count);
 				for (int i = 0; i < count; i++)
 				{
 					_pointLightsNative[i] = _pointLights[i].NativeLight;
@@ -27,31 +28,73 @@ namespace Cyph3D
 				return _pointLightsNative;
 			}
 		}
-		
-		public void AddPointLight(PointLight light)
-		{
-			if (!_pointLights.Contains(light))
-			{
-				_pointLights.Add(light);
-			}
-		}
-		
-		public void RemovePointLight(PointLight light)
-		{
-			if (_pointLights.Contains(light))
-			{
-				_pointLights.Remove(light);
-			}
-		}
+#endregion
 
-		public void ClearAll()
+#region DirectionalLight
+		private List<DirectionalLight> _directionalLights = new List<DirectionalLight>();
+
+		private NativeArray<DirectionalLight.NativeLightData> _directionalLightsNative = new NativeArray<DirectionalLight.NativeLightData>(0);
+		public NativeArray<DirectionalLight.NativeLightData> DirectionalLightsNative
 		{
-			_pointLights.Clear();
+			get
+			{
+				_directionalLightsNative.Dispose();
+				
+				int count = _directionalLights.Count;
+				
+				_directionalLightsNative = new NativeArray<DirectionalLight.NativeLightData>(count);
+				for (int i = 0; i < count; i++)
+				{
+					_directionalLightsNative[i] = _directionalLights[i].NativeLight;
+				}
+
+				return _directionalLightsNative;
+			}
+		}
+#endregion
+		
+		public void Add(Light light)
+		{
+			switch (light)
+			{
+				case PointLight pointLight:
+					if (!_pointLights.Contains(pointLight))
+					{
+						_pointLights.Add(pointLight);
+					}
+					break;
+				case DirectionalLight directionalLight:
+					if (!_directionalLights.Contains(directionalLight))
+					{
+						_directionalLights.Add(directionalLight);
+					}
+					break;
+			}
+		}
+		
+		public void Remove(Light light)
+		{
+			switch (light)
+			{
+				case PointLight pointLight:
+					if (_pointLights.Contains(pointLight))
+					{
+						_pointLights.Remove(pointLight);
+					}
+					break;
+				case DirectionalLight directionalLight:
+					if (_directionalLights.Contains(directionalLight))
+					{
+						_directionalLights.Remove(directionalLight);
+					}
+					break;
+			}
 		}
 
 		public void Dispose()
 		{
 			PointLightsNative?.Dispose();
+			DirectionalLightsNative?.Dispose();
 		}
 	}
 }

@@ -45,20 +45,15 @@ namespace Cyph3D.GLObject
 			
 			return this;
 		}
-		
-		public Framebuffer WithTexture(FramebufferAttachment attachment, InternalFormat internalFormat, TextureFiltering filtering = TextureFiltering.Nearest)
-		{
-			return WithTexture(attachment, internalFormat, out _, filtering);
-		}
 
-		public Framebuffer WithRenderbuffer(FramebufferAttachment attachment, RenderbufferStorage internalFormat, out Renderbuffer renderbuffer)
+		public Framebuffer WithRenderbuffer(FramebufferAttachment attachment, RenderbufferStorage internalFormat)
 		{
 			if (_usedAttachments.Contains(attachment))
 			{
 				throw new InvalidOperationException("This framebuffer attachment is alreay used");
 			}
 			
-			renderbuffer = new Renderbuffer(_size, internalFormat);
+			Renderbuffer renderbuffer = new Renderbuffer(_size, internalFormat);
 			
 			GL.NamedFramebufferRenderbuffer(_ID, attachment, RenderbufferTarget.Renderbuffer, renderbuffer);
 			
@@ -67,15 +62,11 @@ namespace Cyph3D.GLObject
 			
 			return this;
 		}
-		
-		public Framebuffer WithRenderbuffer(FramebufferAttachment attachment, RenderbufferStorage internalFormat)
-		{
-			return WithRenderbuffer(attachment, internalFormat, out _);
-		}
 
 		public Framebuffer Complete()
 		{
 			GL.NamedFramebufferDrawBuffers(_ID, _drawBuffers.Count, _drawBuffers.ToArray());
+			GL.NamedFramebufferReadBuffer(_ID, ReadBufferMode.None);
 			
 			FramebufferErrorCode state = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
 			if (state != FramebufferErrorCode.FramebufferComplete)

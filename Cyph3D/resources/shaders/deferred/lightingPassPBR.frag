@@ -10,9 +10,16 @@ in VERT2FRAG {
 } vert2frag;
 
 /* ------ data structures ------ */
-struct Light
+struct PointLight
 {
 	vec3  pos;
+	float intensity;
+	vec3  color;
+};
+
+struct DirectionalLight
+{
+	vec3  fragToLightDirection;
 	float intensity;
 	vec3  color;
 };
@@ -32,7 +39,12 @@ struct FragData
 /* ------ uniforms ------ */
 layout(std430, binding = 0) buffer UselessNameBecauseItIsNeverUsedAnywhere1
 {
-	Light lights[];
+	PointLight pointLights[];
+};
+
+layout(std430, binding = 1) buffer UselessNameBecauseItIsNeverUsedAnywhere2
+{
+	DirectionalLight directionalLights[];
 };
 
 uniform sampler2D positionTexture;
@@ -133,21 +145,34 @@ vec4 lighting()
 	fragData.emissiveIntensity = getEmissive();
 	fragData.F0                = mix(vec3(0.04), fragData.color, fragData.metalness);
 	
-	// reflectance equation
-	vec3 Lo = saturate(fragData.color) * fragData.emissiveIntensity;
-	for(int i = 0; i < lights.length(); ++i)
+	// aka Lo
+	vec3 finalColor = saturate(fragData.color) * fragData.emissiveIntensity;
+	
+	// Point Light calculation
+	for(int i = 0; i < pointLights.length(); ++i)
 	{
 		// calculate light parameters
-		vec3  lightDir    = normalize(lights[i].pos - fragData.pos);
+		vec3  lightDir    = normalize(pointLights[i].pos - fragData.pos);
 		vec3  halfwayDir  = normalize(fragData.viewDir + lightDir);
-		float distance    = length(lights[i].pos - fragData.pos);
+		float distance    = length(pointLights[i].pos - fragData.pos);
 		float attenuation = 1.0 / (1 + distance * distance);
-		vec3  radiance    = lights[i].color * lights[i].intensity * attenuation;
-		
-		Lo += calculateLighting(radiance, lightDir, halfwayDir);
+		vec3  radiance    = pointLights[i].color * pointLights[i].intensity * attenuation;
+
+		finalColor += calculateLighting(radiance, lightDir, halfwayDir);
 	}
 
-	return reinhard_tone_mapping(Lo);
+	// Directional Light calculation
+	for(int i = 0; i < directionalLights.length(); ++i)
+	{
+		// calculate light parameters
+		vec3 lightDir    = directionalLights[i].fragToLightDirection;
+		vec3 halfwayDir  = normalize(fragData.viewDir + lightDir);
+		vec3 radiance    = directionalLights[i].color * directionalLights[i].intensity;
+
+		finalColor += calculateLighting(radiance, lightDir, halfwayDir);
+	}
+
+	return reinhard_tone_mapping(finalColor);
 }
 
 vec3 calculateLighting(vec3 radiance, vec3 L, vec3 H)

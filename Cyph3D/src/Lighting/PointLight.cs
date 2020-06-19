@@ -2,17 +2,17 @@
 using Cyph3D.Extension;
 using GlmSharp;
 
-namespace Cyph3D.Light
+namespace Cyph3D.Lighting
 {
-	public class PointLight : Light<PointLight.NativePointLight>
+	public class PointLight : Light
 	{
 		public PointLight(Transform parent, vec3 srgbColor, float intensity, string name = "PointLight", vec3? position = null, vec3? rotation = null):
 			base(parent, srgbColor, intensity, name, position, rotation)
 		{
 		}
 		
-		public override NativePointLight NativeLight =>
-			new NativePointLight
+		public NativeLightData NativeLight =>
+			new NativeLightData
 			{
 				Pos = Transform.WorldPosition,
 				Color = LinearColor,
@@ -20,7 +20,7 @@ namespace Cyph3D.Light
 			};
 
 		[StructLayout(LayoutKind.Sequential)]
-		public struct NativePointLight
+		public struct NativeLightData
 		{
 			public vec3  Pos;
 			public float Intensity;

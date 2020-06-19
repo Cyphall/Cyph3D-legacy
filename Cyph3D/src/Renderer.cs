@@ -16,7 +16,8 @@ namespace Cyph3D
 		private Texture _depthTexture;
 		private int _quadVAO;
 		private ShaderProgram _lightingPassShader;
-		private ShaderStorageBuffer _lightsBuffer;
+		private ShaderStorageBuffer _pointLightsBuffer;
+		private ShaderStorageBuffer _directionalLightsBuffer;
 		
 		public bool Debug { get; set; }
 
@@ -69,7 +70,8 @@ namespace Cyph3D
 			_lightingPassShader.SetValue("depthTexture", 4);
 			
 			
-			_lightsBuffer = new ShaderStorageBuffer(0);
+			_pointLightsBuffer = new ShaderStorageBuffer(0);
+			_directionalLightsBuffer = new ShaderStorageBuffer(1);
 		}
 
 		public void Render(Camera camera)
@@ -94,7 +96,8 @@ namespace Cyph3D
 
 		private void LightingPass(vec3 viewPos)
 		{
-			_lightsBuffer.PutData(Engine.Scene.LightManager.PointLightsNative);
+			_pointLightsBuffer.PutData(Engine.Scene.LightManager.PointLightsNative);
+			_directionalLightsBuffer.PutData(Engine.Scene.LightManager.DirectionalLightsNative);
 
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 

@@ -4,7 +4,7 @@ using System.IO;
 using System.Json;
 using Cyph3D.Extension;
 using Cyph3D.GLObject;
-using Cyph3D.Light;
+using Cyph3D.Lighting;
 using GlmSharp;
 
 namespace Cyph3D
@@ -32,24 +32,35 @@ namespace Cyph3D
 		{
 			Objects.Add(obj);
 
-			if (obj is PointLight pointLight)
+			if (obj is Light light)
 			{
-				LightManager.AddPointLight(pointLight);
+				LightManager.Add(light);
 			}
 		}
 		
 		public void Remove(SceneObject obj)
 		{
+			RemoveFromHierarchy(obj);
+			RemoveFromObjects(obj);
+		}
+
+		private void RemoveFromHierarchy(SceneObject obj)
+		{
+			obj.Transform.Parent.Children.Remove(obj.Transform);
+		}
+		
+		private void RemoveFromObjects(SceneObject obj)
+		{
 			Objects.Remove(obj);
-
-			if (obj is PointLight pointLight)
+			
+			if (obj is Light light)
 			{
-				LightManager.RemovePointLight(pointLight);
+				LightManager.Remove(light);
 			}
-
+			
 			for (int i = 0; i < obj.Transform.Children.Count; i++)
 			{
-				Remove(obj.Transform.Children[i].Owner);
+				RemoveFromObjects(obj.Transform.Children[i].Owner);
 			}
 		}
 
