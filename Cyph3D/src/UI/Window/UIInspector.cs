@@ -1,4 +1,6 @@
-﻿using System.Numerics;
+﻿using System.IO;
+using System.Numerics;
+using System.Runtime.InteropServices;
 using Cyph3D.Extension;
 using Cyph3D.GLObject;
 using Cyph3D.Lighting;
@@ -17,7 +19,7 @@ namespace Cyph3D.UI.Window
 		
 		public static void Show()
 		{
-			ImGui.SetNextWindowSize(new Vector2(300, 580));
+			ImGui.SetNextWindowSize(new Vector2(400, 580));
 			ImGui.SetNextWindowPos(new Vector2(0, 500));
 			
 			if (ImGui.Begin("Inspector", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize))
@@ -88,6 +90,19 @@ namespace Cyph3D.UI.Window
             		{
             			meshObject.AngularVelocity = ConvertHelper.Convert(imGuiAngularVelocity);
             		}
+
+                    string meshName = meshObject.Mesh.Name;
+                    ImGui.InputText("Mesh", ref meshName, 0, ImGuiInputTextFlags.ReadOnly);
+                    if (ImGui.BeginDragDropTarget())
+                    {
+	                    ImGuiPayloadPtr payload = ImGui.AcceptDragDropPayload("MeshDragDrop");
+	                    if (payload.IsValid())
+	                    {
+		                    string newMesh = (string) GCHandle.FromIntPtr(payload.Data).Target;
+		                    meshObject.Mesh = Mesh.GetOrLoad(newMesh);
+	                    }
+	                    ImGui.EndDragDropTarget();
+                    }
             		break;
             	case Light pointLight:
             		Vector3 imGuiSrgbColor = ConvertHelper.Convert(pointLight.SrgbColor);

@@ -69,6 +69,8 @@ namespace Cyph3D
 				}, IntPtr.Zero
 			);
 			
+			Material.InitializeDefault();
+			
 			Renderer = new Renderer();
 			
 			Scene = new Scene();

@@ -20,7 +20,7 @@ namespace Cyph3D.UI.Window
 
 		public static void Show()
 		{
-			ImGui.SetNextWindowSize(new Vector2(300, 500));
+			ImGui.SetNextWindowSize(new Vector2(400, 500));
 			ImGui.SetNextWindowPos(new Vector2(0));
 
 			if (ImGui.Begin("Hierarchy", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize))
@@ -165,11 +165,6 @@ namespace Cyph3D.UI.Window
 			}
 			
 			ImGui.PopID();
-		}
-
-		private static unsafe bool IsValid(this ImGuiPayloadPtr payload)
-		{
-			return payload.NativePtr != null;
 		}
 	}
 }

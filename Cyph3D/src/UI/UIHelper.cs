@@ -37,6 +37,7 @@ namespace Cyph3D.UI
 			UIHierarchy.Show();
 			UIMisc.Show();
 			UIInspector.Show();
+			UIResourceExplorer.Show();
 			//UITest.Show();
 		}
 

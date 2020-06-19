@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Cyph3D.Extension;
 using Cyph3D.GLObject;
 using GlmSharp;
@@ -7,14 +8,14 @@ namespace Cyph3D
 {
 	public class MeshObject : SceneObject
 	{
-		public Material Material { get; }
-		public Mesh Mesh { get; }
+		public Material Material { get; set; }
+		public Mesh Mesh { get; set; }
 
 		public vec3 Velocity { get; set; }
 		public vec3 AngularVelocity { get; set; }
 		
 		public MeshObject(
-			Transform parent,
+			[NotNull]Transform parent,
 			Material material,
 			Mesh mesh,
 			string name = null,
@@ -33,8 +34,11 @@ namespace Cyph3D
 
 		public void Render(mat4 view, mat4 projection, vec3 cameraPos)
 		{
-			if (Material.Bind(Transform.WorldMatrix, view, projection, cameraPos))
-				Mesh.Render();
+			if (Material != null)
+			{
+				Material.Bind(Transform.WorldMatrix, view, projection, cameraPos);
+				Mesh?.Render();
+			}
 		}
 
 		public override void Update(double deltaTime)
