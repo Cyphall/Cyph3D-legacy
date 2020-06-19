@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using Cyph3D.Extension;
 using GlmSharp;
 using ObjLoader.Loader.Data.Elements;
@@ -13,7 +14,7 @@ namespace Cyph3D.GLObject
 {
 	public class Mesh : IDisposable
 	{
-		private int _verticesBufferID;
+		private int _verticesDataBufferID;
 		private int _uvsBufferID;
 		private int _normalsBufferID;
 		private int _tangentsBufferID;
@@ -29,39 +30,31 @@ namespace Cyph3D.GLObject
 
 		private static Dictionary<string, Mesh> _meshes = new Dictionary<string, Mesh>();
 
-		private Mesh(string name)
+		private unsafe Mesh(string name)
 		{
 			Name = name;
 			
-			_verticesBufferID = GL.GenBuffer();
-			_uvsBufferID = GL.GenBuffer();
-			_normalsBufferID = GL.GenBuffer();
-			_tangentsBufferID = GL.GenBuffer();
-			_bitangentsBufferID = GL.GenBuffer();
+			_verticesDataBufferID = GL.GenBuffer();
 
 			_vaoID = GL.GenVertexArray();
 
 			GL.BindVertexArray(_vaoID);
 
-			GL.BindBuffer(BufferTarget.ArrayBuffer, _verticesBufferID);
-			GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
-			GL.EnableVertexAttribArray(0);
+				GL.BindBuffer(BufferTarget.ArrayBuffer, _verticesDataBufferID);
 
-			GL.BindBuffer(BufferTarget.ArrayBuffer, _uvsBufferID);
-			GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
-			GL.EnableVertexAttribArray(1);
+				GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, sizeof(VertexData), Marshal.OffsetOf<VertexData>(nameof(VertexData.Position)));
+				GL.EnableVertexAttribArray(0);
 
-			GL.BindBuffer(BufferTarget.ArrayBuffer, _normalsBufferID);
-			GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
-			GL.EnableVertexAttribArray(2);
+				GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, sizeof(VertexData), Marshal.OffsetOf<VertexData>(nameof(VertexData.UV)));
+				GL.EnableVertexAttribArray(1);
 
-			GL.BindBuffer(BufferTarget.ArrayBuffer, _tangentsBufferID);
-			GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
-			GL.EnableVertexAttribArray(3);
+				GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, sizeof(VertexData), Marshal.OffsetOf<VertexData>(nameof(VertexData.Normal)));
+				GL.EnableVertexAttribArray(2);
 
-			GL.BindBuffer(BufferTarget.ArrayBuffer, _bitangentsBufferID);
-			GL.VertexAttribPointer(4, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
-			GL.EnableVertexAttribArray(4);
+				GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, sizeof(VertexData), Marshal.OffsetOf<VertexData>(nameof(VertexData.Tangent)));
+				GL.EnableVertexAttribArray(3);
+				
+				GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
 			GL.BindVertexArray(0);
 
@@ -73,60 +66,44 @@ namespace Cyph3D.GLObject
 			}
 
 			_verticesCount = rawMesh.Groups[0].Faces.Count * 3;
-			NativeArray<float> vertices = new NativeArray<float>(_verticesCount * 3);
-			NativeArray<float> uvs = new NativeArray<float>(_verticesCount * 2);
-			NativeArray<float> normals = new NativeArray<float>(_verticesCount * 3);
-			NativeArray<float> tangents = new NativeArray<float>(_verticesCount * 3);
-			NativeArray<float> bitangents = new NativeArray<float>(_verticesCount * 3);
+			NativeArray<VertexData> vertexData = new NativeArray<VertexData>(_verticesCount * 3);
 
 			for (int i = 0; i < rawMesh.Groups[0].Faces.Count; i++)
 			{
 				Face f = rawMesh.Groups[0].Faces[i];
 
+				VertexData vData1 = new VertexData();
+				VertexData vData2 = new VertexData();
+				VertexData vData3 = new VertexData();
 
 				Vertex v0 = rawMesh.Vertices[f[0].VertexIndex - 1];
-				vertices[i * 9 + 0] = v0.X;
-				vertices[i * 9 + 1] = v0.Y;
-				vertices[i * 9 + 2] = v0.Z;
+				vData1.Position = *(vec3*) &v0;
 
 				Vertex v1 = rawMesh.Vertices[f[1].VertexIndex - 1];
-				vertices[i * 9 + 3] = v1.X;
-				vertices[i * 9 + 4] = v1.Y;
-				vertices[i * 9 + 5] = v1.Z;
+				vData2.Position = *(vec3*) &v1;
 
 				Vertex v2 = rawMesh.Vertices[f[2].VertexIndex - 1];
-				vertices[i * 9 + 6] = v2.X;
-				vertices[i * 9 + 7] = v2.Y;
-				vertices[i * 9 + 8] = v2.Z;
+				vData3.Position = *(vec3*) &v2;
 
 
 				OBJTexture t0 = rawMesh.Textures[f[0].TextureIndex - 1];
-				uvs[i * 6 + 0] = t0.X;
-				uvs[i * 6 + 1] = t0.Y;
+				vData1.UV = *(vec2*) &t0;
 
 				OBJTexture t1 = rawMesh.Textures[f[1].TextureIndex - 1];
-				uvs[i * 6 + 2] = t1.X;
-				uvs[i * 6 + 3] = t1.Y;
+				vData2.UV = *(vec2*) &t1;
 
 				OBJTexture t2 = rawMesh.Textures[f[2].TextureIndex - 1];
-				uvs[i * 6 + 4] = t2.X;
-				uvs[i * 6 + 5] = t2.Y;
+				vData3.UV = *(vec2*) &t2;
 
 
 				Normal n0 = rawMesh.Normals[f[0].NormalIndex - 1];
-				normals[i * 9 + 0] = n0.X;
-				normals[i * 9 + 1] = n0.Y;
-				normals[i * 9 + 2] = n0.Z;
+				vData1.Normal = *(vec3*) &n0;
 
 				Normal n1 = rawMesh.Normals[f[1].NormalIndex - 1];
-				normals[i * 9 + 3] = n1.X;
-				normals[i * 9 + 4] = n1.Y;
-				normals[i * 9 + 5] = n1.Z;
+				vData2.Normal = *(vec3*) &n1;
 
 				Normal n2 = rawMesh.Normals[f[2].NormalIndex - 1];
-				normals[i * 9 + 6] = n2.X;
-				normals[i * 9 + 7] = n2.Y;
-				normals[i * 9 + 8] = n2.Z;
+				vData3.Normal = *(vec3*) &n2;
 
 				vec3 deltaPos1 = new vec3(v1.X, v1.Y, v1.Z) - new vec3(v0.X, v0.Y, v0.Z);
 				vec3 deltaPos2 = new vec3(v2.X, v2.Y, v2.Z) - new vec3(v0.X, v0.Y, v0.Z);
@@ -136,50 +113,24 @@ namespace Cyph3D.GLObject
 
 				float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
 				vec3 tangent = ((deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r).Normalized;
-				vec3 bitangent = ((deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r).Normalized;
 
-				tangents[i * 9 + 0] = tangent.x;
-				tangents[i * 9 + 1] = tangent.y;
-				tangents[i * 9 + 2] = tangent.z;
-				tangents[i * 9 + 3] = tangent.x;
-				tangents[i * 9 + 4] = tangent.y;
-				tangents[i * 9 + 5] = tangent.z;
-				tangents[i * 9 + 6] = tangent.x;
-				tangents[i * 9 + 7] = tangent.y;
-				tangents[i * 9 + 8] = tangent.z;
+				vData1.Tangent = tangent;
+				vData2.Tangent = tangent;
+				vData3.Tangent = tangent;
 
-				bitangents[i * 9 + 0] = bitangent.x;
-				bitangents[i * 9 + 1] = bitangent.y;
-				bitangents[i * 9 + 2] = bitangent.z;
-				bitangents[i * 9 + 3] = bitangent.x;
-				bitangents[i * 9 + 4] = bitangent.y;
-				bitangents[i * 9 + 5] = bitangent.z;
-				bitangents[i * 9 + 6] = bitangent.x;
-				bitangents[i * 9 + 7] = bitangent.y;
-				bitangents[i * 9 + 8] = bitangent.z;
+				vertexData[i * 3 + 0] = vData1;
+				vertexData[i * 3 + 1] = vData2;
+				vertexData[i * 3 + 2] = vData3;
 			}
 
-			GL.BindBuffer(BufferTarget.ArrayBuffer, _verticesBufferID);
-			GL.BufferData(BufferTarget.ArrayBuffer, (int) (vertices.Count * sizeof(float)), vertices, BufferUsageHint.DynamicDraw);
-
-			GL.BindBuffer(BufferTarget.ArrayBuffer, _uvsBufferID);
-			GL.BufferData(BufferTarget.ArrayBuffer, uvs.Count * sizeof(float), uvs, BufferUsageHint.DynamicDraw);
-
-			GL.BindBuffer(BufferTarget.ArrayBuffer, _normalsBufferID);
-			GL.BufferData(BufferTarget.ArrayBuffer, normals.Count * sizeof(float), normals, BufferUsageHint.DynamicDraw);
-
-			GL.BindBuffer(BufferTarget.ArrayBuffer, _tangentsBufferID);
-			GL.BufferData(BufferTarget.ArrayBuffer, tangents.Count * sizeof(float), tangents, BufferUsageHint.DynamicDraw);
-
-			GL.BindBuffer(BufferTarget.ArrayBuffer, _bitangentsBufferID);
-			GL.BufferData(BufferTarget.ArrayBuffer, bitangents.Count * sizeof(float), bitangents, BufferUsageHint.DynamicDraw);
-
+			GL.BindBuffer(BufferTarget.ArrayBuffer, _verticesDataBufferID);
+			
+			GL.BufferData(BufferTarget.ArrayBuffer, vertexData.Count * sizeof(VertexData), vertexData, BufferUsageHint.DynamicDraw);
+			
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
 
-			vertices.Dispose();
-			uvs.Dispose();
-			normals.Dispose();
+			vertexData.Dispose();
 		}
 
 		public static Mesh GetOrLoad(string name)
@@ -202,20 +153,8 @@ namespace Cyph3D.GLObject
 
 		public void Dispose()
 		{
-			GL.DeleteBuffers(5, new []
-				{
-					_verticesBufferID,
-					_uvsBufferID,
-					_normalsBufferID,
-					_tangentsBufferID,
-					_bitangentsBufferID
-				}
-			);
-			_verticesBufferID = 0;
-			_uvsBufferID = 0;
-			_normalsBufferID = 0;
-			_tangentsBufferID = 0;
-			_bitangentsBufferID = 0;
+			GL.DeleteBuffer(_verticesDataBufferID);
+			_verticesDataBufferID = 0;
 		}
 
 		public static void DisposeAll()
@@ -229,6 +168,15 @@ namespace Cyph3D.GLObject
 		static Mesh()
 		{
 			_loaderFactory = new ObjLoaderFactory();
+		}
+
+		[StructLayout(LayoutKind.Sequential)]
+		private struct VertexData
+		{
+			public vec3 Position;
+			public vec2 UV;
+			public vec3 Normal;
+			public vec3 Tangent;
 		}
 	}
 }
