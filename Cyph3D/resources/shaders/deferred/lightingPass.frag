@@ -4,23 +4,47 @@
 const float PI = 3.14159265359;
 
 /* ------ inputs from vertex shader ------ */
-in FRAG {
+in VERT2FRAG {
 	vec2  TexCoords;
 	vec3  ViewPos;
-} frag;
+} vert2frag;
 
 /* ------ data structures ------ */
-struct Light
+struct PointLight
 {
 	vec3  pos;
 	float intensity;
 	vec3  color;
 };
 
-/* ------ uniforms ------ */
-layout(std430, binding = 0) buffer Lights
+struct DirectionalLight
 {
-	Light lights[];
+	vec3  fragToLightDirection;
+	float intensity;
+	vec3  color;
+};
+
+struct FragData
+{
+	vec3  pos;
+	vec3  viewDir;
+	vec3  normal;
+	float roughness;
+	float metalness;
+	vec3  color;
+	float emissiveIntensity;
+	vec3  F0;
+} fragData;
+
+/* ------ uniforms ------ */
+layout(std430, binding = 0) buffer UselessNameBecauseItIsNeverUsedAnywhere1
+{
+	PointLight pointLights[];
+};
+
+layout(std430, binding = 1) buffer UselessNameBecauseItIsNeverUsedAnywhere2
+{
+	DirectionalLight directionalLights[];
 };
 
 uniform sampler2D positionTexture;
@@ -38,6 +62,8 @@ out vec4 out_Color;
 vec4 debugView();
 vec4 lighting();
 
+vec3 calculateLighting(vec3 radiance, vec3 L, vec3 H);
+
 vec3 getPosition();
 vec3 getColor();
 vec3 getNormal();
@@ -52,6 +78,9 @@ vec3 toSRGB(vec3 linear);
 vec4 reinhard_tone_mapping(vec3 hdrColor);
 
 float DistributionGGX(vec3 N, vec3 H, float roughness);
+float GeometrySchlickGGX(float NdotV, float roughness);
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
+vec3 fresnelSchlick(float cosTheta, vec3 F0);
 
 /* ------ code ------ */
 void main()
@@ -76,7 +105,7 @@ void main()
 
 vec4 debugView()
 {
-	vec2 texCoords = frag.TexCoords;
+	vec2 texCoords = vert2frag.TexCoords;
 	if (texCoords.x >= 0.5 && texCoords.y >= 0.5)
 	{
 		texCoords.x = (texCoords.x - 0.5) * 2;
@@ -103,93 +132,107 @@ vec4 debugView()
 	}
 }
 
+// Based on the code at https://learnopengl.com/PBR/Lighting by Joey de Vries (https://twitter.com/JoeyDeVriez)
 vec4 lighting()
 {
-	// setup
-	vec3  fragPos           = getPosition();
-	vec3  viewDir           = normalize(frag.ViewPos - fragPos);
-	vec3  normal            = getNormal();
-	float roughness         = getRoughness();
-	float metalness         = getMetallic();
-	vec3  color             = getColor();
-	float emissiveIntensity = getEmissive();
-
-	vec3 totalDiffuseMetallic = saturate(color) * emissiveIntensity;
-	vec3 totalDiffuseNonMetallic = saturate(color) * emissiveIntensity;
-	vec3 totalSpecularMetallic = vec3(0);
-	vec3 totalSpecularNonMetallic = vec3(0);
-
-	for (int i = 0; i < lights.length(); i++)
+	// Fragment parameters initialization
+	fragData.pos               = getPosition();
+	fragData.viewDir           = normalize(vert2frag.ViewPos - fragData.pos);
+	fragData.normal            = getNormal();
+	fragData.roughness         = getRoughness();
+	fragData.metalness         = getMetallic();
+	fragData.color             = getColor();
+	fragData.emissiveIntensity = getEmissive();
+	fragData.F0                = mix(vec3(0.04), fragData.color, fragData.metalness);
+	
+	// aka Lo
+	vec3 finalColor = saturate(fragData.color) * fragData.emissiveIntensity;
+	
+	// Point Light calculation
+	for(int i = 0; i < pointLights.length(); ++i)
 	{
-		vec3  lightDir       = normalize(lights[i].pos - fragPos);
-		float distance       = distance(lights[i].pos, fragPos);
-		vec3  halfwayDir     = normalize(lightDir + viewDir);
-		vec3  lightColor     = lights[i].color;
-		float lightIntensity = lights[i].intensity / (1 + distance * distance);
+		// calculate light parameters
+		vec3  lightDir    = normalize(pointLights[i].pos - fragData.pos);
+		vec3  halfwayDir  = normalize(fragData.viewDir + lightDir);
+		float distance    = length(pointLights[i].pos - fragData.pos);
+		float attenuation = 1.0 / (1 + distance * distance);
+		vec3  radiance    = pointLights[i].color * pointLights[i].intensity * attenuation;
 
-		// Diffuse calculation
-		float diffuseIntensity = max(dot(normal, lightDir), 0);
-
-		vec3 diffuseNonMetallic = color * lightColor * lightIntensity * diffuseIntensity;
-
-		// Specular calculation
-		float specularIntensity = DistributionGGX(normal, halfwayDir, roughness);
-
-		vec3 specularMetallic =  color * lightColor * lightIntensity * specularIntensity;
-		vec3 specularNonMetallic = lightColor * lightIntensity * specularIntensity * pow((1 - roughness) / 2 + 0.1, 4);
-
-		totalDiffuseNonMetallic = max(totalDiffuseNonMetallic, diffuseNonMetallic);
-
-		totalSpecularMetallic += specularMetallic;
-		totalSpecularNonMetallic += specularNonMetallic;
+		finalColor += calculateLighting(radiance, lightDir, halfwayDir);
 	}
 
-	vec3 metallicPart = max(totalDiffuseMetallic, totalSpecularMetallic);
-	vec3 nonMetallicPart = max(totalDiffuseNonMetallic, totalSpecularNonMetallic);
+	// Directional Light calculation
+	for(int i = 0; i < directionalLights.length(); ++i)
+	{
+		// calculate light parameters
+		vec3 lightDir    = directionalLights[i].fragToLightDirection;
+		vec3 halfwayDir  = normalize(fragData.viewDir + lightDir);
+		vec3 radiance    = directionalLights[i].color * directionalLights[i].intensity;
 
-	vec3 HDRColor = metallicPart * metalness + nonMetallicPart * (1 - metalness);
+		finalColor += calculateLighting(radiance, lightDir, halfwayDir);
+	}
 
-	return reinhard_tone_mapping(HDRColor);
+	return reinhard_tone_mapping(finalColor);
+}
+
+vec3 calculateLighting(vec3 radiance, vec3 L, vec3 H)
+{
+	// cook-torrance brdf
+	float NDF = DistributionGGX(fragData.normal, H, fragData.roughness);
+	float G   = GeometrySmith(fragData.normal, fragData.viewDir, L, fragData.roughness);
+	vec3 F    = fresnelSchlick(max(dot(H, fragData.viewDir), 0.0), fragData.F0);
+
+	vec3 kS = F;
+	vec3 kD = vec3(1.0) - kS;
+	kD *= 1.0 - fragData.metalness;
+
+	vec3  numerator    = NDF * G * F;
+	float denominator = 4.0 * max(dot(fragData.normal, fragData.viewDir), 0.0) * max(dot(fragData.normal, L), 0.0);
+	vec3  specular     = numerator / max(denominator, 0.001);
+
+	// add to outgoing radiance Lo
+	float NdotL = max(dot(fragData.normal, L), 0.0);
+	return (kD * fragData.color / PI + specular) * radiance * NdotL;
 }
 
 vec3 getPosition()
 {
-	return texture(positionTexture, frag.TexCoords).rgb;
+	return texture(positionTexture, vert2frag.TexCoords).rgb;
 }
 
 vec3 getColor()
 {
-	return texture(colorTexture, frag.TexCoords).rgb;
+	return texture(colorTexture, vert2frag.TexCoords).rgb;
 }
 
 vec3 getNormal()
 {
-	return normalize(texture(normalTexture, frag.TexCoords).rgb * 2.0 - 1.0);
+	return normalize(texture(normalTexture, vert2frag.TexCoords).rgb * 2.0 - 1.0);
 }
 
 float getRoughness()
 {
-	return texture(materialTexture, frag.TexCoords).r;
+	return texture(materialTexture, vert2frag.TexCoords).r;
 }
 
 float getMetallic()
 {
-	return texture(materialTexture, frag.TexCoords).g;
+	return texture(materialTexture, vert2frag.TexCoords).g;
 }
 
 float getEmissive()
 {
-	return texture(materialTexture, frag.TexCoords).b;
+	return texture(materialTexture, vert2frag.TexCoords).b;
 }
 
 float getDepth()
 {
-	return texture(depthTexture, frag.TexCoords).r;
+	return texture(depthTexture, vert2frag.TexCoords).r;
 }
 
 int isLit()
 {
-	return int(texture(materialTexture, frag.TexCoords).a);
+	return int(texture(materialTexture, vert2frag.TexCoords).a);
 }
 
 vec3 saturate(vec3 color)
@@ -218,6 +261,7 @@ vec4 reinhard_tone_mapping(vec3 color)
 	return vec4(color, 1);
 }
 
+// Normal Distribution Function
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
 	float a      = roughness*roughness;
@@ -230,4 +274,31 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
 	denom = PI * denom * denom;
 
 	return num / denom;
+}
+
+// Geometry Shadowing Function
+float GeometrySchlickGGX(float NdotV, float roughness)
+{
+	float r = (roughness + 1.0);
+	float k = (r*r) / 8.0;
+
+	float num   = NdotV;
+	float denom = NdotV * (1.0 - k) + k;
+
+	return num / denom;
+}
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+	float NdotV = max(dot(N, V), 0.0);
+	float NdotL = max(dot(N, L), 0.0);
+	float ggx2  = GeometrySchlickGGX(NdotV, roughness);
+	float ggx1  = GeometrySchlickGGX(NdotL, roughness);
+
+	return ggx1 * ggx2;
+}
+
+// Fresnel Function
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+	return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
