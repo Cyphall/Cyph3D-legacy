@@ -73,7 +73,6 @@ float getEmissive();
 float getDepth();
 int isLit();
 
-vec3 saturate(vec3 color);
 vec3 toSRGB(vec3 linear);
 vec4 reinhard_tone_mapping(vec3 hdrColor);
 
@@ -146,7 +145,7 @@ vec4 lighting()
 	fragData.F0                = mix(vec3(0.04), fragData.color, fragData.metalness);
 	
 	// aka Lo
-	vec3 finalColor = saturate(fragData.color) * fragData.emissiveIntensity;
+	vec3 finalColor = fragData.color * fragData.emissiveIntensity;
 	
 	// Point Light calculation
 	for(int i = 0; i < pointLights.length(); ++i)
@@ -233,12 +232,6 @@ float getDepth()
 int isLit()
 {
 	return int(texture(materialTexture, vert2frag.TexCoords).a);
-}
-
-vec3 saturate(vec3 color)
-{
-	float highest = max(max(color.r, color.g), color.b);
-	return color / highest;
 }
 
 vec3 toSRGB(vec3 linear)
