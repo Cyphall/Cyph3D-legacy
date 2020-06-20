@@ -6,6 +6,7 @@ using Cyph3D.Extension;
 using Cyph3D.GLObject;
 using Cyph3D.Lighting;
 using GlmSharp;
+using ObjLoader.Loader.Common;
 
 namespace Cyph3D
 {
@@ -117,10 +118,12 @@ namespace Cyph3D
 					
 					JsonArray angularVelocityArray = (JsonArray)jsonData["angular_velocity"];
 					vec3 angularVelocity = new vec3(angularVelocityArray[0], angularVelocityArray[1], angularVelocityArray[2]);
+
+					string meshName = jsonData["mesh"];
+					Mesh mesh = meshName.IsNullOrEmpty() ? null : Mesh.GetOrLoad(meshName);
 					
-					Mesh mesh = Mesh.GetOrLoad(jsonData["mesh"]);
-					
-					Material material = Material.GetOrLoad(jsonData["material"]);
+					string materialName = jsonData["material"];
+					Material material = materialName.IsNullOrEmpty() ? null : Material.GetOrLoad(materialName);
 					
 					sceneObject = new MeshObject(parent, material, mesh, name, position, rotation, scale, velocity, angularVelocity);
 					break;
@@ -192,14 +195,9 @@ namespace Cyph3D
 					
 					jsonData.Add("velocity", ConvertHelper.JsonConvert(meshObject.Velocity));
 					jsonData.Add("angular_velocity", ConvertHelper.JsonConvert(meshObject.AngularVelocity));
-					jsonData.Add("mesh", meshObject.Mesh.Name);
-
-					JsonObject jsonMaterial = new JsonObject()
-					{
-						{"name", meshObject.Material.Name},
-						{"is_lit", meshObject.Material.IsLit}
-					};
-					jsonData.Add("material", jsonMaterial);
+					jsonData.Add("mesh", meshObject.Mesh?.Name);
+					
+					jsonData.Add("material", meshObject.Material?.Name);
 					break;
 				case PointLight pointLight:
 					jsonObject.Add("type", "point_light");
