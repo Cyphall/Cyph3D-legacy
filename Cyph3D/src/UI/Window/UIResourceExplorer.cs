@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -11,9 +12,20 @@ namespace Cyph3D.UI.Window
 	{
 		private static ResourceType _currentResourceType;
 		
+		private static List<string> _meshes = new List<string>();
+		private static List<string> _materials = new List<string>();
+
+		private static bool _initialized;
+		
 		public static void Show()
 		{
-			ImGui.SetNextWindowSize(new Vector2(300, 300));
+			if (!_initialized)
+			{
+				RescanFiles();
+				_initialized = true;
+			}
+			
+			ImGui.SetNextWindowSize(new Vector2(500, 300));
 			ImGui.SetNextWindowPos(new Vector2(400, 1080-300));
 			
 			if (!ImGui.Begin("Resources", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize)) return;
@@ -31,31 +43,77 @@ namespace Cyph3D.UI.Window
 			ImGui.SameLine();
 			
 			ImGui.BeginGroup();
+
+			Vector2 buttonSize = ImGui.CalcTextSize("Refresh") + ImGui.GetStyle().FramePadding*2;
+			ImGui.Spacing();
+			ImGui.SameLine(ImGui.GetContentRegionAvail().X - buttonSize.X);
+			if (ImGui.Button("Refresh"))
+			{
+				RescanFiles();
+			}
+			
 			ImGui.BeginChild("list", Vector2.Zero, true);
 			switch (_currentResourceType)
 			{
 				case ResourceType.Meshes:
-					foreach (string meshPath in Directory.GetFiles("resources/meshes/", "*.obj", SearchOption.AllDirectories))
+					foreach (string mesh in _meshes)
 					{
-						string meshName = PathUtility.GetPathWithoutExtension(meshPath.Remove("resources/meshes/"));
-
-						ImGui.Selectable(meshName);
+						ImGui.Selectable(mesh);
 						
 						if (ImGui.BeginDragDropSource())
 						{
-							GCHandle handle = GCHandle.Alloc(meshName);
+							GCHandle handle = GCHandle.Alloc(mesh);
 							ImGui.SetDragDropPayload("MeshDragDrop", GCHandle.ToIntPtr(handle), (uint)sizeof(GCHandle));
 							ImGui.EndDragDropSource();
 						}
 					}
 					break;
 				case ResourceType.Materials:
+					foreach (string material in _materials)
+					{
+						ImGui.Selectable(material);
+						
+						if (ImGui.BeginDragDropSource())
+						{
+							GCHandle handle = GCHandle.Alloc(material);
+							ImGui.SetDragDropPayload("MaterialDragDrop", GCHandle.ToIntPtr(handle), (uint)sizeof(GCHandle));
+							ImGui.EndDragDropSource();
+						}
+					}
 					break;
 			}
 			ImGui.EndChild();
+			
 			ImGui.EndGroup();
 			
 			ImGui.End();
+		}
+
+		private static void RescanFiles()
+		{
+			_meshes.Clear();
+			foreach (string meshPath in Directory.GetFiles("resources/meshes/", "*.obj", SearchOption.AllDirectories))
+			{
+				_meshes.Add(PathUtility.GetPathWithoutExtension(meshPath.Remove("resources/meshes/")));
+			}
+			_meshes.Sort();
+			
+			_materials.Clear();
+			FindMaterial("resources/materials/");
+			_materials.Sort();
+		}
+
+		private static void FindMaterial(string path)
+		{
+			if (File.Exists($"{path}/material.json"))
+			{
+				_materials.Add(path.Remove("resources/materials/"));
+			}
+
+			foreach (string folder in Directory.GetDirectories(path))
+			{
+				FindMaterial(folder.Replace(@"\", "/"));
+			}
 		}
 
 		private enum ResourceType

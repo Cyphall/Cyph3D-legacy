@@ -103,6 +103,19 @@ namespace Cyph3D.UI.Window
 	                    }
 	                    ImGui.EndDragDropTarget();
                     }
+                    
+                    string materialName = meshObject.Material.Name;
+                    ImGui.InputText("Material", ref materialName, 0, ImGuiInputTextFlags.ReadOnly);
+                    if (ImGui.BeginDragDropTarget())
+                    {
+	                    ImGuiPayloadPtr payload = ImGui.AcceptDragDropPayload("MaterialDragDrop");
+	                    if (payload.IsValid())
+	                    {
+		                    string newMaterial = (string) GCHandle.FromIntPtr(payload.Data).Target;
+		                    meshObject.Material = Material.GetOrLoad(newMaterial);
+	                    }
+	                    ImGui.EndDragDropTarget();
+                    }
             		break;
             	case Light pointLight:
             		Vector3 imGuiSrgbColor = ConvertHelper.Convert(pointLight.SrgbColor);

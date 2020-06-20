@@ -1,0 +1,7 @@
+{
+	"colorMap": "col.jpg",
+	"normalMap": "nrm.jpg",
+	"roughnessMap": "rgh.jpg",
+	"displacementMap": "disp.jpg",
+	"lit": true
+}

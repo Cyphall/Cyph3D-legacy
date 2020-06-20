@@ -81,20 +81,12 @@ namespace Cyph3D.GLObject
 			
 			try
 			{
-				using Stream stream = File.OpenRead($"resources/textures/{name}.png");
+				using Stream stream = File.OpenRead($"resources/materials/{name}");
 				StbImageExt.StbImageInfo(stream, out size, out comp);
 			}
 			catch (IOException)
 			{
-				try
-				{
-					using Stream stream = File.OpenRead($"resources/textures/{name}.jpg");
-					StbImageExt.StbImageInfo(stream, out size, out comp);
-				}
-				catch (IOException)
-				{
-					throw new IOException($"Unable to load image {name} from disk");
-				}
+				throw new IOException($"Unable to load image {name} from disk");
 			}
 
 			InternalFormat internalFormat;
@@ -142,20 +134,12 @@ namespace Cyph3D.GLObject
 
 				try
 				{
-					using Stream stream = File.OpenRead($"resources/textures/{name}.png");
+					using Stream stream = File.OpenRead($"resources/materials/{name}");
 					image = ImageResult.FromStream(stream, comp);
 				}
 				catch (IOException)
 				{
-					try
-					{
-						using Stream stream = File.OpenRead($"resources/textures/{name}.jpg");
-						image = ImageResult.FromStream(stream, comp);
-					}
-					catch (IOException)
-					{
-						throw new IOException($"Unable to load image {name} from disk");
-					}
+					throw new IOException($"Unable to load image {name} from disk");
 				}
 				
 				texture.PutData(image.Data, pixelFormat);
@@ -168,11 +152,6 @@ namespace Cyph3D.GLObject
 			});
 			
 			return texture;
-		}
-
-		public static bool ExistsOnDisk(string name)
-		{
-			return File.Exists($"resources/textures/{name}.png") || File.Exists($"resources/textures/{name}.jpg");
 		}
 
 		static Texture()

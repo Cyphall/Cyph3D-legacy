@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Json;
 using Cyph3D.Extension;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
@@ -32,7 +34,7 @@ namespace Cyph3D.GLObject
 		
 		public static Material Default { get; private set; }
 
-		public Material(string name, bool isLit)
+		public Material(string name)
 		{
 			_shaderProgram = ShaderProgram.Get("deferred/firstPass");
 			
@@ -43,39 +45,57 @@ namespace Cyph3D.GLObject
 			_shaderProgram.SetValue("metallicMap", 4);
 			_shaderProgram.SetValue("emissiveMap", 5);
 			
-			if (Texture.ExistsOnDisk($"{name}/col"))
+			JsonObject jsonRoot = (JsonObject)JsonValue.Parse(File.ReadAllText($"resources/materials/{name}/material.json"));
+			
+			if (jsonRoot.ContainsKey("colorMap"))
 			{
-				_colorMap = Texture.FromFile($"{name}/col", true, true);
+				_colorMap = Texture.FromFile($"{name}/{(string)jsonRoot["colorMap"]}", true, true);
 			}
 			
-			if (Texture.ExistsOnDisk($"{name}/nrm"))
+			if (jsonRoot.ContainsKey("normalMap"))
 			{
-				_normalMap = Texture.FromFile($"{name}/nrm");
+				_normalMap = Texture.FromFile($"{name}/{(string)jsonRoot["normalMap"]}");
 			}
 			
-			if (Texture.ExistsOnDisk($"{name}/rgh"))
+			if (jsonRoot.ContainsKey("roughnessMap"))
 			{
-				_roughnessMap = Texture.FromFile($"{name}/rgh", compressed: true);
+				_roughnessMap = Texture.FromFile($"{name}/{(string)jsonRoot["roughnessMap"]}", compressed: true);
 			}
 			
-			if (Texture.ExistsOnDisk($"{name}/disp"))
+			if (jsonRoot.ContainsKey("displacementMap"))
 			{
-				_displacementMap = Texture.FromFile($"{name}/disp", compressed: true);
+				_displacementMap = Texture.FromFile($"{name}/{(string)jsonRoot["displacementMap"]}", compressed: true);
 			}
 			
-			if (Texture.ExistsOnDisk($"{name}/met"))
+			if (jsonRoot.ContainsKey("metallicMap"))
 			{
-				_metallicMap = Texture.FromFile($"{name}/met", compressed: true);
+				_metallicMap = Texture.FromFile($"{name}/{(string)jsonRoot["metallicMap"]}", compressed: true);
 			}
 			
-			if (Texture.ExistsOnDisk($"{name}/emis"))
+			if (jsonRoot.ContainsKey("emissiveMap"))
 			{
-				_emissiveMap = Texture.FromFile($"{name}/emis", compressed: true);
+				_emissiveMap = Texture.FromFile($"{name}/{(string)jsonRoot["emissiveMap"]}", compressed: true);
 			}
 
 			Name = name;
-			IsLit = isLit;
+			IsLit = jsonRoot["lit"];
 			_materials.Add(name, this);
+		}
+
+		private Material()
+		{
+			_shaderProgram = ShaderProgram.Get("deferred/firstPass");
+			
+			_shaderProgram.SetValue("colorMap", 0);
+			_shaderProgram.SetValue("normalMap", 1);
+			_shaderProgram.SetValue("roughnessMap", 2);
+			_shaderProgram.SetValue("displacementMap", 3);
+			_shaderProgram.SetValue("metallicMap", 4);
+			_shaderProgram.SetValue("emissiveMap", 5);
+			
+			Name = "Default Material";
+			IsLit = false;
+			_materials.Add(Name, this);
 		}
 
 		public void Bind(mat4 model, mat4 view, mat4 projection, vec3 cameraPos)
@@ -128,7 +148,7 @@ namespace Cyph3D.GLObject
 		
 		public static void InitializeDefault()
 		{
-			Default = new Material("default", false);
+			Default = new Material();
 			
 			_defaultColorMap = new Texture(new ivec2(1), InternalFormat.CompressedSrgbS3tcDxt1Ext);
 			_defaultColorMap.PutData(new byte[]{255, 0, 255});
@@ -149,13 +169,13 @@ namespace Cyph3D.GLObject
 			_defaultEmissiveMap.PutData(new byte[]{0, 0, 0});
 		}
 		
-		public static Material GetOrLoad(string name, bool isLit)
+		public static Material GetOrLoad(string name)
 		{
 			if (!_materials.ContainsKey(name))
 			{
 				Logger.Info($"Loading material \"{name}\"");
 				// ReSharper disable once ObjectCreationAsStatement
-				new Material(name, isLit);
+				new Material(name);
 			}
 
 			return _materials[name];

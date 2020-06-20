@@ -120,7 +120,7 @@ namespace Cyph3D
 					
 					Mesh mesh = Mesh.GetOrLoad(jsonData["mesh"]);
 					
-					Material material = Material.GetOrLoad(jsonData["material"]["name"], jsonData["material"]["is_lit"]);
+					Material material = Material.GetOrLoad(jsonData["material"]);
 					
 					sceneObject = new MeshObject(parent, material, mesh, name, position, rotation, scale, velocity, angularVelocity);
 					break;

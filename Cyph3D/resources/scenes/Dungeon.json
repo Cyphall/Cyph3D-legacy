@@ -18,11 +18,7 @@
 				"velocity": [0, 0, 0],
 				"angular_velocity": [0, 0, 0],
 				"mesh": "dungeon",
-				"material":
-				{
-					"name": "Tiles/WallBrick",
-					"is_lit": true
-				}
+				"material": "Tiles/WallBrick"
 			},
 			"children":
 			[
