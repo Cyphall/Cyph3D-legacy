@@ -2,9 +2,8 @@
 
 in FRAG {
 	vec2 TexCoords;
-	vec3 T;
-	vec3 B;
-	vec3 N;
+	mat3 TangentToWorld;
+	mat3 WorldToTangent;
 	vec3 FragPos;
 } frag;
 
@@ -29,17 +28,14 @@ vec2 POM(vec2 texCoords, vec3 viewDir);
 
 void main()
 {
-	mat3 TangentToWorld = mat3(frag.T, frag.B, frag.N);
-	mat3 WorldToTangent = transpose(TangentToWorld);
-	
-	vec2 texCoords = POM(frag.TexCoords, normalize(WorldToTangent * (viewPos - frag.FragPos)));
+	vec2 texCoords = POM(frag.TexCoords, normalize(frag.WorldToTangent * (viewPos - frag.FragPos)));
 
 	color = texture(colorMap, texCoords).rgb;
-	
+
 	position = frag.FragPos;
 
 	normal = normalize(texture(normalMap, texCoords).rgb * 2.0 - 1.0);
-	normal = TangentToWorld * normal;
+	normal = frag.TangentToWorld * normal;
 	normal = (normal + 1) * 0.5;
 
 	material.r = texture(roughnessMap, texCoords).r;
@@ -58,7 +54,7 @@ vec2 POM(vec2 texCoords, vec3 viewDir)
 	const float depthScale           = 0.05;
 	const int   layerCount           = 8;
 	const int   resamplingLoopCount  = 6;
-	
+
 	// Initial sampling pass
 	vec2 currentTexCoords = texCoords;
 

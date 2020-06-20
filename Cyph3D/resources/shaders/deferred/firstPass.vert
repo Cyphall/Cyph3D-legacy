@@ -11,9 +11,8 @@ uniform mat4 projection;
 
 out FRAG {
 	vec2 TexCoords;
-	vec3 T;
-	vec3 B;
-	vec3 N;
+	mat3 TangentToWorld;
+	mat3 WorldToTangent;
 	vec3 FragPos;
 } frag;
 
@@ -23,9 +22,12 @@ void main()
 	frag.FragPos = vec3(model * vec4(in_Vertex, 1.0));
 
 	mat3 normalMatrix = transpose(inverse(mat3(model)));
-	frag.T = normalMatrix * in_tangents;
-	frag.N = normalMatrix * in_Normals;
-	frag.B = cross(frag.N, frag.T);
+	vec3 T = normalize(normalMatrix * in_tangents);
+	vec3 N = normalize(normalMatrix * in_Normals);
+	vec3 B = cross(N, T);
+
+	frag.TangentToWorld = mat3(T, B, N);
+	frag.WorldToTangent = transpose(frag.TangentToWorld);
 
 	gl_Position = projection * view * model * vec4(in_Vertex, 1.0);
 }
