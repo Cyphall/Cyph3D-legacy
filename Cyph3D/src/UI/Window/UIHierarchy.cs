@@ -38,6 +38,10 @@ namespace Cyph3D.UI.Window
 						{
 							_hierarchyAddQueue.Enqueue(typeof(DirectionalLight));
 						}
+						if (ImGui.MenuItem("MeshObject"))
+						{
+							_hierarchyAddQueue.Enqueue(typeof(MeshObject));
+						}
 						ImGui.EndMenu();
 					}
 
@@ -112,6 +116,10 @@ namespace Cyph3D.UI.Window
 				else if (type == typeof(DirectionalLight))
 				{
 					Engine.Scene.Add(new DirectionalLight(Engine.Scene.Root, vec3.Ones, 1));
+				}
+				else if (type == typeof(MeshObject))
+				{
+					Engine.Scene.Add(new MeshObject(Engine.Scene.Root, null, null));
 				}
 			}
 		}

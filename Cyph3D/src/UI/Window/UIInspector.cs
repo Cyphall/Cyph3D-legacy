@@ -91,7 +91,7 @@ namespace Cyph3D.UI.Window
             			meshObject.AngularVelocity = ConvertHelper.Convert(imGuiAngularVelocity);
             		}
 
-                    string meshName = meshObject.Mesh.Name;
+                    string meshName = meshObject.Mesh?.Name ?? "None";
                     ImGui.InputText("Mesh", ref meshName, 0, ImGuiInputTextFlags.ReadOnly);
                     if (ImGui.BeginDragDropTarget())
                     {
@@ -104,7 +104,7 @@ namespace Cyph3D.UI.Window
 	                    ImGui.EndDragDropTarget();
                     }
                     
-                    string materialName = meshObject.Material.Name;
+                    string materialName = meshObject.Material?.Name ?? "None";
                     ImGui.InputText("Material", ref materialName, 0, ImGuiInputTextFlags.ReadOnly);
                     if (ImGui.BeginDragDropTarget())
                     {
