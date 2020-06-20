@@ -35,10 +35,11 @@ namespace Cyph3D
 		public void Render(mat4 view, mat4 projection, vec3 cameraPos)
 		{
 			if (Material != null)
-			{
 				Material.Bind(Transform.WorldMatrix, view, projection, cameraPos);
-				Mesh?.Render();
-			}
+			else
+				Material.Default.Bind(Transform.WorldMatrix, view, projection, cameraPos);
+			
+			Mesh?.Render();
 		}
 
 		public override void Update(double deltaTime)
