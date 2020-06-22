@@ -19,7 +19,7 @@ F3: Show UI
 - [x] PBR Lighting
 - [x] Parallax Occlusion Mapping
 - [x] Point Light
-- [ ] Directional Light
+- [x] Directional Light
 - [ ] Point Shadows
 - [ ] Directional Shadows
 - [ ] Skybox
@@ -28,7 +28,7 @@ F3: Show UI
 
 - [x] Scene Hirarchy
 - [x] Object Inspector
-- [ ] Resources Viewer
+- [x] Resources Viewer
 - [ ] Gizmos
 
 ## Screenshots
