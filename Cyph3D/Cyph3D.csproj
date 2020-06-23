@@ -21,6 +21,7 @@
     <ItemGroup>
         <None Include="resources/**">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
     </ItemGroup>
     
