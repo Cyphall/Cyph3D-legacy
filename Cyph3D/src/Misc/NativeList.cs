@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Cyph3D.Extension
+namespace Cyph3D.Misc
 {
 	public unsafe class NativeList<T> : IDisposable where T : unmanaged
 	{

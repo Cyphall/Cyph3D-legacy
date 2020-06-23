@@ -1,7 +1,7 @@
 ﻿using System;
 using GlmSharp;
 
-namespace Renderer.Misc
+namespace Cyph3D.Misc
 {
 	public readonly struct Quaternion
 	{

@@ -1,5 +1,5 @@
 ﻿using System.Runtime.InteropServices;
-using Cyph3D.Extension;
+using Cyph3D.Misc;
 using GlmSharp;
 
 namespace Cyph3D.Lighting

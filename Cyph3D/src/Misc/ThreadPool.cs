@@ -5,7 +5,7 @@ using System.Threading;
 using OpenToolkit.Windowing.GraphicsLibraryFramework;
 using GLFWWindow = OpenToolkit.Windowing.GraphicsLibraryFramework.Window;
 
-namespace Cyph3D.Extension
+namespace Cyph3D.Misc
 {
 	public unsafe class ThreadPool : IDisposable
 	{

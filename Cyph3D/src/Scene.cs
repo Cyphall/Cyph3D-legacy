@@ -5,6 +5,7 @@ using System.Json;
 using Cyph3D.Extension;
 using Cyph3D.GLObject;
 using Cyph3D.Lighting;
+using Cyph3D.Misc;
 using GlmSharp;
 using ObjLoader.Loader.Common;
 

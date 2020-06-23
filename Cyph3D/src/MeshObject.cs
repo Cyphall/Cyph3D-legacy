@@ -1,7 +1,5 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using Cyph3D.Extension;
-using Cyph3D.GLObject;
+﻿using Cyph3D.GLObject;
+using Cyph3D.Misc;
 using GlmSharp;
 
 namespace Cyph3D
@@ -15,7 +13,7 @@ namespace Cyph3D
 		public vec3 AngularVelocity { get; set; }
 		
 		public MeshObject(
-			[NotNull]Transform parent,
+			Transform parent,
 			Material material,
 			Mesh mesh,
 			string name = null,

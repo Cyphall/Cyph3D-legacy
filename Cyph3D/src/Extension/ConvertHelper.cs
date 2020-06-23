@@ -1,7 +1,7 @@
 ﻿using System.Json;
 using System.Numerics;
 using GlmSharp;
-using Quaternion = Renderer.Misc.Quaternion;
+using Quaternion = Cyph3D.Misc.Quaternion;
 
 namespace Cyph3D.Extension
 {

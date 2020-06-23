@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using GlmSharp;
-using Renderer.Misc;
 
-namespace Cyph3D.Extension
+namespace Cyph3D.Misc
 {
 	[SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
 	public class Transform

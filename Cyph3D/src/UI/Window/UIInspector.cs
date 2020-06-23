@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Runtime.InteropServices;
 using Cyph3D.Extension;
 using Cyph3D.GLObject;
