@@ -15,16 +15,13 @@ namespace Cyph3D.UI.Window
 		private static List<string> _meshes = new List<string>();
 		private static List<string> _materials = new List<string>();
 
-		private static bool _initialized;
+		static UIResourceExplorer()
+		{
+			RescanFiles();
+		}
 		
 		public static void Show()
 		{
-			if (!_initialized)
-			{
-				RescanFiles();
-				_initialized = true;
-			}
-			
 			ImGui.SetNextWindowSize(new Vector2(500, 300));
 			ImGui.SetNextWindowPos(new Vector2(400, 1080-300));
 			

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using ImGuiNET;
 
 namespace Cyph3D.UI.Window
@@ -16,14 +17,17 @@ namespace Cyph3D.UI.Window
 
 		static UIMisc()
 		{
-			RefreshList();
+			RescanFiles();
 		}
 		
 		public static bool ShowRawQuaternion => _showRawQuaternion;
 
 		public static void Show()
 		{
-			if (ImGui.Begin("Misc"))
+			ImGui.SetNextWindowSize(new Vector2(350, 200));
+			ImGui.SetNextWindowPos(new Vector2(1570, 0));
+			
+			if (ImGui.Begin("Misc", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize))
 			{
 				if (ImGui.Checkbox("GBuffer Debug View", ref _gbufferDebug))
 				{
@@ -57,6 +61,13 @@ namespace Cyph3D.UI.Window
 
 					ImGui.EndCombo();
 				}
+				
+				ImGui.SameLine();
+				
+				if (ImGui.Button("Refresh"))
+				{
+					RescanFiles();
+				}
 
 				if (ImGui.Button("Load scene"))
 				{
@@ -66,21 +77,14 @@ namespace Cyph3D.UI.Window
 			
 				ImGui.SameLine();
 
-				if (ImGui.Button("Refresh list"))
-				{
-					RefreshList();
-				}
-
-				ImGui.Separator();
-
-				if (ImGui.Button("Save current scene"))
+				if (ImGui.Button("Save scene"))
 				{
 					Engine.Scene.Save();
 				}
 			}
 		}
-
-		private static void RefreshList()
+		
+		private static void RescanFiles()
 		{
 			_scenes = new List<string>();
 
