@@ -5,6 +5,7 @@ using Cyph3D.GLObject;
 using Cyph3D.Lighting;
 using ImGuiNET;
 
+// ReSharper disable PossibleLossOfFraction
 namespace Cyph3D.UI.Window
 {
 	public static class UIInspector
@@ -18,8 +19,8 @@ namespace Cyph3D.UI.Window
 		
 		public static void Show()
 		{
-			ImGui.SetNextWindowSize(new Vector2(400, 580));
-			ImGui.SetNextWindowPos(new Vector2(0, 500));
+			ImGui.SetNextWindowSize(new Vector2(400, Engine.Window.Size.y - Engine.Window.Size.y / 2));
+			ImGui.SetNextWindowPos(new Vector2(0, Engine.Window.Size.y / 2));
 			
 			if (ImGui.Begin("Inspector", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize))
 			{

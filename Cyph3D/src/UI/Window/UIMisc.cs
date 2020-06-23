@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using ImGuiNET;
 
+// ReSharper disable PossibleLossOfFraction
 namespace Cyph3D.UI.Window
 {
 	public static class UIMisc
@@ -25,7 +26,7 @@ namespace Cyph3D.UI.Window
 		public static void Show()
 		{
 			ImGui.SetNextWindowSize(new Vector2(350, 200));
-			ImGui.SetNextWindowPos(new Vector2(1570, 0));
+			ImGui.SetNextWindowPos(new Vector2(Engine.Window.Size.x - 350, 0));
 			
 			if (ImGui.Begin("Misc", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize))
 			{

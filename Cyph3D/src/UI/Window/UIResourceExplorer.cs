@@ -23,7 +23,7 @@ namespace Cyph3D.UI.Window
 		public static void Show()
 		{
 			ImGui.SetNextWindowSize(new Vector2(500, 300));
-			ImGui.SetNextWindowPos(new Vector2(400, 1080-300));
+			ImGui.SetNextWindowPos(new Vector2(400, Engine.Window.Size.y - 300));
 			
 			if (!ImGui.Begin("Resources", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize)) return;
 

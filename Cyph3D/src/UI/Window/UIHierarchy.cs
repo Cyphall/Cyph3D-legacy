@@ -7,6 +7,7 @@ using Cyph3D.Misc;
 using GlmSharp;
 using ImGuiNET;
 
+// ReSharper disable PossibleLossOfFraction
 namespace Cyph3D.UI.Window
 {
 	public static class UIHierarchy
@@ -21,7 +22,7 @@ namespace Cyph3D.UI.Window
 
 		public static void Show()
 		{
-			ImGui.SetNextWindowSize(new Vector2(400, 500));
+			ImGui.SetNextWindowSize(new Vector2(400, Engine.Window.Size.y / 2));
 			ImGui.SetNextWindowPos(new Vector2(0));
 
 			if (ImGui.Begin("Hierarchy", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize))
