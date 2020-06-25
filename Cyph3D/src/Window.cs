@@ -33,17 +33,16 @@ namespace Cyph3D
 			private set
 			{
 				_guiOpen = value;
-				switch (value)
+
+				if (value)
 				{
-					case true:
-						GLFW.SetInputMode(_glfwWindow, CursorStateAttribute.Cursor, CursorModeValue.CursorNormal);
-						CursorPos = Center;
-						break;
-					case false:
-						GLFW.SetInputMode(_glfwWindow, CursorStateAttribute.Cursor, CursorModeValue.CursorDisabled);
-						break;
+					GLFW.SetInputMode(_glfwWindow, CursorStateAttribute.Cursor, CursorModeValue.CursorNormal);
+					CursorPos = Center;
 				}
-				
+				else
+				{
+					GLFW.SetInputMode(_glfwWindow, CursorStateAttribute.Cursor, CursorModeValue.CursorDisabled);
+				}
 			}
 		}
 
@@ -184,7 +183,7 @@ namespace Cyph3D
 		
 		private void CursorPosCallback(GLFWWindow* window, double x, double y)
 		{
-			CursorPos = new vec2((float)x, (float)y);
+			
 		}
 	}
 }
