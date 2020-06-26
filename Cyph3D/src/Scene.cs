@@ -129,13 +129,23 @@ namespace Cyph3D
 					sceneObject = new MeshObject(parent, material, mesh, name, position, rotation, scale, velocity, angularVelocity);
 					break;
 				case "point_light":
+				{
 					JsonArray colorArray = (JsonArray)jsonData["color"];
 					vec3 srgbColor = new vec3(colorArray[0], colorArray[1], colorArray[2]);
 					
 					float intensity = jsonData["intensity"];
 					
 					sceneObject = new PointLight(parent, srgbColor, intensity, name, position);
-					break;
+				}break;
+				case "directional_light":
+				{
+					JsonArray colorArray = (JsonArray)jsonData["color"];
+					vec3 srgbColor = new vec3(colorArray[0], colorArray[1], colorArray[2]);
+					
+					float intensity = jsonData["intensity"];
+					
+					sceneObject = new DirectionalLight(parent, srgbColor, intensity, name, position);
+				}break;
 				default:
 					throw new InvalidOperationException($"The object type {jsonObject["type"]} is not recognized");
 			}
@@ -205,6 +215,12 @@ namespace Cyph3D
 					
 					jsonData.Add("color", ConvertHelper.JsonConvert(pointLight.SrgbColor));
 					jsonData.Add("intensity", pointLight.Intensity);
+					break;
+				case DirectionalLight directionalLight:
+					jsonObject.Add("type", "directional_light");
+					
+					jsonData.Add("color", ConvertHelper.JsonConvert(directionalLight.SrgbColor));
+					jsonData.Add("intensity", directionalLight.Intensity);
 					break;
 				default:
 					throw new InvalidOperationException();
