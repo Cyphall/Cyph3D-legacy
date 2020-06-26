@@ -41,6 +41,12 @@ namespace Cyph3D.UI.Window
 					ImGui.ShowDemoWindow();
 
 				ImGui.Checkbox("Show Raw Quaternion", ref _showRawQuaternion);
+
+				float cameraSpeed = Engine.Scene.Camera.Speed;
+				if (ImGui.SliderFloat("Camera speed", ref cameraSpeed, 0, 10))
+				{
+					Engine.Scene.Camera.Speed = cameraSpeed;
+				}
 			
 				ImGui.Separator();
 

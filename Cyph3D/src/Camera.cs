@@ -58,6 +58,8 @@ namespace Cyph3D
 			}
 		}
 
+		public float Speed { get; set; } = 1;
+
 		public Camera(vec3 position = default, vec2 sphericalCoords = default)
 		{
 			Position = position;
@@ -99,7 +101,7 @@ namespace Cyph3D
 				return;
 			}
 			
-			float ratio = (float)deltaTime * 2;
+			float ratio = (float)deltaTime * 2 * Speed;
 
 			if (Engine.Window.GetKey(Keys.LeftControl) == InputAction.Press)
 			{
