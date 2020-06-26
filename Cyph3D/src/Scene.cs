@@ -146,7 +146,7 @@ namespace Cyph3D
 					
 					float intensity = jsonData["intensity"];
 					
-					sceneObject = new DirectionalLight(parent, srgbColor, intensity, name, position);
+					sceneObject = new DirectionalLight(parent, srgbColor, intensity, name, position, rotation);
 				}break;
 				default:
 					throw new InvalidOperationException($"The object type {jsonObject["type"]} is not recognized");
