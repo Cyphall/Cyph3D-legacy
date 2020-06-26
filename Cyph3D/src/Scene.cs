@@ -18,11 +18,13 @@ namespace Cyph3D
 		public LightManager LightManager { get; } = new LightManager();
 		public Camera Camera { get; }
 		public string Name { get; set; }
+		public Cubemap Skybox { get; }
 
 		public Scene(Camera camera = null, string name = null)
 		{
 			Camera = camera ?? new Camera();
 			Name = name ?? "Untitled Scene";
+			Skybox = Cubemap.FromFiles("Skybox/space{0}.png", true, true);
 		}
 
 		public void Dispose()

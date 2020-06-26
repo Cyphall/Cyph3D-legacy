@@ -15,7 +15,9 @@ namespace Cyph3D
 		private Texture _materialTexture;
 		private Texture _depthTexture;
 		private int _quadVAO;
+		private int _skyboxVAO;
 		private ShaderProgram _lightingPassShader;
+		private ShaderProgram _skyboxShader;
 		private ShaderStorageBuffer _pointLightsBuffer;
 		private ShaderStorageBuffer _directionalLightsBuffer;
 		
@@ -32,6 +34,7 @@ namespace Cyph3D
 				.Complete();
 
 			GL.Enable(EnableCap.DepthTest);
+			GL.DepthFunc(DepthFunction.Lequal);
 
 			GL.ClearColor(0, 0, 0, 1);
 
@@ -70,28 +73,102 @@ namespace Cyph3D
 			_lightingPassShader.SetValue("depthTexture", 4);
 			
 			
+			float[] skyboxVertices = {
+				-1.0f,  1.0f, -1.0f,
+				-1.0f, -1.0f, -1.0f,
+				 1.0f, -1.0f, -1.0f,
+				 1.0f, -1.0f, -1.0f,
+				 1.0f,  1.0f, -1.0f,
+				-1.0f,  1.0f, -1.0f,
+				
+				-1.0f, -1.0f,  1.0f,
+				-1.0f, -1.0f, -1.0f,
+				-1.0f,  1.0f, -1.0f,
+				-1.0f,  1.0f, -1.0f,
+				-1.0f,  1.0f,  1.0f,
+				-1.0f, -1.0f,  1.0f,
+				
+				 1.0f, -1.0f, -1.0f,
+				 1.0f, -1.0f,  1.0f,
+				 1.0f,  1.0f,  1.0f,
+				 1.0f,  1.0f,  1.0f,
+				 1.0f,  1.0f, -1.0f,
+				 1.0f, -1.0f, -1.0f,
+				
+				-1.0f, -1.0f,  1.0f,
+				-1.0f,  1.0f,  1.0f,
+				 1.0f,  1.0f,  1.0f,
+				 1.0f,  1.0f,  1.0f,
+				 1.0f, -1.0f,  1.0f,
+				-1.0f, -1.0f,  1.0f,
+				
+				-1.0f,  1.0f, -1.0f,
+				 1.0f,  1.0f, -1.0f,
+				 1.0f,  1.0f,  1.0f,
+				 1.0f,  1.0f,  1.0f,
+				-1.0f,  1.0f,  1.0f,
+				-1.0f,  1.0f, -1.0f,
+				
+				-1.0f, -1.0f, -1.0f,
+				-1.0f, -1.0f,  1.0f,
+				 1.0f, -1.0f, -1.0f,
+				 1.0f, -1.0f, -1.0f,
+				-1.0f, -1.0f,  1.0f,
+				 1.0f, -1.0f,  1.0f
+			};
+			
+			_skyboxVAO = GL.GenVertexArray();
+			int skyboxVBO = GL.GenBuffer();
+			GL.BindVertexArray(_skyboxVAO);
+			GL.BindBuffer(BufferTarget.ArrayBuffer, skyboxVBO);
+			GL.BufferData(BufferTarget.ArrayBuffer, skyboxVertices.Length * sizeof(float), skyboxVertices, BufferUsageHint.StaticDraw);
+			GL.EnableVertexAttribArray(0);
+			GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
+			
+			_skyboxShader = ShaderProgram.Get("deferred/skybox");
+			
 			_pointLightsBuffer = new ShaderStorageBuffer(0);
 			_directionalLightsBuffer = new ShaderStorageBuffer(1);
 		}
 
 		public void Render(Camera camera)
 		{
+			_gbuffer.Bind();
+			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+			
 			FirstPass(camera.View, camera.Projection, camera.Position);
+			SkyboxPass(camera.View, camera.Projection);
 			LightingPass(camera.Position);
 		}
 
 		private void FirstPass(mat4 view, mat4 projection, vec3 viewPos)
 		{
 			_gbuffer.Bind();
-
-			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
+			
 			int objectCount = Engine.Scene.Objects.Count;
 			for (int i = 0; i < objectCount; i++)
 			{
 				if (Engine.Scene.Objects[i] is MeshObject meshObject)
 					meshObject.Render(view, projection, viewPos);
 			}
+		}
+		
+		private void SkyboxPass(mat4 view, mat4 projection)
+		{
+			GL.DepthMask(false);
+			_gbuffer.Bind();
+			
+			_skyboxShader.Bind();
+			
+			_skyboxShader.SetValue("view", new mat4(new mat3(view)));
+			_skyboxShader.SetValue("projection", projection);
+			
+			Engine.Scene.Skybox.Bind(0);
+			
+			GL.BindVertexArray(_skyboxVAO);
+			
+			GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+			GL.DepthMask(true);
 		}
 
 		private void LightingPass(vec3 viewPos)

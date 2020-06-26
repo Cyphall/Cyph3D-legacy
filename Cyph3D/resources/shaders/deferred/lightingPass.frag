@@ -88,13 +88,9 @@ void main()
 	{
 		out_Color = debugView();
 	}
-	else if (getDepth() == 1)
-	{
-		discard;
-	}
 	else if (isLit() == 0)
 	{
-		out_Color = reinhard_tone_mapping(getColor());
+		out_Color = vec4(toSRGB(getColor()), 1);
 	}
 	else
 	{
@@ -121,7 +117,7 @@ vec4 debugView()
 	{
 		texCoords.x = texCoords.x * 2;
 		texCoords.y = (texCoords.y - 0.5) * 2;
-		return reinhard_tone_mapping(texture(colorTexture, texCoords).rgb);
+		return texture(colorTexture, texCoords);
 	}
 	else
 	{
