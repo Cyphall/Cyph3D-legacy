@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Cyph3D.Extension;
@@ -43,10 +44,14 @@ namespace Cyph3D.UI.Window
 
 		private static void ShowSceneObject(SceneObject selected)
 		{
-			byte[] imGuiName = Encoding.UTF8.GetBytes(selected.Name.ToCharArray());
-			if (ImGui.InputText("Name", imGuiName, 10))
+			byte[] imGuiName = new byte[50];
+			Encoding.UTF8.GetBytes(selected.Name.ToCharArray()).CopyTo(imGuiName, 0);
+			
+			if (ImGui.InputText("Name", imGuiName, 50))
 			{
-				selected.Name = Encoding.UTF8.GetString(imGuiName);
+				string temp = Encoding.UTF8.GetString(imGuiName);
+				int end = temp.IndexOf('\0');
+				selected.Name = temp.Substring(0, end);
 			}
 			
 			ImGui.Text("Transform");
