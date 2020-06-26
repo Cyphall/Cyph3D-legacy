@@ -1,8 +1,10 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Text;
 using Cyph3D.Extension;
 using Cyph3D.GLObject;
 using Cyph3D.Lighting;
+using Cyph3D.Misc;
 using ImGuiNET;
 
 // ReSharper disable PossibleLossOfFraction
@@ -41,6 +43,12 @@ namespace Cyph3D.UI.Window
 
 		private static void ShowSceneObject(SceneObject selected)
 		{
+			byte[] imGuiName = Encoding.UTF8.GetBytes(selected.Name.ToCharArray());
+			if (ImGui.InputText("Name", imGuiName, 10))
+			{
+				selected.Name = Encoding.UTF8.GetString(imGuiName);
+			}
+			
 			ImGui.Text("Transform");
             
             Vector3 imGuiPosition = ConvertHelper.Convert(selected.Transform.Position);
