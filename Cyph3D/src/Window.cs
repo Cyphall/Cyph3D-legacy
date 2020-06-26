@@ -136,11 +136,12 @@ namespace Cyph3D
 				{
 					switch (key)
 					{
-						case Keys.F3:
+						case Keys.Escape:
 							GuiOpen = !GuiOpen;
 							break;
-						case Keys.Escape:
-							ShouldClose = true;
+						case Keys.Q:
+							if (mods == KeyModifiers.Control)
+								ShouldClose = true;
 							break;
 					}
 				}
