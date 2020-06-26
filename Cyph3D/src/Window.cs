@@ -139,7 +139,7 @@ namespace Cyph3D
 						case Keys.Escape:
 							GuiOpen = !GuiOpen;
 							break;
-						case Keys.Q:
+						case Keys.X:
 							if (mods == KeyModifiers.Control)
 								ShouldClose = true;
 							break;
