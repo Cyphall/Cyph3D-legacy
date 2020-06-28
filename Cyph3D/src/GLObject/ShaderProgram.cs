@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Cyph3D.Misc;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 
@@ -18,12 +17,10 @@ namespace Cyph3D.GLObject
 		
 		public static implicit operator int(ShaderProgram shaderProgram) => shaderProgram._ID;
 		
-		private static Dictionary<string, ShaderProgram> _shaderPrograms = new Dictionary<string, ShaderProgram>();
-		
-		private ShaderProgram(string shadersName)
+		public ShaderProgram(string shadersName)
 		{
-			_vertex = Shader.Get($"{shadersName}.vert", ShaderType.VertexShader);
-			_fragment = Shader.Get($"{shadersName}.frag", ShaderType.FragmentShader);
+			_vertex = new Shader($"{shadersName}.vert", ShaderType.VertexShader);
+			_fragment = new Shader($"{shadersName}.frag", ShaderType.FragmentShader);
 			
 			_ID = GL.CreateProgram();
 			if (_ID == 0)
@@ -49,20 +46,6 @@ namespace Cyph3D.GLObject
 		
 				throw new InvalidOperationException($"Error while linking shaders ({_vertex.FileName}, {_fragment.FileName}) to program: {error}");
 			}
-			
-			_shaderPrograms.Add(shadersName, this);
-		}
-		
-		public static ShaderProgram Get(string name)
-		{
-			if (!_shaderPrograms.ContainsKey(name))
-			{
-				Logger.Info($"Loading shader program \"{name}\"");
-				ShaderProgram shaderProgram = new ShaderProgram(name);
-				Logger.Info($"Shader program \"{name}\" loaded (id: {shaderProgram._ID})");
-			}
-
-			return _shaderPrograms[name];
 		}
 
 		private int GetLocation(string variableName)
@@ -82,14 +65,6 @@ namespace Cyph3D.GLObject
 			
 			GL.DeleteProgram(_ID);
 			_ID = 0;
-		}
-		
-		public static void DisposeAll()
-		{
-			foreach (ShaderProgram program in _shaderPrograms.Values)
-			{
-				program.Dispose();
-			}
 		}
 		
 		public void Bind()

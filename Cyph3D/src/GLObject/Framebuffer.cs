@@ -14,8 +14,6 @@ namespace Cyph3D.GLObject
 
 		private List<DrawBuffersEnum> _drawBuffers = new List<DrawBuffersEnum>();
 		private List<FramebufferAttachment> _usedAttachments = new List<FramebufferAttachment>();
-		
-		private static HashSet<Framebuffer> _framebuffers = new HashSet<Framebuffer>();
 
 		public static implicit operator int(Framebuffer framebuffer) => framebuffer._ID;
 
@@ -23,8 +21,6 @@ namespace Cyph3D.GLObject
 		{
 			_size = size;
 			GL.CreateFramebuffers(1, out _ID);
-
-			_framebuffers.Add(this);
 		}
 
 		public Framebuffer WithTexture(FramebufferAttachment attachment, InternalFormat internalFormat, out Texture texture, TextureFiltering filtering = TextureFiltering.Nearest)
@@ -88,14 +84,6 @@ namespace Cyph3D.GLObject
 		{
 			GL.DeleteFramebuffer(_ID);
 			_ID = 0;
-		}
-		
-		public static void DisposeAll()
-		{
-			foreach (Framebuffer framebuffer in _framebuffers)
-			{
-				framebuffer.Dispose();
-			}
 		}
 
 		public void Bind()

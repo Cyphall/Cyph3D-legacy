@@ -112,7 +112,7 @@ namespace Cyph3D.UI.Window
 	                    if (payload.IsValid())
 	                    {
 		                    string newMesh = (string) GCHandle.FromIntPtr(payload.Data).Target;
-		                    meshObject.Mesh = Mesh.GetOrLoad(newMesh);
+		                    meshObject.Mesh = Engine.Scene.ResourceManager.RequestMesh(newMesh);
 	                    }
 	                    ImGui.EndDragDropTarget();
                     }
@@ -125,7 +125,7 @@ namespace Cyph3D.UI.Window
 	                    if (payload.IsValid())
 	                    {
 		                    string newMaterial = (string) GCHandle.FromIntPtr(payload.Data).Target;
-		                    meshObject.Material = Material.GetOrLoad(newMaterial);
+		                    meshObject.Material = Engine.Scene.ResourceManager.RequestMaterial(newMaterial);
 	                    }
 	                    ImGui.EndDragDropTarget();
                     }

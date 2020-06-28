@@ -23,6 +23,8 @@ namespace Cyph3D
 				SceneChanged?.Invoke();
 			}
 		}
+		
+		public static ResourceManager GlobalResourceManager { get; } = new ResourceManager();
 
 		public static Renderer Renderer { get; private set; }
 		
@@ -83,6 +85,9 @@ namespace Cyph3D
 			while (!Window.ShouldClose)
 			{
 				GLFW.PollEvents();
+				
+				GlobalResourceManager.Update();
+				Scene.ResourceManager.Update();
 
 				double deltaTime = Logger.Time.DeltaTime;
 				
@@ -101,13 +106,14 @@ namespace Cyph3D
 		public static void Shutdown()
 		{
 			Scene.Dispose();
-			ShaderProgram.DisposeAll();
-			Shader.DisposeAll();
-			Texture.DisposeAll();
-			Renderbuffer.DisposeAll();
-			ShaderStorageBuffer.DisposeAll();
-			Mesh.DisposeAll();
-			Framebuffer.DisposeAll();
+			GlobalResourceManager.Dispose();
+			// ShaderProgram.DisposeAll();
+			// Shader.DisposeAll();
+			// Texture.DisposeAll();
+			// Renderbuffer.DisposeAll();
+			// ShaderStorageBuffer.DisposeAll();
+			// Mesh.DisposeAll();
+			// Framebuffer.DisposeAll();
 
 			UIHelper.Shutdown();
 			

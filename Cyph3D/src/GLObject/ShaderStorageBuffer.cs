@@ -12,8 +12,6 @@ namespace Cyph3D.GLObject
 		
 		private static HashSet<int> _usedIndexes = new HashSet<int>();
 		
-		private static HashSet<ShaderStorageBuffer> _shaderStorageBuffers = new HashSet<ShaderStorageBuffer>();
-		
 		public static implicit operator int(ShaderStorageBuffer shaderStorageBuffer) => shaderStorageBuffer._ID;
 
 		public ShaderStorageBuffer(int index)
@@ -23,8 +21,6 @@ namespace Cyph3D.GLObject
 			_usedIndexes.Add(index);
 			
 			GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, _index, _ID);
-
-			_shaderStorageBuffers.Add(this);
 		}
 
 		public void PutData<T>(NativeArray<T> array) where T : unmanaged
@@ -36,14 +32,6 @@ namespace Cyph3D.GLObject
 		{
 			GL.DeleteBuffer(_ID);
 			_ID = 0;
-		}
-		
-		public static void DisposeAll()
-		{
-			foreach (ShaderStorageBuffer shaderStorageBuffer in _shaderStorageBuffers)
-			{
-				shaderStorageBuffer.Dispose();
-			}
 		}
 	}
 }

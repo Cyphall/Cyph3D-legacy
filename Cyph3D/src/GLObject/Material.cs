@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Json;
+using Cyph3D.Enumerable;
 using Cyph3D.Misc;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
@@ -25,18 +26,16 @@ namespace Cyph3D.GLObject
 		private static Texture _defaultMetallicMap;
 		private static Texture _defaultEmissiveMap;
 		
-		private bool _loadedMessageDisplayed;
+		private int _remainingTextures;
 
 		public string Name { get; }
 		public bool IsLit { get; }
-
-		private static Dictionary<string, Material> _materials = new Dictionary<string, Material>();
 		
 		public static Material Default { get; private set; }
 
-		public Material(string name)
+		public Material(string name, ResourceManager resourceManager)
 		{
-			_shaderProgram = ShaderProgram.Get("deferred/firstPass");
+			_shaderProgram = resourceManager.RequestShaderProgram("deferred/firstPass");
 			
 			_shaderProgram.SetValue("colorMap", 0);
 			_shaderProgram.SetValue("normalMap", 1);
@@ -49,42 +48,72 @@ namespace Cyph3D.GLObject
 			
 			if (jsonRoot.ContainsKey("colorMap"))
 			{
-				_colorMap = Texture.FromFile($"{name}/{(string)jsonRoot["colorMap"]}", true, true);
+				resourceManager.RequestImageTexture(
+					$"{name}/{(string)jsonRoot["colorMap"]}",
+					texture => HandleLoadedTexture(texture, TextureType.Color),
+					true,
+					true
+				);
+				_remainingTextures++;
 			}
 			
 			if (jsonRoot.ContainsKey("normalMap"))
 			{
-				_normalMap = Texture.FromFile($"{name}/{(string)jsonRoot["normalMap"]}");
+				resourceManager.RequestImageTexture(
+					$"{name}/{(string)jsonRoot["normalMap"]}",
+					texture => HandleLoadedTexture(texture, TextureType.Normal)
+				);
+				_remainingTextures++;
 			}
 			
 			if (jsonRoot.ContainsKey("roughnessMap"))
 			{
-				_roughnessMap = Texture.FromFile($"{name}/{(string)jsonRoot["roughnessMap"]}", compressed: true);
+				resourceManager.RequestImageTexture(
+					$"{name}/{(string)jsonRoot["roughnessMap"]}",
+					texture => HandleLoadedTexture(texture, TextureType.Roughness),
+					compressed: true
+				);
+				_remainingTextures++;
 			}
 			
 			if (jsonRoot.ContainsKey("displacementMap"))
 			{
-				_displacementMap = Texture.FromFile($"{name}/{(string)jsonRoot["displacementMap"]}", compressed: true);
+				resourceManager.RequestImageTexture(
+					$"{name}/{(string)jsonRoot["displacementMap"]}",
+					texture => HandleLoadedTexture(texture, TextureType.Displacement),
+					compressed: true
+				);
+				_remainingTextures++;
 			}
 			
 			if (jsonRoot.ContainsKey("metallicMap"))
 			{
-				_metallicMap = Texture.FromFile($"{name}/{(string)jsonRoot["metallicMap"]}", compressed: true);
+				resourceManager.RequestImageTexture(
+					$"{name}/{(string)jsonRoot["metallicMap"]}",
+					texture => HandleLoadedTexture(texture, TextureType.Metallic),
+					compressed: true
+				);
+				_remainingTextures++;
 			}
 			
 			if (jsonRoot.ContainsKey("emissiveMap"))
 			{
-				_emissiveMap = Texture.FromFile($"{name}/{(string)jsonRoot["emissiveMap"]}", compressed: true);
+				resourceManager.RequestImageTexture(
+					$"{name}/{(string)jsonRoot["emissiveMap"]}",
+					texture => HandleLoadedTexture(texture, TextureType.Emissive),
+					compressed: true
+				);
+				_remainingTextures++;
 			}
 
 			Name = name;
 			IsLit = jsonRoot["lit"];
-			_materials.Add(name, this);
 		}
 
 		private Material()
 		{
-			_shaderProgram = ShaderProgram.Get("deferred/firstPass");
+			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram("deferred/firstPass");
+			
 			
 			_shaderProgram.SetValue("colorMap", 0);
 			_shaderProgram.SetValue("normalMap", 1);
@@ -95,43 +124,67 @@ namespace Cyph3D.GLObject
 			
 			Name = "Default Material";
 			IsLit = false;
-			_materials.Add(Name, this);
+		}
+
+		private void HandleLoadedTexture(Texture texture, TextureType textureType)
+		{
+			switch (textureType)
+			{
+				case TextureType.Color:
+					_colorMap = texture;
+					break;
+				case TextureType.Normal:
+					_normalMap = texture;
+					break;
+				case TextureType.Roughness:
+					_roughnessMap = texture;
+					break;
+				case TextureType.Displacement:
+					_displacementMap = texture;
+					break;
+				case TextureType.Metallic:
+					_metallicMap = texture;
+					break;
+				case TextureType.Emissive:
+					_emissiveMap = texture;
+					break;
+			}
+
+			_remainingTextures--;
+			if (_remainingTextures == 0)
+			{
+				Logger.Info($"Material \"{Name}\" loaded");
+			}
 		}
 
 		public void Bind(mat4 model, mat4 view, mat4 projection, vec3 cameraPos)
 		{
-			if (!_loadedMessageDisplayed)
-			{
-				Logger.Info($"Material \"{Name}\" loaded");
-				_loadedMessageDisplayed = true;
-			}
-
-			if (_colorMap != null && _colorMap.IsReady)
+			if (_colorMap != null)
 				_colorMap.Bind(0);
 			else
 				_defaultColorMap.Bind(0);
 			
-			if (_normalMap != null && _normalMap.IsReady)
+			if (_normalMap != null)
 				_normalMap.Bind(1);
 			else
 				_defaultNormalMap.Bind(1);
 			
-			if (_roughnessMap != null && _roughnessMap.IsReady)
+			if (_roughnessMap != null)
 				_roughnessMap.Bind(2);
 			else
 				_defaultRoughnessMap.Bind(2);
 			
-			if (_displacementMap != null && _displacementMap.IsReady)
+			if (_displacementMap != null)
 				_displacementMap.Bind(3);
 			else
 				_defaultDisplacementMap.Bind(3);
 			
-			if (_metallicMap != null && _metallicMap.IsReady)
+			if (_metallicMap != null)
 				_metallicMap.Bind(4);
 			else
 				_defaultMetallicMap.Bind(4);
 			
-			if (_emissiveMap != null && _emissiveMap.IsReady)
+			if (_emissiveMap != null)
 				_emissiveMap.Bind(5);
 			else
 				_defaultEmissiveMap.Bind(5);
@@ -150,35 +203,33 @@ namespace Cyph3D.GLObject
 		{
 			Default = new Material();
 			
-			_defaultColorMap = new Texture(new ivec2(1), InternalFormat.CompressedSrgbS3tcDxt1Ext);
+			_defaultColorMap = new Texture(new ivec2(1), InternalFormat.CompressedSrgbS3tcDxt1Ext, TextureFiltering.Nearest);
 			_defaultColorMap.PutData(new byte[]{255, 0, 255});
 			
-			_defaultNormalMap = new Texture(new ivec2(1), InternalFormat.Rgb8);
+			_defaultNormalMap = new Texture(new ivec2(1), InternalFormat.Rgb8, TextureFiltering.Nearest);
 			_defaultNormalMap.PutData(new byte[]{128, 128, 255});
 			
-			_defaultRoughnessMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext);
+			_defaultRoughnessMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext, TextureFiltering.Nearest);
 			_defaultRoughnessMap.PutData(new byte[]{128}, PixelFormat.Luminance);
 		
-			_defaultDisplacementMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext);
+			_defaultDisplacementMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext, TextureFiltering.Nearest);
 			_defaultDisplacementMap.PutData(new byte[]{255}, PixelFormat.Luminance);
 		
-			_defaultMetallicMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext);
+			_defaultMetallicMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext, TextureFiltering.Nearest);
 			_defaultMetallicMap.PutData(new byte[]{0, 0, 0});
 		
-			_defaultEmissiveMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext);
+			_defaultEmissiveMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext, TextureFiltering.Nearest);
 			_defaultEmissiveMap.PutData(new byte[]{0, 0, 0});
 		}
-		
-		public static Material GetOrLoad(string name)
-		{
-			if (!_materials.ContainsKey(name))
-			{
-				Logger.Info($"Loading material \"{name}\"");
-				// ReSharper disable once ObjectCreationAsStatement
-				new Material(name);
-			}
 
-			return _materials[name];
+		private enum TextureType
+		{
+			Color,
+			Normal,
+			Roughness,
+			Displacement,
+			Metallic,
+			Emissive
 		}
 	}
 }

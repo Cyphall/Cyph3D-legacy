@@ -60,7 +60,7 @@ namespace Cyph3D.UI.Impl
 		{
 			ImGuiIOPtr io = ImGui.GetIO();
 
-			_shaderProgram = ShaderProgram.Get("deferred/imgui");
+			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram("deferred/imgui");
 
 			_VBO = GL.GenBuffer();
 			_EBO = GL.GenBuffer();

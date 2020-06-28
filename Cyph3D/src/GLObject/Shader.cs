@@ -13,9 +13,7 @@ namespace Cyph3D.GLObject
 
 		public static implicit operator int(Shader shader) => shader._ID;
 		
-		private static Dictionary<string, Shader> _shaders = new Dictionary<string, Shader>();
-		
-		private Shader(string fileName, ShaderType type)
+		public Shader(string fileName, ShaderType type)
 		{
 			FileName = fileName;
 			
@@ -51,34 +49,12 @@ namespace Cyph3D.GLObject
 		
 				throw new InvalidOperationException($"Error while compiling shader {FileName}: {error}");
 			}
-			
-			_shaders.Add(fileName, this);
-		}
-		
-		public static Shader Get(string name, ShaderType type)
-		{
-			if (!_shaders.ContainsKey(name))
-			{
-				Logger.Info($"Loading shader \"{name}\"");
-				Shader shader = new Shader(name, type);
-				Logger.Info($"Shader \"{name}\" loaded (id: {shader._ID})");
-			}
-
-			return _shaders[name];
 		}
 		
 		public void Dispose()
 		{
 			GL.DeleteShader(_ID);
 			_ID = 0;
-		}
-		
-		public static void DisposeAll()
-		{
-			foreach (Shader shader in _shaders.Values)
-			{
-				shader.Dispose();
-			}
 		}
 	}
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Cyph3D.Misc;
 using GlmSharp;
 using ObjLoader.Loader.Data.Elements;
 using ObjLoader.Loader.Data.VertexData;
@@ -25,9 +24,7 @@ namespace Cyph3D.GLObject
 
 		private static ObjLoaderFactory _loaderFactory;
 
-		private static Dictionary<string, Mesh> _meshes = new Dictionary<string, Mesh>();
-
-		private unsafe Mesh(string name)
+		public unsafe Mesh(string name)
 		{
 			Name = name;
 			
@@ -131,18 +128,6 @@ namespace Cyph3D.GLObject
 			}
 		}
 
-		public static Mesh GetOrLoad(string name)
-		{
-			if (!_meshes.ContainsKey(name))
-			{
-				Logger.Info($"Loading mesh \"{name}\"");
-				_meshes.Add(name, new Mesh(name));
-				Logger.Info($"Mesh \"{name}\" loaded");
-			}
-
-			return _meshes[name];
-		}
-
 		public void Render()
 		{
 			GL.BindVertexArray(_vaoID);
@@ -153,14 +138,6 @@ namespace Cyph3D.GLObject
 		{
 			GL.DeleteBuffer(_verticesDataBufferID);
 			_verticesDataBufferID = 0;
-		}
-
-		public static void DisposeAll()
-		{
-			foreach (Mesh mesh in _meshes.Values)
-			{
-				mesh.Dispose();
-			}
 		}
 
 		static Mesh()

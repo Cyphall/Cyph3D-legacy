@@ -18,18 +18,25 @@ namespace Cyph3D
 		public LightManager LightManager { get; } = new LightManager();
 		public Camera Camera { get; }
 		public string Name { get; set; }
-		public Cubemap Skybox { get; }
+		public Cubemap Skybox { get; private set; }
+		public ResourceManager ResourceManager { get; } = new ResourceManager();
 
 		public Scene(Camera camera = null, string name = null)
 		{
 			Camera = camera ?? new Camera();
 			Name = name ?? "Untitled Scene";
-			Skybox = Cubemap.FromFiles("Skybox/space{0}.png", true, true);
+			ResourceManager.RequestImageCubemap("Skybox", HandleCubemapLoaded, true, true);
+		}
+
+		private void HandleCubemapLoaded(Cubemap cubemap)
+		{
+			Skybox = cubemap;
 		}
 
 		public void Dispose()
 		{
 			LightManager?.Dispose();
+			ResourceManager?.Dispose();
 		}
 
 		public void Add(SceneObject obj)
@@ -123,10 +130,10 @@ namespace Cyph3D
 					vec3 angularVelocity = new vec3(angularVelocityArray[0], angularVelocityArray[1], angularVelocityArray[2]);
 
 					string meshName = jsonData["mesh"];
-					Mesh mesh = meshName.IsNullOrEmpty() ? null : Mesh.GetOrLoad(meshName);
+					Mesh mesh = meshName.IsNullOrEmpty() ? null : scene.ResourceManager.RequestMesh(meshName);
 					
 					string materialName = jsonData["material"];
-					Material material = materialName.IsNullOrEmpty() ? null : Material.GetOrLoad(materialName);
+					Material material = materialName.IsNullOrEmpty() ? null : scene.ResourceManager.RequestMaterial(materialName);
 					
 					sceneObject = new MeshObject(parent, material, mesh, name, position, rotation, scale, velocity, angularVelocity);
 					break;

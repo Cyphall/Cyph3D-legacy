@@ -64,7 +64,7 @@ namespace Cyph3D
 			GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), (IntPtr) (2 * sizeof(float)));
 
 
-			_lightingPassShader = ShaderProgram.Get("deferred/lightingPass");
+			_lightingPassShader = Engine.GlobalResourceManager.RequestShaderProgram("deferred/lightingPass");
 
 			_lightingPassShader.SetValue("positionTexture", 0);
 			_lightingPassShader.SetValue("normalTexture", 1);
@@ -125,7 +125,7 @@ namespace Cyph3D
 			GL.EnableVertexAttribArray(0);
 			GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
 			
-			_skyboxShader = ShaderProgram.Get("deferred/skybox");
+			_skyboxShader = Engine.GlobalResourceManager.RequestShaderProgram("deferred/skybox");
 			
 			_pointLightsBuffer = new ShaderStorageBuffer(0);
 			_directionalLightsBuffer = new ShaderStorageBuffer(1);
@@ -137,7 +137,8 @@ namespace Cyph3D
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 			
 			FirstPass(camera.View, camera.Projection, camera.Position);
-			SkyboxPass(camera.View, camera.Projection);
+			if (Engine.Scene.Skybox != null)
+				SkyboxPass(camera.View, camera.Projection);
 			LightingPass(camera.Position);
 		}
 
