@@ -16,6 +16,8 @@ namespace Cyph3D.UI.Window
 		private static List<string> _materials = new List<string>();
 		private static List<string> _skyboxes = new List<string>();
 
+		private static GCHandle? _currentlyDraggedHandle;
+
 		static UIResourceExplorer()
 		{
 			RescanFiles();
@@ -49,7 +51,8 @@ namespace Cyph3D.UI.Window
 			{
 				RescanFiles();
 			}
-			
+
+			bool currentlyDragging = false;
 			ImGui.BeginChild("list", Vector2.Zero, true);
 			switch (_currentResourceType)
 			{
@@ -60,8 +63,11 @@ namespace Cyph3D.UI.Window
 						
 						if (ImGui.BeginDragDropSource())
 						{
-							GCHandle handle = GCHandle.Alloc(mesh);
-							ImGui.SetDragDropPayload("MeshDragDrop", GCHandle.ToIntPtr(handle), (uint)sizeof(GCHandle));
+							currentlyDragging = true;
+							ImGui.Text(mesh);
+							
+							_currentlyDraggedHandle ??= GCHandle.Alloc(mesh);
+							ImGui.SetDragDropPayload("MeshDragDrop", GCHandle.ToIntPtr(_currentlyDraggedHandle.Value), (uint)sizeof(IntPtr));
 							ImGui.EndDragDropSource();
 						}
 					}
@@ -73,8 +79,11 @@ namespace Cyph3D.UI.Window
 						
 						if (ImGui.BeginDragDropSource())
 						{
-							GCHandle handle = GCHandle.Alloc(material);
-							ImGui.SetDragDropPayload("MaterialDragDrop", GCHandle.ToIntPtr(handle), (uint)sizeof(GCHandle));
+							currentlyDragging = true;
+							ImGui.Text(material);
+							
+							_currentlyDraggedHandle ??= GCHandle.Alloc(material);
+							ImGui.SetDragDropPayload("MaterialDragDrop", GCHandle.ToIntPtr(_currentlyDraggedHandle.Value), (uint)sizeof(IntPtr));
 							ImGui.EndDragDropSource();
 						}
 					}
@@ -86,14 +95,22 @@ namespace Cyph3D.UI.Window
 						
 						if (ImGui.BeginDragDropSource())
 						{
-							GCHandle handle = GCHandle.Alloc(skybox);
-							ImGui.SetDragDropPayload("SkyboxDragDrop", GCHandle.ToIntPtr(handle), (uint)sizeof(GCHandle));
+							currentlyDragging = true;
+							ImGui.Text(skybox);
+							
+							_currentlyDraggedHandle ??= GCHandle.Alloc(skybox);
+							ImGui.SetDragDropPayload("SkyboxDragDrop", GCHandle.ToIntPtr(_currentlyDraggedHandle.Value), (uint)sizeof(IntPtr));
 							ImGui.EndDragDropSource();
 						}
 					}
 					break;
 			}
 			ImGui.EndChild();
+			if (!currentlyDragging && _currentlyDraggedHandle != null)
+			{
+				_currentlyDraggedHandle.Value.Free();
+				_currentlyDraggedHandle = null;
+			}
 			
 			ImGui.EndGroup();
 			
