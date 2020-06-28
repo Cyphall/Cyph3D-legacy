@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using Cyph3D.Extension;
 using Cyph3D.Lighting;
 using Cyph3D.Misc;
@@ -14,7 +15,7 @@ namespace Cyph3D.UI.Window
 	{
 		private const ImGuiTreeNodeFlags BASE_FLAGS = ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick | ImGuiTreeNodeFlags.SpanAvailWidth;
 
-		private static Transform _currentlyDragged;
+		private static GCHandle? _currentlyDraggedHandle;
 		
 		private static Queue<Tuple<Transform, Transform>> _hierarchyOrderChangeQueue = new Queue<Tuple<Transform, Transform>>();
 		private static Queue<Transform> _hierarchyDeleteQueue = new Queue<Transform>();
@@ -57,26 +58,10 @@ namespace Cyph3D.UI.Window
 				}
 				
 				//Hierarchy tree creation
-				if (ImGui.TreeNodeEx(Engine.Scene.Name, BASE_FLAGS | ImGuiTreeNodeFlags.DefaultOpen))
+				if (!AddRootToTree() && _currentlyDraggedHandle != null)
 				{
-					//Make root a dragdrop target for hierarchy change
-					if (ImGui.BeginDragDropTarget())
-					{
-						if (ImGui.AcceptDragDropPayload("HierarchyOrderChange").IsValid())
-						{
-							_hierarchyOrderChangeQueue.Enqueue(new Tuple<Transform, Transform>(_currentlyDragged, Engine.Scene.Root));
-						}
-						ImGui.EndDragDropTarget();
-					}
-					
-					//Add root children
-					int childrenCount = Engine.Scene.Root.Children.Count;
-					for (int i = 0; i < childrenCount; i++)
-					{
-						AddToTree(Engine.Scene.Root.Children[i]);
-					}
-
-					ImGui.TreePop();
+					_currentlyDraggedHandle.Value.Free();
+					_currentlyDraggedHandle = null;
 				}
 
 				ProcessHierarchyChanges();
@@ -126,7 +111,37 @@ namespace Cyph3D.UI.Window
 			}
 		}
 		
-		private static void AddToTree(Transform transform)
+		private static bool AddRootToTree()
+		{
+			bool open = ImGui.TreeNodeEx(Engine.Scene.Name, BASE_FLAGS | ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.CollapsingHeader);
+			
+			//Make root a dragdrop target for hierarchy change
+			ImGuiPayloadPtr payload = ImGui.AcceptDragDropPayload("HierarchyOrderChange");
+			if (payload.IsValid())
+			{
+				Transform dropped = (Transform) GCHandle.FromIntPtr(payload.Data).Target;
+				_hierarchyOrderChangeQueue.Enqueue(new Tuple<Transform, Transform>(dropped, Engine.Scene.Root));
+			}
+			ImGui.EndDragDropTarget();
+			
+			bool currentlyDragging = false;
+			
+			if (open)
+			{
+				//Add root children
+				int childrenCount = Engine.Scene.Root.Children.Count;
+				for (int i = 0; i < childrenCount; i++)
+				{
+					currentlyDragging |= AddObjectToTree(Engine.Scene.Root.Children[i]);
+				}
+
+				ImGui.TreePop();
+			}
+
+			return currentlyDragging;
+		}
+		
+		private static unsafe bool AddObjectToTree(Transform transform)
 		{
 			ImGui.PushID(transform.Owner.GUID);
 			ImGuiTreeNodeFlags flags = BASE_FLAGS;
@@ -146,18 +161,23 @@ namespace Cyph3D.UI.Window
 			}
 			
 			//Make the item a drag drop source and target for hierarchy change
+			bool currentlyDragging = false;
 			if (ImGui.BeginDragDropSource())
 			{
-				ImGui.SetDragDropPayload("HierarchyOrderChange", IntPtr.Zero, 0);
-				_currentlyDragged = transform;
+				currentlyDragging = true;
 				ImGui.Text(transform.Owner.Name);
+							
+				_currentlyDraggedHandle ??= GCHandle.Alloc(transform);
+				ImGui.SetDragDropPayload("HierarchyOrderChange", GCHandle.ToIntPtr(_currentlyDraggedHandle.Value), (uint)sizeof(IntPtr));
 				ImGui.EndDragDropSource();
 			}
 			if (ImGui.BeginDragDropTarget())
 			{
-				if (ImGui.AcceptDragDropPayload("HierarchyOrderChange").IsValid())
+				ImGuiPayloadPtr payload = ImGui.AcceptDragDropPayload("HierarchyOrderChange");
+				if (payload.IsValid())
 				{
-					_hierarchyOrderChangeQueue.Enqueue(new Tuple<Transform, Transform>(_currentlyDragged, transform));
+					Transform dropped = (Transform) GCHandle.FromIntPtr(payload.Data).Target;
+					_hierarchyOrderChangeQueue.Enqueue(new Tuple<Transform, Transform>(dropped, transform));
 				}
 				ImGui.EndDragDropTarget();
 			}
@@ -168,13 +188,15 @@ namespace Cyph3D.UI.Window
 				int childrenCount = transform.Children.Count;
 				for (int i = 0; i < childrenCount; i++)
 				{
-					AddToTree(transform.Children[i]);
+					currentlyDragging |= AddObjectToTree(transform.Children[i]);
 				}
 
 				ImGui.TreePop();
 			}
 			
 			ImGui.PopID();
+
+			return currentlyDragging;
 		}
 	}
 }
