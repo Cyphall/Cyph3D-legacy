@@ -18,19 +18,13 @@ namespace Cyph3D
 		public LightManager LightManager { get; } = new LightManager();
 		public Camera Camera { get; }
 		public string Name { get; set; }
-		public Cubemap Skybox { get; private set; }
+		public Skybox Skybox { get; set; }
 		public ResourceManager ResourceManager { get; } = new ResourceManager();
 
 		public Scene(Camera camera = null, string name = null)
 		{
 			Camera = camera ?? new Camera();
 			Name = name ?? "Untitled Scene";
-			ResourceManager.RequestImageCubemap("Skybox", HandleCubemapLoaded, true, true);
-		}
-
-		private void HandleCubemapLoaded(Cubemap cubemap)
-		{
-			Skybox = cubemap;
 		}
 
 		public void Dispose()
@@ -91,6 +85,9 @@ namespace Cyph3D
 			);
 			
 			Scene scene = new Scene(camera, name);
+			
+			if (version >= 2 && !((string)jsonRoot["skybox"]).IsNullOrEmpty())
+				scene.ResourceManager.RequestSkybox(jsonRoot["skybox"], skybox => scene.Skybox = skybox);
 			
 			
 			JsonArray jsonSceneObjects = (JsonArray)jsonRoot["objects"];
@@ -171,7 +168,7 @@ namespace Cyph3D
 		{
 			JsonObject jsonRoot = new JsonObject();
 			
-			jsonRoot.Add("version", 1);
+			jsonRoot.Add("version", 2);
 			
 
 			JsonObject jsonCamera = new JsonObject
@@ -182,6 +179,8 @@ namespace Cyph3D
 
 
 			jsonRoot.Add("camera", jsonCamera);
+			
+			jsonRoot.Add("skybox", Skybox?.Name);
 			
 			
 			JsonArray objects = new JsonArray();

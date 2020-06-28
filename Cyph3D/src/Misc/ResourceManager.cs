@@ -17,7 +17,7 @@ namespace Cyph3D.Misc
 		public void Update()
 		{
 			TextureUpdate();
-			CubemapUpdate();
+			SkyboxUpdate();
 		}
 		
 		public void Dispose()
@@ -26,7 +26,7 @@ namespace Cyph3D.Misc
 			{
 				handler.Dispose();
 			}
-			foreach (ResourceHandler<Cubemap> handler in _cubemaps.Values)
+			foreach (ResourceHandler<Skybox> handler in _skyboxes.Values)
 			{
 				handler.Dispose();
 			}
@@ -148,25 +148,25 @@ namespace Cyph3D.Misc
 		
 		#endregion
 
-		#region Cubemaps
+		#region Skybox
 
-		private Dictionary<string, ResourceHandler<Cubemap>> _cubemaps = new Dictionary<string, ResourceHandler<Cubemap>>();
-		private ConcurrentQueue<Tuple<string, Cubemap>> _loadedCubemaps = new ConcurrentQueue<Tuple<string, Cubemap>>();
+		private Dictionary<string, ResourceHandler<Skybox>> _skyboxes = new Dictionary<string, ResourceHandler<Skybox>>();
+		private ConcurrentQueue<Tuple<string, Skybox>> _loadedSkyboxes = new ConcurrentQueue<Tuple<string, Skybox>>();
 
-		public void RequestImageCubemap(string name, ResourceHandler<Cubemap>.ResourceCallback callback, bool sRGB = false, bool compressed = false)
+		public void RequestSkybox(string name, ResourceHandler<Skybox>.ResourceCallback callback)
 		{
-			string path = $"resources/cubemaps/{name}";
+			string path = $"resources/skyboxes/{name}";
 			
-			if (!_cubemaps.ContainsKey(path))
+			if (!_skyboxes.ContainsKey(path))
 			{
-				_cubemaps.Add(path, new ResourceHandler<Cubemap>());
-				LoadImageCubemap(path, sRGB, compressed);
+				_skyboxes.Add(path, new ResourceHandler<Skybox>());
+				LoadSkybox(path, name);
 			}
 			
-			_cubemaps[path].AddCallback(callback);
+			_skyboxes[path].AddCallback(callback);
 		}
 
-		private void LoadImageCubemap(string path, bool sRGB, bool compressed)
+		private void LoadSkybox(string path, string name)
 		{
 			string[] jsonDataNames =
 			{
@@ -178,9 +178,9 @@ namespace Cyph3D.Misc
 				"back"
 			};
 			
-			Logger.Info($"Loading image cubemap \"{path}\"");
+			Logger.Info($"Loading skybox \"{path}\"");
 			
-			JsonObject jsonRoot = (JsonObject)JsonValue.Parse(File.ReadAllText($"{path}/cubemap.json"));
+			JsonObject jsonRoot = (JsonObject)JsonValue.Parse(File.ReadAllText($"{path}/skybox.json"));
 			
 			ivec2 size;
 			ColorComponents comp;
@@ -192,7 +192,7 @@ namespace Cyph3D.Misc
 			}
 			catch (IOException)
 			{
-				throw new IOException($"Unable to load image {path}/{(string)jsonRoot["front"]} from disk");
+				throw new IOException($"Unable to load skybox {path}/{(string)jsonRoot["front"]} from disk");
 			}
 
 			InternalFormat internalFormat;
@@ -201,37 +201,25 @@ namespace Cyph3D.Misc
 			{
 				case ColorComponents.Grey:
 					pixelFormat = PixelFormat.Luminance;
-					if (compressed)
-						internalFormat = sRGB ? InternalFormat.CompressedSrgbS3tcDxt1Ext : InternalFormat.CompressedRedRgtc1;
-					else
-						internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Red;
+					internalFormat = InternalFormat.CompressedSrgbS3tcDxt1Ext;
 					break;
 				case ColorComponents.GreyAlpha:
 					pixelFormat = PixelFormat.LuminanceAlpha;
-					if (compressed)
-						internalFormat = sRGB ? InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext : InternalFormat.CompressedRgbaS3tcDxt5Ext;
-					else
-						internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba8;
+					internalFormat = InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext;
 					break;
 				case ColorComponents.RedGreenBlue:
 					pixelFormat = PixelFormat.Rgb;
-					if (compressed)
-						internalFormat = sRGB ? InternalFormat.CompressedSrgbS3tcDxt1Ext : InternalFormat.CompressedRgbS3tcDxt1Ext;
-					else
-						internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Rgb8;
+					internalFormat = InternalFormat.CompressedSrgbS3tcDxt1Ext;
 					break;
 				case ColorComponents.RedGreenBlueAlpha:
 					pixelFormat = PixelFormat.Rgba;
-					if (compressed)
-						internalFormat = sRGB ? InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext : InternalFormat.CompressedRgbaS3tcDxt5Ext;
-					else
-						internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba8;
+					internalFormat = InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext;
 					break;
 				default:
 					throw new NotSupportedException($"The colors format {comp} is not supported");
 			}
 			
-			Cubemap cubemap = new Cubemap(size, internalFormat, TextureFiltering.Linear);
+			Skybox skybox = new Skybox(size, name, internalFormat, TextureFiltering.Linear);
 
 			// 0 = positive x face
 			// 1 = negative x face
@@ -254,19 +242,19 @@ namespace Cyph3D.Misc
 					throw new IOException($"Unable to load image {path}/{(string)jsonRoot[jsonDataNames[i]]} from disk");
 				}
 				
-				cubemap.PutData(image.Data, i, pixelFormat);
+				skybox.PutData(image.Data, i, pixelFormat);
 			}
 			
-			Logger.Info($"Cubemap \"{path}\" loaded (id: {(int)cubemap})");
+			Logger.Info($"Skybox \"{path}\" loaded (id: {(int)skybox})");
 			
-			_loadedCubemaps.Enqueue(new Tuple<string, Cubemap>(path, cubemap));
+			_loadedSkyboxes.Enqueue(new Tuple<string, Skybox>(path, skybox));
 		}
 
-		private void CubemapUpdate()
+		private void SkyboxUpdate()
 		{
-			while (_loadedCubemaps.TryDequeue(out Tuple<string, Cubemap> data))
+			while (_loadedSkyboxes.TryDequeue(out Tuple<string, Skybox> data))
 			{
-				_cubemaps[data.Item1].ValidateLoading(data.Item2);
+				_skyboxes[data.Item1].ValidateLoading(data.Item2);
 			}
 		}
 		

@@ -14,6 +14,7 @@ namespace Cyph3D.UI.Window
 		
 		private static List<string> _meshes = new List<string>();
 		private static List<string> _materials = new List<string>();
+		private static List<string> _skyboxes = new List<string>();
 
 		static UIResourceExplorer()
 		{
@@ -78,6 +79,19 @@ namespace Cyph3D.UI.Window
 						}
 					}
 					break;
+				case ResourceType.Skyboxes:
+					foreach (string skybox in _skyboxes)
+					{
+						ImGui.Selectable(skybox);
+						
+						if (ImGui.BeginDragDropSource())
+						{
+							GCHandle handle = GCHandle.Alloc(skybox);
+							ImGui.SetDragDropPayload("SkyboxDragDrop", GCHandle.ToIntPtr(handle), (uint)sizeof(GCHandle));
+							ImGui.EndDragDropSource();
+						}
+					}
+					break;
 			}
 			ImGui.EndChild();
 			
@@ -98,6 +112,10 @@ namespace Cyph3D.UI.Window
 			_materials.Clear();
 			FindMaterial("resources/materials/");
 			_materials.Sort();
+			
+			_skyboxes.Clear();
+			FindSkyboxes("resources/skyboxes/");
+			_skyboxes.Sort();
 		}
 
 		private static void FindMaterial(string path)
@@ -112,11 +130,25 @@ namespace Cyph3D.UI.Window
 				FindMaterial(folder.Replace(@"\", "/"));
 			}
 		}
+		
+		private static void FindSkyboxes(string path)
+		{
+			if (File.Exists($"{path}/skybox.json"))
+			{
+				_skyboxes.Add(path.Remove("resources/skyboxes/"));
+			}
+
+			foreach (string folder in Directory.GetDirectories(path))
+			{
+				FindSkyboxes(folder.Replace(@"\", "/"));
+			}
+		}
 
 		private enum ResourceType
 		{
 			Meshes,
-			Materials
+			Materials,
+			Skyboxes
 		}
 	}
 }

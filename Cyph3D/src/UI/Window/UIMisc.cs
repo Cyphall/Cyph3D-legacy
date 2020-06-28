@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
+using Cyph3D.Extension;
 using ImGuiNET;
 
 // ReSharper disable PossibleLossOfFraction
@@ -87,6 +89,21 @@ namespace Cyph3D.UI.Window
 				if (ImGui.Button("Save scene"))
 				{
 					Engine.Scene.Save();
+				}
+				
+				ImGui.Separator();
+				
+				string skyboxName = Engine.Scene.Skybox?.Name ?? "None";
+				ImGui.InputText("Skybox", ref skyboxName, 0, ImGuiInputTextFlags.ReadOnly);
+				if (ImGui.BeginDragDropTarget())
+				{
+					ImGuiPayloadPtr payload = ImGui.AcceptDragDropPayload("SkyboxDragDrop");
+					if (payload.IsValid())
+					{
+						string name = (string) GCHandle.FromIntPtr(payload.Data).Target;
+						Engine.Scene.ResourceManager.RequestSkybox(name, skybox => Engine.Scene.Skybox = skybox);
+					}
+					ImGui.EndDragDropTarget();
 				}
 			}
 		}
