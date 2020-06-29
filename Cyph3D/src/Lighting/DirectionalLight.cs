@@ -14,7 +14,7 @@ namespace Cyph3D.Lighting
 		public NativeLightData NativeLight =>
 			new NativeLightData
 			{
-				FragToLightDirection = (Transform.WorldMatrix * new vec4(0, 1, 0, 1)).xyz - Transform.WorldPosition,
+				FragToLightDirection = (new mat4(new mat3(Transform.WorldMatrix)) * new vec4(0, 1, 0, 1)).xyz,
 				Color = LinearColor,
 				Intensity = Intensity
 			};
