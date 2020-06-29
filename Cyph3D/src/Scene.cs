@@ -85,9 +85,25 @@ namespace Cyph3D
 			);
 			
 			Scene scene = new Scene(camera, name);
-			
-			if (version >= 2 && !((string)jsonRoot["skybox"]).IsNullOrEmpty())
-				scene.ResourceManager.RequestSkybox(jsonRoot["skybox"], skybox => scene.Skybox = skybox);
+
+			if (version == 2)
+			{
+				if (!((string) jsonRoot["skybox"]).IsNullOrEmpty())
+				{
+					scene.ResourceManager.RequestSkybox(jsonRoot["skybox"], skybox => scene.Skybox = skybox);
+				}
+			}
+			else if (version >= 3)
+			{
+				if (jsonRoot["skybox"].Count > 0)
+				{
+					float skyboxRotation = jsonRoot["skybox"]["rotation"];
+					scene.ResourceManager.RequestSkybox(jsonRoot["skybox"]["name"], skybox => {
+						skybox.Rotation = skyboxRotation;
+						scene.Skybox = skybox;
+					});
+				}
+			}
 			
 			
 			JsonArray jsonSceneObjects = (JsonArray)jsonRoot["objects"];
@@ -168,7 +184,7 @@ namespace Cyph3D
 		{
 			JsonObject jsonRoot = new JsonObject();
 			
-			jsonRoot.Add("version", 2);
+			jsonRoot.Add("version", 3);
 			
 
 			JsonObject jsonCamera = new JsonObject
@@ -180,7 +196,13 @@ namespace Cyph3D
 
 			jsonRoot.Add("camera", jsonCamera);
 			
-			jsonRoot.Add("skybox", Skybox?.Name);
+			JsonObject skybox = new JsonObject();
+			if (Skybox != null)
+			{
+				skybox["name"] = Skybox.Name;
+				skybox["rotation"] = Skybox.Rotation;
+			}
+			jsonRoot.Add("skybox", skybox);
 			
 			
 			JsonArray objects = new JsonArray();

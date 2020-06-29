@@ -27,8 +27,8 @@ namespace Cyph3D.UI.Window
 
 		public static void Show()
 		{
-			ImGui.SetNextWindowSize(new Vector2(350, 200));
-			ImGui.SetNextWindowPos(new Vector2(Engine.Window.Size.x - 350, 0));
+			ImGui.SetNextWindowSize(new Vector2(400, 300));
+			ImGui.SetNextWindowPos(new Vector2(Engine.Window.Size.x - 400, 0));
 			
 			if (ImGui.Begin("Misc", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize))
 			{
@@ -104,6 +104,15 @@ namespace Cyph3D.UI.Window
 						Engine.Scene.ResourceManager.RequestSkybox(name, skybox => Engine.Scene.Skybox = skybox);
 					}
 					ImGui.EndDragDropTarget();
+				}
+
+				if (Engine.Scene.Skybox != null)
+				{
+					float skyboxRotation = Engine.Scene.Skybox.Rotation;
+					if (ImGui.SliderFloat("Skybox rotation", ref skyboxRotation, 0, 360))
+					{
+						Engine.Scene.Skybox.Rotation = skyboxRotation;
+					}
 				}
 			}
 		}

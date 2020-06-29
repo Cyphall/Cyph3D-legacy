@@ -161,6 +161,7 @@ namespace Cyph3D
 			
 			_skyboxShader.Bind();
 			
+			_skyboxShader.SetValue("model", mat4.RotateY(glm.Radians(Engine.Scene.Skybox.Rotation)));
 			_skyboxShader.SetValue("view", new mat4(new mat3(view)));
 			_skyboxShader.SetValue("projection", projection);
 			
