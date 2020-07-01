@@ -140,14 +140,14 @@ namespace Cyph3D
 					
 					JsonArray angularVelocityArray = (JsonArray)jsonData["angular_velocity"];
 					vec3 angularVelocity = new vec3(angularVelocityArray[0], angularVelocityArray[1], angularVelocityArray[2]);
-
-					string meshName = jsonData["mesh"];
-					Mesh mesh = string.IsNullOrEmpty(meshName) ? null : scene.ResourceManager.RequestMesh(meshName);
 					
 					string materialName = jsonData["material"];
 					Material material = string.IsNullOrEmpty(materialName) ? null : scene.ResourceManager.RequestMaterial(materialName);
 					
-					sceneObject = new MeshObject(parent, material, mesh, name, position, rotation, scale, velocity, angularVelocity);
+					sceneObject = new MeshObject(parent, material, null, name, position, rotation, scale, velocity, angularVelocity);
+					
+					string meshName = jsonData["mesh"];
+					scene.ResourceManager.RequestMesh(meshName, mesh => ((MeshObject)sceneObject).Mesh = mesh);
 					break;
 				case "point_light":
 				{

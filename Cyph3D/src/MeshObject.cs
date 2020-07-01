@@ -15,7 +15,7 @@ namespace Cyph3D
 		public MeshObject(
 			Transform parent,
 			Material material,
-			Mesh mesh,
+			Mesh mesh = null,
 			string name = null,
 			vec3? position = null,
 			vec3? rotation = null,

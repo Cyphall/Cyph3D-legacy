@@ -18,6 +18,7 @@ namespace Cyph3D.Misc
 		{
 			TextureUpdate();
 			SkyboxUpdate();
+			MeshUpdate();
 		}
 		
 		public void Dispose()
@@ -34,9 +35,9 @@ namespace Cyph3D.Misc
 			{
 				shaderProgram.Dispose();
 			}
-			foreach (Mesh mesh in _meshes.Values)
+			foreach (ResourceHandler<Mesh> handler in _meshes.Values)
 			{
-				mesh.Dispose();
+				handler.Dispose();
 			}
 		}
 		
@@ -298,18 +299,41 @@ namespace Cyph3D.Misc
 		
 		#region Meshes
 		
-		private Dictionary<string, Mesh> _meshes = new Dictionary<string, Mesh>();
+		private Dictionary<string, ResourceHandler<Mesh>> _meshes = new Dictionary<string, ResourceHandler<Mesh>>();
+		private ConcurrentQueue<Tuple<string, Mesh>> _loadedMeshes = new ConcurrentQueue<Tuple<string, Mesh>>();
 		
-		public Mesh RequestMesh(string name)
+		public void RequestMesh(string name, ResourceHandler<Mesh>.ResourceCallback callback)
 		{
 			if (!_meshes.ContainsKey(name))
 			{
-				Logger.Info($"Loading mesh \"{name}\"");
-				_meshes.Add(name, new Mesh(name));
-				Logger.Info($"Mesh \"{name}\" loaded");
+				_meshes.Add(name, new ResourceHandler<Mesh>());
+				LoadMesh(name);
 			}
+			
+			_meshes[name].AddCallback(callback);
+		}
 
-			return _meshes[name];
+		private void LoadMesh(string name)
+		{
+			Logger.Info($"Loading mesh \"{name}\"");
+			
+			Mesh mesh = new Mesh();
+			
+			Engine.ThreadPool.Schedule(() => {
+				mesh.LoadFromFile(name);
+				
+				Logger.Info($"Mesh \"{name}\" loaded");
+				
+				_loadedMeshes.Enqueue(new Tuple<string, Mesh>(name, mesh));
+			});
+		}
+
+		private void MeshUpdate()
+		{
+			while (_loadedMeshes.TryDequeue(out Tuple<string, Mesh> data))
+			{
+				_meshes[data.Item1].ValidateLoading(data.Item2);
+			}
 		}
 		
 		#endregion

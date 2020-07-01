@@ -18,12 +18,10 @@ namespace Cyph3D.GLObject
 
 		private int[] _indices;
 		
-		public string Name { get; }
+		public string Name { get; private set; }
 
-		public unsafe Mesh(string name)
+		public unsafe Mesh()
 		{
-			Name = name;
-			
 			_verticesDataBufferID = GL.GenBuffer();
 
 			_vaoID = GL.GenVertexArray();
@@ -47,8 +45,12 @@ namespace Cyph3D.GLObject
 				GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
 			GL.BindVertexArray(0);
+		}
 
-
+		public unsafe void LoadFromFile(string name)
+		{
+			Name = name;
+			
 			AssImpScene scene = new AssimpContext().ImportFile($"resources/meshes/{name}.obj",
 				PostProcessSteps.CalculateTangentSpace | PostProcessSteps.Triangulate);
 			AssImpMesh mesh = scene.Meshes[0];
@@ -58,7 +60,9 @@ namespace Cyph3D.GLObject
 
 			for (int i = 0; i < mesh.FaceCount; i++)
 			{
-				indices.AddRange(mesh.Faces[i].Indices);
+				indices.Add(mesh.Faces[i].Indices[0]);
+				indices.Add(mesh.Faces[i].Indices[1]);
+				indices.Add(mesh.Faces[i].Indices[2]);
 			}
 			
 			for (int i = 0; i < mesh.VertexCount; i++)
@@ -85,6 +89,8 @@ namespace Cyph3D.GLObject
 			GL.BufferData(BufferTarget.ArrayBuffer, vertexData.Count * sizeof(VertexData), vertexData.ToArray(), BufferUsageHint.DynamicDraw);
 			
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+			
+			GL.Finish();
 
 			_indices = indices.ToArray();
 		}
