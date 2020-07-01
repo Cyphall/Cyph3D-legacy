@@ -222,33 +222,40 @@ namespace Cyph3D.Misc
 			
 			Skybox skybox = new Skybox(size, name, internalFormat, TextureFiltering.Linear);
 
-			// 0 = positive x face
-			// 1 = negative x face
-			// 2 = positive y face
-			// 3 = negative y face
-			// 4 = positive z face
-			// 5 = negative z face
+			GL.Finish();
+
+			Engine.ThreadPool.Schedule(
+				() => {
+					// 0 = positive x face
+					// 1 = negative x face
+					// 2 = positive y face
+					// 3 = negative y face
+					// 4 = positive z face
+					// 5 = negative z face
+					
+					for (int i = 0; i < 6; i++)
+					{
+						ImageResult image;
 			
-			for (int i = 0; i < 6; i++)
-			{
-				ImageResult image;
-			
-				try
-				{
-					using Stream stream = File.OpenRead($"{path}/{(string)jsonRoot[jsonDataNames[i]]}");
-					image = ImageResult.FromStream(stream);
-				}
-				catch (IOException)
-				{
-					throw new IOException($"Unable to load image {path}/{(string)jsonRoot[jsonDataNames[i]]} from disk");
-				}
+						try
+						{
+							using Stream stream = File.OpenRead($"{path}/{(string)jsonRoot[jsonDataNames[i]]}");
+							image = ImageResult.FromStream(stream);
+						}
+						catch (IOException)
+						{
+							throw new IOException($"Unable to load image {path}/{(string)jsonRoot[jsonDataNames[i]]} from disk");
+						}
 				
-				skybox.PutData(image.Data, i, pixelFormat);
-			}
+						skybox.PutData(image.Data, i, pixelFormat);
+					}
+					
+					GL.Finish();
 			
-			Logger.Info($"Skybox \"{path}\" loaded (id: {(int)skybox})");
+					Logger.Info($"Skybox \"{path}\" loaded (id: {(int)skybox})");
 			
-			_loadedSkyboxes.Enqueue(new Tuple<string, Skybox>(path, skybox));
+					_loadedSkyboxes.Enqueue(new Tuple<string, Skybox>(path, skybox));
+				});
 		}
 
 		private void SkyboxUpdate()
