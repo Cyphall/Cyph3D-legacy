@@ -318,9 +318,13 @@ namespace Cyph3D.Misc
 			Logger.Info($"Loading mesh \"{name}\"");
 			
 			Mesh mesh = new Mesh();
+
+			GL.Finish();
 			
 			Engine.ThreadPool.Schedule(() => {
 				mesh.LoadFromFile(name);
+				
+				GL.Finish();
 				
 				Logger.Info($"Mesh \"{name}\" loaded");
 				

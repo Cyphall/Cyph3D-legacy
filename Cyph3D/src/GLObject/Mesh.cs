@@ -89,8 +89,6 @@ namespace Cyph3D.GLObject
 			GL.BufferData(BufferTarget.ArrayBuffer, vertexData.Count * sizeof(VertexData), vertexData.ToArray(), BufferUsageHint.DynamicDraw);
 			
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-			
-			GL.Finish();
 
 			_indices = indices.ToArray();
 		}
