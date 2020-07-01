@@ -49,7 +49,8 @@ namespace Cyph3D.GLObject
 			GL.BindVertexArray(0);
 
 
-			AssImpScene scene = new AssimpContext().ImportFile($"resources/meshes/{name}.obj", PostProcessSteps.CalculateTangentSpace);
+			AssImpScene scene = new AssimpContext().ImportFile($"resources/meshes/{name}.obj",
+				PostProcessSteps.CalculateTangentSpace | PostProcessSteps.Triangulate);
 			AssImpMesh mesh = scene.Meshes[0];
 
 			List<VertexData> vertexData = new List<VertexData>();
