@@ -7,7 +7,6 @@ using Cyph3D.GLObject;
 using Cyph3D.Lighting;
 using Cyph3D.Misc;
 using GlmSharp;
-using ObjLoader.Loader.Common;
 
 namespace Cyph3D
 {
@@ -88,7 +87,7 @@ namespace Cyph3D
 
 			if (version == 2)
 			{
-				if (!((string) jsonRoot["skybox"]).IsNullOrEmpty())
+				if (!string.IsNullOrEmpty(jsonRoot["skybox"]))
 				{
 					scene.ResourceManager.RequestSkybox(jsonRoot["skybox"], skybox => scene.Skybox = skybox);
 				}
@@ -143,10 +142,10 @@ namespace Cyph3D
 					vec3 angularVelocity = new vec3(angularVelocityArray[0], angularVelocityArray[1], angularVelocityArray[2]);
 
 					string meshName = jsonData["mesh"];
-					Mesh mesh = meshName.IsNullOrEmpty() ? null : scene.ResourceManager.RequestMesh(meshName);
+					Mesh mesh = string.IsNullOrEmpty(meshName) ? null : scene.ResourceManager.RequestMesh(meshName);
 					
 					string materialName = jsonData["material"];
-					Material material = materialName.IsNullOrEmpty() ? null : scene.ResourceManager.RequestMaterial(materialName);
+					Material material = string.IsNullOrEmpty(materialName) ? null : scene.ResourceManager.RequestMaterial(materialName);
 					
 					sceneObject = new MeshObject(parent, material, mesh, name, position, rotation, scale, velocity, angularVelocity);
 					break;

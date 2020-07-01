@@ -1,5 +1,4 @@
 ﻿using System;
-using ObjLoader.Loader.Common;
 
 namespace Cyph3D.Misc
 {
@@ -43,7 +42,7 @@ namespace Cyph3D.Misc
 			Console.ForegroundColor = ConsoleColor.Gray;
 			Console.Write($"{(long)ts.TotalSeconds}.{ts:ffff} ");
 
-			if (!context.IsNullOrEmpty())
+			if (!string.IsNullOrEmpty(context))
 			{
 				Console.ForegroundColor = ConsoleColor.Gray;
 				Console.Write($"[{context}] ");
