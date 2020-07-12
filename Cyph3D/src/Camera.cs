@@ -10,7 +10,7 @@ namespace Cyph3D
 		private bool _orientationChanged = true;
 		
 		private vec3 _orientation = vec3.Zero;
-		private vec3 Orientation
+		public vec3 Orientation
 		{
 			get
 			{
