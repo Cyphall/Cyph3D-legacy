@@ -32,7 +32,7 @@ namespace Cyph3D.GLObject
 			GL.EnableVertexAttribArray(1);
 			GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), (IntPtr) (2 * sizeof(float)));
 			
-			_shaderProgram = new ShaderProgram("framebuffer/drawToDefault");
+			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram("framebuffer/drawToDefault");
 			_shaderProgram.SetValue("Texture", 0);
 		}
 
