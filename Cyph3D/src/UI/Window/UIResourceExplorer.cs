@@ -120,10 +120,7 @@ namespace Cyph3D.UI.Window
 		private static void RescanFiles()
 		{
 			_meshes.Clear();
-			foreach (string meshPath in Directory.GetFiles("resources/meshes/", "*.obj", SearchOption.AllDirectories))
-			{
-				_meshes.Add(PathUtility.GetPathWithoutExtension(meshPath.Remove("resources/meshes/")));
-			}
+			FindMeshes("resources/meshes/");
 			_meshes.Sort();
 			
 			_materials.Clear();
@@ -133,6 +130,19 @@ namespace Cyph3D.UI.Window
 			_skyboxes.Clear();
 			FindSkyboxes("resources/skyboxes/");
 			_skyboxes.Sort();
+		}
+		
+		private static void FindMeshes(string path)
+		{
+			foreach (string meshPath in Directory.GetFiles(path))
+			{
+				_meshes.Add(PathUtility.GetPathWithoutExtension(meshPath.Remove("resources/meshes/").Replace(@"\", "/")));
+			}
+			
+			foreach (string folder in Directory.GetDirectories(path))
+			{
+				FindMeshes(folder.Replace(@"\", "/"));
+			}
 		}
 
 		private static void FindMaterial(string path)
