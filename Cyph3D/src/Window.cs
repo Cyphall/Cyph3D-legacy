@@ -79,19 +79,6 @@ namespace Cyph3D
 		
 		public Window(ivec2? size = null)
 		{
-			GLFW.Init();
-
-			GLFW.SetErrorCallback((code, message) => Logger.Error(message, "GLFW"));
-
-			GLFW.WindowHint(WindowHintInt.ContextVersionMajor, 4);
-			GLFW.WindowHint(WindowHintInt.ContextVersionMinor, 6);
-			GLFW.WindowHint(WindowHintInt.DepthBits, 0);
-			GLFW.WindowHint(WindowHintInt.StencilBits, 0);
-			GLFW.WindowHint(WindowHintOpenGlProfile.OpenGlProfile, OpenGlProfile.Core);
-#if DEBUG
-			GLFW.WindowHint(WindowHintBool.OpenGLDebugContext, true);
-#endif
-
 			if (size != null)
 			{
 				_glfwWindow = GLFW.CreateWindow(size.Value.x, size.Value.y, "Cyph3D", null, null);

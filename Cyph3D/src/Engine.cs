@@ -2,6 +2,7 @@ using System;
 using System.Management;
 using System.Runtime.InteropServices;
 using Cyph3D.GLObject;
+using Cyph3D.Helper;
 using Cyph3D.Misc;
 using Cyph3D.UI;
 using OpenToolkit.Graphics.OpenGL4;
@@ -34,9 +35,9 @@ namespace Cyph3D
 
 		public static void Init()
 		{
+			GlfwHelper.Init();
+			
 			Window = new Window();
-
-			GL.LoadBindings(new GLFWBindingsContext());
 			
 			GLFW.GetVersion(out int major, out int minor, out int revision);
 			Logger.Info($"GLFW Version: {major}.{minor}.{revision}", "GLFW");
@@ -120,5 +121,7 @@ namespace Cyph3D
 			
 			GLFW.Terminate();
 		}
+
+		
 	}
 }
