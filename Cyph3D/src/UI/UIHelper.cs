@@ -1,4 +1,5 @@
 ﻿using System;
+using Cyph3D.UI.Gizmo;
 using Cyph3D.UI.Impl;
 using Cyph3D.UI.Window;
 using ImGuiNET;
@@ -18,27 +19,28 @@ namespace Cyph3D.UI
 			ImplOpenGL.Init();
 			
 			ImGui.StyleColorsDark();
+			
+			TranslateGizmo.Init();
 		}
 
 		public static void Render()
 		{
-			ImGui.Render();
-			ImplOpenGL.RenderDrawData(*ImGuiNative.igGetDrawData());
-		}
+			if (!Engine.Window.GuiOpen) return;
 
-		public static void Update()
-		{
+			TranslateGizmo.Update();
+			
 			ImplOpenGL.NewFrame();
 			ImplGlfw.NewFrame();
 			ImGui.NewFrame();
 			
-			if (!Engine.Window.GuiOpen) return;
-
 			UIHierarchy.Show();
 			UIMisc.Show();
 			UIInspector.Show();
 			UIResourceExplorer.Show();
 			//UITest.Show();
+			
+			ImGui.Render();
+			ImplOpenGL.RenderDrawData(*ImGuiNative.igGetDrawData());
 		}
 
 		public static void Shutdown()

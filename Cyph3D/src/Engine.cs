@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Management;
 using System.Runtime.InteropServices;
 using Cyph3D.GLObject;
@@ -97,7 +97,6 @@ namespace Cyph3D
 			
 				Renderer.Render(Scene.Camera);
 
-				UIHelper.Update();
 				UIHelper.Render();
 
 				Window.SwapBuffers();
