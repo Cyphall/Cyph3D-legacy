@@ -6,7 +6,7 @@ using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D.GLObject
 {
-	public class Framebuffer : IDisposable
+	public partial class Framebuffer : IDisposable
 	{
 		private int _ID;
 		private ivec2 _size;

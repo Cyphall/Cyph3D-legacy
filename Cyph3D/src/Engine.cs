@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Management;
 using System.Runtime.InteropServices;
 using Cyph3D.GLObject;
@@ -72,6 +72,7 @@ namespace Cyph3D
 			);
 			
 			Material.InitializeDefault();
+			Framebuffer.InitDrawToDefault();
 			
 			Renderer = new Renderer();
 			
