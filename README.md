@@ -23,7 +23,7 @@ CTRL X: Quit
 - [x] Directional Light
 - [ ] Point Shadows
 - [ ] Directional Shadows
-- [ ] Skybox
+- [x] Skybox
 
 #### UI
 
