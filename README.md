@@ -5,8 +5,8 @@ It uses the OpenGL and GLFW bindings from [OpenTK](https://github.com/opentk/ope
 ## Controls
 
 ZQSD: Moving around<br/>
-F3  : Toggle UI<br/>
-ESC : Quit
+ESC: Toggle UI<br/>
+CTRL X: Quit
 
 ## Features
 
