@@ -60,7 +60,7 @@ namespace Cyph3D.UI.Impl
 		{
 			ImGuiIOPtr io = ImGui.GetIO();
 
-			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram("deferred/imgui");
+			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram("imgui/imgui");
 
 			_VBO = GL.GenBuffer();
 			_EBO = GL.GenBuffer();
@@ -100,7 +100,8 @@ namespace Cyph3D.UI.Impl
 			GL.Disable(EnableCap.DepthTest);
 			GL.Enable(EnableCap.ScissorTest);
 			GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
-			
+			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+
 			GL.Viewport(0, 0, fbSize.x, fbSize.y);
 			float l = drawData.DisplayPos.X;
 			float r = drawData.DisplayPos.X + drawData.DisplaySize.X;
