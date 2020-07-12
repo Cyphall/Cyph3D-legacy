@@ -63,7 +63,7 @@ vec2 POM(vec2 texCoords, vec3 viewDir)
 
 	if (currentTexDepth == 0 || layerCount == 0) return texCoords;
 
-	if (viewDir.z <= 0) discard;
+	if (viewDir.z <= 0) return texCoords;
 
 	// Offsets applied at each steps
 	vec2  texCoordsStepOffset = -(viewDir.xy / viewDir.z) / layerCount * depthScale;
