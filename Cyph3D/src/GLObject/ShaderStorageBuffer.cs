@@ -5,33 +5,15 @@ using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D.GLObject
 {
-	public class ShaderStorageBuffer : IDisposable
+	public class ShaderStorageBuffer<T> : Buffer<T> where T: unmanaged
 	{
-		private int _ID;
-		private int _index;
-		
-		private static HashSet<int> _usedIndexes = new HashSet<int>();
-		
-		public static implicit operator int(ShaderStorageBuffer shaderStorageBuffer) => shaderStorageBuffer._ID;
-
-		public ShaderStorageBuffer(int index)
+		public void Bind(int bindingPoint)
 		{
-			GL.CreateBuffers(1, out _ID);
-			_index = index;
-			_usedIndexes.Add(index);
-			
-			GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, _index, _ID);
+			GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, bindingPoint, _ID);
 		}
 
-		public void PutData<T>(NativeArray<T> array) where T : unmanaged
+		public ShaderStorageBuffer() : base(true)
 		{
-			GL.NamedBufferData(_ID, array.ByteSize, array, BufferUsageHint.DynamicDraw);
-		}
-
-		public void Dispose()
-		{
-			GL.DeleteBuffer(_ID);
-			_ID = 0;
 		}
 	}
 }

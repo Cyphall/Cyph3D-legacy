@@ -1,6 +1,7 @@
 ﻿using System;
 using Cyph3D.Enumerable;
 using Cyph3D.GLObject;
+using Cyph3D.Lighting;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 
@@ -17,8 +18,8 @@ namespace Cyph3D
 		private int _skyboxVAO;
 		private ShaderProgram _lightingPassShader;
 		private ShaderProgram _skyboxShader;
-		private ShaderStorageBuffer _pointLightsBuffer;
-		private ShaderStorageBuffer _directionalLightsBuffer;
+		private ShaderStorageBuffer<PointLight.NativeLightData> _pointLightsBuffer;
+		private ShaderStorageBuffer<DirectionalLight.NativeLightData> _directionalLightsBuffer;
 		
 		public bool Debug { get; set; }
 
@@ -103,8 +104,8 @@ namespace Cyph3D
 			
 			_skyboxShader = Engine.GlobalResourceManager.RequestShaderProgram("deferred/skybox");
 			
-			_pointLightsBuffer = new ShaderStorageBuffer(0);
-			_directionalLightsBuffer = new ShaderStorageBuffer(1);
+			_pointLightsBuffer = new ShaderStorageBuffer<PointLight.NativeLightData>();
+			_directionalLightsBuffer = new ShaderStorageBuffer<DirectionalLight.NativeLightData>();
 		}
 
 		public void Render(Camera camera)
@@ -152,7 +153,9 @@ namespace Cyph3D
 		private void LightingPass(vec3 viewPos)
 		{
 			_pointLightsBuffer.PutData(Engine.Scene.LightManager.PointLightsNative);
+			_pointLightsBuffer.Bind(0);
 			_directionalLightsBuffer.PutData(Engine.Scene.LightManager.DirectionalLightsNative);
+			_directionalLightsBuffer.Bind(1);
 
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 

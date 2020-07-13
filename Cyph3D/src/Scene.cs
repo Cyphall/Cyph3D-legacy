@@ -28,7 +28,6 @@ namespace Cyph3D
 
 		public void Dispose()
 		{
-			LightManager?.Dispose();
 			ResourceManager?.Dispose();
 		}
 

@@ -12,39 +12,26 @@ namespace Cyph3D.GLObject
 {
 	public class Mesh : IDisposable
 	{
-		private int _verticesDataBufferID;
+		private Buffer<VertexData> _vbo;
+		private Buffer<int> _ibo;
 
-		private int _vaoID;
+		private VertexArray _vao;
 
-		private int[] _indices;
+		private int indicesCount;
 		
 		public string Name { get; private set; }
 
-		public unsafe Mesh()
+		public Mesh()
 		{
-			_verticesDataBufferID = GL.GenBuffer();
+			_vbo = new Buffer<VertexData>(false);
+			_ibo = new Buffer<int>(false);
 
-			_vaoID = GL.GenVertexArray();
-
-			GL.BindVertexArray(_vaoID);
-
-				GL.BindBuffer(BufferTarget.ArrayBuffer, _verticesDataBufferID);
-
-				GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, sizeof(VertexData), Marshal.OffsetOf<VertexData>(nameof(VertexData.Position)));
-				GL.EnableVertexAttribArray(0);
-
-				GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, sizeof(VertexData), Marshal.OffsetOf<VertexData>(nameof(VertexData.UV)));
-				GL.EnableVertexAttribArray(1);
-
-				GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, sizeof(VertexData), Marshal.OffsetOf<VertexData>(nameof(VertexData.Normal)));
-				GL.EnableVertexAttribArray(2);
-
-				GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, sizeof(VertexData), Marshal.OffsetOf<VertexData>(nameof(VertexData.Tangent)));
-				GL.EnableVertexAttribArray(3);
-				
-				GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-
-			GL.BindVertexArray(0);
+			_vao = new VertexArray();
+			_vao.RegisterAttrib(_vbo, 0, 3, VertexAttribType.Float, nameof(VertexData.Position));
+			_vao.RegisterAttrib(_vbo, 1, 2, VertexAttribType.Float, nameof(VertexData.UV));
+			_vao.RegisterAttrib(_vbo, 2, 3, VertexAttribType.Float, nameof(VertexData.Normal));
+			_vao.RegisterAttrib(_vbo, 3, 3, VertexAttribType.Float, nameof(VertexData.Tangent));
+			_vao.RegisterIndexBuffer(_ibo);
 		}
 
 		public unsafe void LoadFromFile(string name)
@@ -83,26 +70,23 @@ namespace Cyph3D.GLObject
 				
 				vertexData.Add(vData);
 			}
-
-			GL.BindBuffer(BufferTarget.ArrayBuffer, _verticesDataBufferID);
 			
-			GL.BufferData(BufferTarget.ArrayBuffer, vertexData.Count * sizeof(VertexData), vertexData.ToArray(), BufferUsageHint.DynamicDraw);
-			
-			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+			_vbo.PutData(vertexData.ToArray());
+			_ibo.PutData(indices.ToArray());
 
-			_indices = indices.ToArray();
+			indicesCount = indices.Count;
 		}
 
 		public void Render()
 		{
-			GL.BindVertexArray(_vaoID);
-			GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, _indices);
+			_vao.Bind();
+			GL.DrawElements(PrimitiveType.Triangles, indicesCount, DrawElementsType.UnsignedInt, 0);
 		}
 
 		public void Dispose()
 		{
-			GL.DeleteBuffer(_verticesDataBufferID);
-			_verticesDataBufferID = 0;
+			_vao.Dispose();
+			_vbo.Dispose();
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
