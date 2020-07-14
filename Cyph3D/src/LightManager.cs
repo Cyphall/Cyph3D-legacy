@@ -31,10 +31,8 @@ namespace Cyph3D
 		{
 			get
 			{
-				int count = _directionalLights.Count;
-				
-				DirectionalLight.NativeLightData[] directionalLightsNative = new DirectionalLight.NativeLightData[_pointLights.Count];
-				for (int i = 0; i < count; i++)
+				DirectionalLight.NativeLightData[] directionalLightsNative = new DirectionalLight.NativeLightData[_directionalLights.Count];
+				for (int i = 0; i < _directionalLights.Count; i++)
 				{
 					directionalLightsNative[i] = _directionalLights[i].NativeLight;
 				}
