@@ -16,18 +16,18 @@ namespace Cyph3D.GLObject
 			GL.CreateVertexArrays(1, out _ID);
 		}
 
-		private int ResolveBufferIndex<T>(Buffer<T> buffer) where T: unmanaged
+		private int ResolveBufferIndex<T>(VertexBuffer<T> buffer) where T: unmanaged
 		{
 			if (!_mappedBuffers.Contains(buffer))
 			{
 				_mappedBuffers.Add(buffer);
-				GL.VertexArrayVertexBuffer(_ID, _mappedBuffers.Count-1, buffer, IntPtr.Zero, sizeof(T));
+				GL.VertexArrayVertexBuffer(_ID, _mappedBuffers.Count-1, buffer, IntPtr.Zero, buffer.Stride);
 			}
 
 			return _mappedBuffers.IndexOf(buffer);
 		}
 
-		public void RegisterAttrib<T>(Buffer<T> buffer, int index, int dataCount, VertexAttribType dataType, int offset) where T: unmanaged
+		public void RegisterAttrib<T>(VertexBuffer<T> buffer, int index, int dataCount, VertexAttribType dataType, int offset) where T: unmanaged
 		{
 			int bindingIndex = ResolveBufferIndex(buffer);
 			
@@ -36,7 +36,7 @@ namespace Cyph3D.GLObject
 			GL.VertexArrayAttribBinding(_ID, index, bindingIndex);
 		}
 		
-		public void RegisterAttrib<T>(Buffer<T> buffer, int index, int dataCount, VertexAttribType dataType, string structFieldName) where T: unmanaged
+		public void RegisterAttrib<T>(VertexBuffer<T> buffer, int index, int dataCount, VertexAttribType dataType, string structFieldName) where T: unmanaged
 		{
 			RegisterAttrib(buffer, index, dataCount, dataType, Marshal.OffsetOf<T>(structFieldName).ToInt32());
 		}

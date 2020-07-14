@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Cyph3D.Helper;
 using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D.GLObject
 {
 	public partial class Framebuffer
 	{
-		private static int _quadVAO;
+		private static VertexArray _quadVAO;
+		private static VertexBuffer<float> _quadVBO;
 		private static ShaderProgram _shaderProgram;
 
 		public static void InitDrawToDefault()
@@ -22,15 +23,13 @@ namespace Cyph3D.GLObject
 				1.0f, 1.0f, 1.0f, 1.0f
 			};
 			
-			_quadVAO = GL.GenVertexArray();
-			int quadVBO = GL.GenBuffer();
-			GL.BindVertexArray(_quadVAO);
-			GL.BindBuffer(BufferTarget.ArrayBuffer, quadVBO);
-			GL.BufferData(BufferTarget.ArrayBuffer, quadVertices.Length * sizeof(float), quadVertices, BufferUsageHint.StaticDraw);
-			GL.EnableVertexAttribArray(0);
-			GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), IntPtr.Zero);
-			GL.EnableVertexAttribArray(1);
-			GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), (IntPtr) (2 * sizeof(float)));
+			_quadVAO = new VertexArray();
+			
+			_quadVBO = new VertexBuffer<float>(false, Stride.Get<float>(4));
+			_quadVBO.PutData(quadVertices);
+			
+			_quadVAO.RegisterAttrib(_quadVBO, 0, 2, VertexAttribType.Float, 0);
+			_quadVAO.RegisterAttrib(_quadVBO, 1, 2, VertexAttribType.Float, 2 * sizeof(float));
 			
 			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram("framebuffer/drawToDefault");
 			_shaderProgram.SetValue("Texture", 0);
@@ -57,7 +56,7 @@ namespace Cyph3D.GLObject
 				textures[i].Bind(i);
 			}
 			
-			GL.BindVertexArray(_quadVAO);
+			_quadVAO.Bind();
 			GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
 
 			if (previousBlend == 1)

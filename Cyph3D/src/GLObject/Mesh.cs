@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Assimp;
+using Cyph3D.Helper;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 using AssImpScene = Assimp.Scene;
@@ -12,18 +13,18 @@ namespace Cyph3D.GLObject
 {
 	public class Mesh : IDisposable
 	{
-		private Buffer<VertexData> _vbo;
+		private VertexBuffer<VertexData> _vbo;
 		private Buffer<int> _ibo;
 
 		private VertexArray _vao;
 
-		private int indicesCount;
+		private int _indicesCount;
 		
 		public string Name { get; private set; }
 
 		public Mesh()
 		{
-			_vbo = new Buffer<VertexData>(false);
+			_vbo = new VertexBuffer<VertexData>(false, Stride.Get<VertexData>(1));
 			_ibo = new Buffer<int>(false);
 
 			_vao = new VertexArray();
@@ -74,13 +75,13 @@ namespace Cyph3D.GLObject
 			_vbo.PutData(vertexData.ToArray());
 			_ibo.PutData(indices.ToArray());
 
-			indicesCount = indices.Count;
+			_indicesCount = indices.Count;
 		}
 
 		public void Render()
 		{
 			_vao.Bind();
-			GL.DrawElements(PrimitiveType.Triangles, indicesCount, DrawElementsType.UnsignedInt, 0);
+			GL.DrawElements(PrimitiveType.Triangles, _indicesCount, DrawElementsType.UnsignedInt, 0);
 		}
 
 		public void Dispose()
