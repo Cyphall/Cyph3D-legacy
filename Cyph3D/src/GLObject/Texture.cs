@@ -2,7 +2,7 @@
 using Cyph3D.Enumerable;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
-using StbImageSharp;
+using StbImageNET;
 
 namespace Cyph3D.GLObject
 {
@@ -55,7 +55,7 @@ namespace Cyph3D.GLObject
 
 		static Texture()
 		{
-			StbImage.stbi_set_flip_vertically_on_load((int)All.True);
+			StbImage.SetFlipVerticallyOnLoad(true);
 		}
 	}
 }

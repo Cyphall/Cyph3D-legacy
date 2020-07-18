@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Json;
 using Cyph3D.Enumerable;
-using Cyph3D.Extension;
 using Cyph3D.GLObject;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
-using StbImageSharp;
+using StbImageNET;
 
 namespace Cyph3D.Misc
 {
@@ -63,13 +62,13 @@ namespace Cyph3D.Misc
 		{
 			Logger.Info($"Loading image texture \"{path}\"");
 
-			ivec2 size;
-			ColorComponents comp;
+			int x;
+			int y;
+			Components comp;
 			
 			try
 			{
-				using Stream stream = File.OpenRead(path);
-				StbImageExt.StbImageInfo(stream, out size, out comp);
+				StbImage.Info(path, out x, out y, out comp);
 			}
 			catch (IOException)
 			{
@@ -80,28 +79,28 @@ namespace Cyph3D.Misc
 			PixelFormat pixelFormat;
 			switch (comp)
 			{
-				case ColorComponents.Grey:
+				case Components.Grey:
 					pixelFormat = PixelFormat.Luminance;
 					if (compressed)
 						internalFormat = sRGB ? InternalFormat.CompressedSrgbS3tcDxt1Ext : InternalFormat.CompressedRedRgtc1;
 					else
 						internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Red;
 					break;
-				case ColorComponents.GreyAlpha:
+				case Components.GreyAlpha:
 					pixelFormat = PixelFormat.LuminanceAlpha;
 					if (compressed)
 						internalFormat = sRGB ? InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext : InternalFormat.CompressedRgbaS3tcDxt5Ext;
 					else
 						internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba8;
 					break;
-				case ColorComponents.RedGreenBlue:
+				case Components.RedGreenBlue:
 					pixelFormat = PixelFormat.Rgb;
 					if (compressed)
 						internalFormat = sRGB ? InternalFormat.CompressedSrgbS3tcDxt1Ext : InternalFormat.CompressedRgbS3tcDxt1Ext;
 					else
 						internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Rgb8;
 					break;
-				case ColorComponents.RedGreenBlueAlpha:
+				case Components.RedGreenBlueAlpha:
 					pixelFormat = PixelFormat.Rgba;
 					if (compressed)
 						internalFormat = sRGB ? InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext : InternalFormat.CompressedRgbaS3tcDxt5Ext;
@@ -112,24 +111,23 @@ namespace Cyph3D.Misc
 					throw new NotSupportedException($"The colors format {comp} is not supported");
 			}
 			
-			Texture texture = new Texture(size, internalFormat, TextureFiltering.Linear);
+			Texture texture = new Texture(new ivec2(x, y), internalFormat, TextureFiltering.Linear);
 			
 			GL.Finish();
 			
 			Engine.ThreadPool.Schedule(() => {
-				ImageResult image;
-
+				byte[] image;
+				
 				try
 				{
-					using Stream stream = File.OpenRead(path);
-					image = ImageResult.FromStream(stream, comp);
+					image = StbImage.Load(path, out int _, out int _, out Components _, comp);
 				}
 				catch (IOException)
 				{
 					throw new IOException($"Unable to load image {path} from disk");
 				}
 				
-				texture.PutData(image.Data, pixelFormat);
+				texture.PutData(image, pixelFormat);
 				
 				GL.Finish();
 				
@@ -182,14 +180,14 @@ namespace Cyph3D.Misc
 			Logger.Info($"Loading skybox \"{path}\"");
 			
 			JsonObject jsonRoot = (JsonObject)JsonValue.Parse(File.ReadAllText($"{path}/skybox.json"));
-			
-			ivec2 size;
-			ColorComponents comp;
+
+			int x;
+			int y;
+			Components comp;
 			
 			try
 			{
-				using Stream stream = File.OpenRead($"{path}/{(string)jsonRoot["front"]}");
-				StbImageExt.StbImageInfo(stream, out size, out comp);
+				StbImage.Info($"{path}/{(string)jsonRoot["front"]}", out x, out y, out comp);
 			}
 			catch (IOException)
 			{
@@ -200,19 +198,19 @@ namespace Cyph3D.Misc
 			PixelFormat pixelFormat;
 			switch (comp)
 			{
-				case ColorComponents.Grey:
+				case Components.Grey:
 					pixelFormat = PixelFormat.Luminance;
 					internalFormat = InternalFormat.CompressedSrgbS3tcDxt1Ext;
 					break;
-				case ColorComponents.GreyAlpha:
+				case Components.GreyAlpha:
 					pixelFormat = PixelFormat.LuminanceAlpha;
 					internalFormat = InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext;
 					break;
-				case ColorComponents.RedGreenBlue:
+				case Components.RedGreenBlue:
 					pixelFormat = PixelFormat.Rgb;
 					internalFormat = InternalFormat.CompressedSrgbS3tcDxt1Ext;
 					break;
-				case ColorComponents.RedGreenBlueAlpha:
+				case Components.RedGreenBlueAlpha:
 					pixelFormat = PixelFormat.Rgba;
 					internalFormat = InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext;
 					break;
@@ -220,7 +218,7 @@ namespace Cyph3D.Misc
 					throw new NotSupportedException($"The colors format {comp} is not supported");
 			}
 			
-			Skybox skybox = new Skybox(size, name, internalFormat, TextureFiltering.Linear);
+			Skybox skybox = new Skybox(new ivec2(x, y), name, internalFormat, TextureFiltering.Linear);
 
 			GL.Finish();
 
@@ -235,19 +233,18 @@ namespace Cyph3D.Misc
 					
 					for (int i = 0; i < 6; i++)
 					{
-						ImageResult image;
+						byte[] image;
 			
 						try
 						{
-							using Stream stream = File.OpenRead($"{path}/{(string)jsonRoot[jsonDataNames[i]]}");
-							image = ImageResult.FromStream(stream);
+							image = StbImage.Load($"{path}/{(string)jsonRoot[jsonDataNames[i]]}", out int _, out int _, out Components _, comp);
 						}
 						catch (IOException)
 						{
 							throw new IOException($"Unable to load image {path}/{(string)jsonRoot[jsonDataNames[i]]} from disk");
 						}
 				
-						skybox.PutData(image.Data, i, pixelFormat);
+						skybox.PutData(image, i, pixelFormat);
 					}
 					
 					GL.Finish();
