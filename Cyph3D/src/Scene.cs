@@ -146,7 +146,9 @@ namespace Cyph3D
 					sceneObject = new MeshObject(parent, material, null, name, position, rotation, scale, velocity, angularVelocity);
 					
 					string meshName = jsonData["mesh"];
-					scene.ResourceManager.RequestMesh(meshName, mesh => ((MeshObject)sceneObject).Mesh = mesh);
+					if (!string.IsNullOrEmpty(meshName))
+						scene.ResourceManager.RequestMesh(meshName, mesh => ((MeshObject)sceneObject).Mesh = mesh);
+					
 					break;
 				case "point_light":
 				{
