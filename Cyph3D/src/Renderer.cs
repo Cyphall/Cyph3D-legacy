@@ -27,7 +27,7 @@ namespace Cyph3D
 		{
 			_gbuffer = new Framebuffer(Engine.Window.Size)
 				.WithTexture(FramebufferAttachment.ColorAttachment0, (InternalFormat) All.Rgb32f, out _positionTexture)
-				.WithTexture(FramebufferAttachment.ColorAttachment1, InternalFormat.Rgb8, out _normalTexture)
+				.WithTexture(FramebufferAttachment.ColorAttachment1, InternalFormat.Rgb16f, out _normalTexture)
 				.WithTexture(FramebufferAttachment.ColorAttachment2, InternalFormat.Rgb16f, out _colorTexture)
 				.WithTexture(FramebufferAttachment.ColorAttachment3, InternalFormat.Rgba8, out _materialTexture)
 				.WithTexture(FramebufferAttachment.DepthAttachment, (InternalFormat) All.DepthComponent24, out _depthTexture, TextureFiltering.Linear)
