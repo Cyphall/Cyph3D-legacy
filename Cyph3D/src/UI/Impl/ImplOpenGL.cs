@@ -85,7 +85,12 @@ namespace Cyph3D.UI.Impl
 			
 			io.Fonts.GetTexDataAsRGBA32(out byte* pixels, out int width, out int height);
 			
-			_fontTexture = new Texture(new ivec2(width, height), InternalFormat.Rgba8, TextureFiltering.Linear);
+			_fontTexture = new TextureSetting
+			{
+				Size = new ivec2(width, height),
+				InternalFormat = InternalFormat.Rgba8,
+				Filtering = TextureFiltering.Linear
+			}.CreateTexture();
 			_fontTexture.PutData((IntPtr)pixels, PixelFormat.Rgba);
 			
 			io.Fonts.SetTexID((IntPtr)(int)_fontTexture);

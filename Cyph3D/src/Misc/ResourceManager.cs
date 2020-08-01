@@ -111,7 +111,13 @@ namespace Cyph3D.Misc
 					throw new NotSupportedException($"The colors format {comp} is not supported");
 			}
 			
-			Texture texture = new Texture(new ivec2(x, y), internalFormat, TextureFiltering.Linear);
+			Texture texture = new TextureSetting
+			{
+				Size = new ivec2(x, y),
+				InternalFormat = internalFormat,
+				Filtering = TextureFiltering.Linear,
+				UseMipmaps = true
+			}.CreateTexture();
 			
 			GL.Finish();
 			

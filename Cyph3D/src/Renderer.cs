@@ -26,11 +26,27 @@ namespace Cyph3D
 		public Renderer()
 		{
 			_gbuffer = new Framebuffer(Engine.Window.Size)
-				.WithTexture(FramebufferAttachment.ColorAttachment0, (InternalFormat) All.Rgb32f, out _positionTexture)
-				.WithTexture(FramebufferAttachment.ColorAttachment1, InternalFormat.Rgb16f, out _normalTexture)
-				.WithTexture(FramebufferAttachment.ColorAttachment2, InternalFormat.Rgb16f, out _colorTexture)
-				.WithTexture(FramebufferAttachment.ColorAttachment3, InternalFormat.Rgba8, out _materialTexture)
-				.WithTexture(FramebufferAttachment.DepthAttachment, (InternalFormat) All.DepthComponent24, out _depthTexture, TextureFiltering.Linear)
+				.WithTexture(FramebufferAttachment.ColorAttachment0, new TextureSetting
+				{
+					InternalFormat = (InternalFormat) All.Rgb32f
+				}, out _positionTexture)
+				.WithTexture(FramebufferAttachment.ColorAttachment1, new TextureSetting
+				{
+					InternalFormat = InternalFormat.Rgb16f
+				}, out _normalTexture)
+				.WithTexture(FramebufferAttachment.ColorAttachment2, new TextureSetting
+				{
+					InternalFormat = InternalFormat.Rgb16f
+				}, out _colorTexture)
+				.WithTexture(FramebufferAttachment.ColorAttachment3, new TextureSetting
+				{
+					InternalFormat = InternalFormat.Rgba8
+				}, out _materialTexture)
+				.WithTexture(FramebufferAttachment.DepthAttachment, new TextureSetting
+				{
+					InternalFormat = (InternalFormat) All.DepthComponent24,
+					Filtering = TextureFiltering.Linear
+				}, out _depthTexture)
 				.Complete();
 
 			GL.Enable(EnableCap.DepthTest);

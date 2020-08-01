@@ -203,22 +203,52 @@ namespace Cyph3D.GLObject
 		{
 			Default = new Material();
 			
-			_defaultColorMap = new Texture(new ivec2(1), InternalFormat.CompressedSrgbS3tcDxt1Ext, TextureFiltering.Nearest);
+			_defaultColorMap = new TextureSetting
+			{
+				Size = new ivec2(1),
+				InternalFormat = InternalFormat.CompressedSrgbS3tcDxt1Ext,
+				Filtering = TextureFiltering.Nearest
+			}.CreateTexture();
 			_defaultColorMap.PutData(new byte[]{255, 0, 255});
 			
-			_defaultNormalMap = new Texture(new ivec2(1), InternalFormat.Rgb8, TextureFiltering.Nearest);
+			_defaultNormalMap = new TextureSetting
+			{
+				Size = new ivec2(1),
+				InternalFormat = InternalFormat.Rgb8,
+				Filtering = TextureFiltering.Nearest
+			}.CreateTexture();
 			_defaultNormalMap.PutData(new byte[]{128, 128, 255});
 			
-			_defaultRoughnessMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext, TextureFiltering.Nearest);
+			_defaultRoughnessMap = new TextureSetting
+			{
+				Size = new ivec2(1),
+				InternalFormat = InternalFormat.CompressedRgbS3tcDxt1Ext,
+				Filtering = TextureFiltering.Nearest
+			}.CreateTexture();
 			_defaultRoughnessMap.PutData(new byte[]{128}, PixelFormat.Luminance);
-		
-			_defaultDisplacementMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext, TextureFiltering.Nearest);
+			
+			_defaultDisplacementMap = new TextureSetting
+			{
+				Size = new ivec2(1),
+				InternalFormat = InternalFormat.CompressedRgbS3tcDxt1Ext,
+				Filtering = TextureFiltering.Nearest
+			}.CreateTexture();
 			_defaultDisplacementMap.PutData(new byte[]{255}, PixelFormat.Luminance);
-		
-			_defaultMetallicMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext, TextureFiltering.Nearest);
+			
+			_defaultMetallicMap = new TextureSetting
+			{
+				Size = new ivec2(1),
+				InternalFormat = InternalFormat.CompressedRgbS3tcDxt1Ext,
+				Filtering = TextureFiltering.Nearest
+			}.CreateTexture();
 			_defaultMetallicMap.PutData(new byte[]{0, 0, 0});
-		
-			_defaultEmissiveMap = new Texture(new ivec2(1), InternalFormat.CompressedRgbS3tcDxt1Ext, TextureFiltering.Nearest);
+			
+			_defaultEmissiveMap = new TextureSetting
+			{
+				Size = new ivec2(1),
+				InternalFormat = InternalFormat.CompressedRgbS3tcDxt1Ext,
+				Filtering = TextureFiltering.Nearest
+			}.CreateTexture();
 			_defaultEmissiveMap.PutData(new byte[]{0, 0, 0});
 		}
 

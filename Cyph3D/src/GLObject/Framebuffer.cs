@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Cyph3D.Enumerable;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 
@@ -23,14 +22,15 @@ namespace Cyph3D.GLObject
 			GL.CreateFramebuffers(1, out _ID);
 		}
 
-		public Framebuffer WithTexture(FramebufferAttachment attachment, InternalFormat internalFormat, out Texture texture, TextureFiltering filtering = TextureFiltering.Nearest)
+		public Framebuffer WithTexture(FramebufferAttachment attachment, TextureSetting textureSetting, out Texture texture)
 		{
 			if (_usedAttachments.Contains(attachment))
 			{
 				throw new InvalidOperationException("This framebuffer attachment is alreay used");
 			}
-				
-			texture = new Texture(_size, internalFormat, filtering);
+
+			textureSetting.Size = _size;
+			texture = textureSetting.CreateTexture();
 			
 			GL.NamedFramebufferTexture(_ID, attachment, texture, 0);
 			
