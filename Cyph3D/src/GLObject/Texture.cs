@@ -52,13 +52,15 @@ namespace Cyph3D.GLObject
 		public void PutData(byte[] data, PixelFormat format = PixelFormat.Rgb, PixelType type = PixelType.UnsignedByte)
 		{
 			GL.TextureSubImage2D(_ID, 0, 0, 0, _size.x, _size.y, format, type, data);
-			GL.GenerateTextureMipmap(_ID);
+			if (_useMipmaps)
+				GL.GenerateTextureMipmap(_ID);
 		}
 		
 		public void PutData(IntPtr data, PixelFormat format = PixelFormat.Rgb, PixelType type = PixelType.UnsignedByte)
 		{
 			GL.TextureSubImage2D(_ID, 0, 0, 0, _size.x, _size.y, format, type, data);
-			GL.GenerateTextureMipmap(_ID);
+			if (_useMipmaps)
+				GL.GenerateTextureMipmap(_ID);
 		}
 
 		public void Dispose()
