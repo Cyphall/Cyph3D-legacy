@@ -71,7 +71,7 @@ namespace Cyph3D.Helper
 					$"The following driver does not support OpenGL 4.6.0.\n\n" + 
 					$"Driver: {GL.GetString(StringName.Version)}\n" +
 					$"GPU: {GL.GetString(StringName.Renderer)}\n\n" +
-					$"Please ensure your GPU is compatible and update your drivers", "OPENGL");
+					"Please ensure your GPU is compatible and update your drivers", "OPGL");
 				error = true;
 			}
 			

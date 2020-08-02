@@ -60,13 +60,13 @@ namespace Cyph3D
 					switch (severity)
 					{
 						case DebugSeverity.DebugSeverityHigh:
-							Logger.Error(logMessage, "OPENGL");
+							Logger.Error(logMessage, "OPGL");
 							break;
 						case DebugSeverity.DebugSeverityMedium:
-							Logger.Warning(logMessage, "OPENGL");
+							Logger.Warning(logMessage, "OPGL");
 							break;
 						case DebugSeverity.DebugSeverityLow:
-							Logger.Info(logMessage, "OPENGL");
+							Logger.Info(logMessage, "OPGL");
 							break;
 					}
 				}, IntPtr.Zero
