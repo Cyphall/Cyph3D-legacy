@@ -13,7 +13,7 @@ namespace Cyph3D.GLObject
 		private Shader _vertex;
 		private Shader _fragment;
 		
-		private Dictionary<string, int> _locations = new Dictionary<string, int>();
+		private Dictionary<string, int> _uniforms = new Dictionary<string, int>();
 		
 		public static implicit operator int(ShaderProgram shaderProgram) => shaderProgram._ID;
 		
@@ -46,16 +46,32 @@ namespace Cyph3D.GLObject
 		
 				throw new InvalidOperationException($"Error while linking shaders ({_vertex.FileName}, {_fragment.FileName}) to program: {error}");
 			}
+			
+			GL.GetProgramInterface(_ID, ProgramInterface.Uniform, ProgramInterfaceParameter.ActiveResources, out int uniformCount);
+
+			for (int i = 0; i < uniformCount; i++)
+			{
+				int[] values = new int[1];
+				GL.GetProgramResource(
+					_ID,
+					ProgramInterface.Uniform,
+					i,
+					1,
+					new [] {ProgramProperty.NameLength},
+					1,
+					out int _,
+					values
+				);
+				
+				GL.GetProgramResourceName(_ID, ProgramInterface.Uniform, i, values[0], out int _, out string name);
+				
+				_uniforms.Add(name, i);
+			}
 		}
 
 		private int GetLocation(string variableName)
 		{
-			if (!_locations.ContainsKey(variableName))
-			{
-				_locations.Add(variableName, GL.GetUniformLocation(_ID, variableName));
-			}
-
-			return _locations[variableName];
+			return _uniforms.GetValueOrDefault(variableName, -1);
 		}
 
 		public void Dispose()
