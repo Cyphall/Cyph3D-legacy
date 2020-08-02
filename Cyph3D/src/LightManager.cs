@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cyph3D.Lighting;
+using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D
 {
@@ -77,6 +78,18 @@ namespace Cyph3D
 						_directionalLights.Remove(directionalLight);
 					}
 					break;
+			}
+		}
+
+		public void UpdateShadowMaps()
+		{
+			GL.Disable(EnableCap.CullFace);
+			for (int i = 0; i < _directionalLights.Count; i++)
+			{
+				if (_directionalLights[i].CastShadows)
+				{
+					_directionalLights[i].UpdateShadowMap();
+				}
 			}
 		}
 	}

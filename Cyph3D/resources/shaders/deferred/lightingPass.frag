@@ -1,4 +1,5 @@
 #version 460 core
+#extension GL_ARB_bindless_texture : enable
 
 /* ------ consts ------ */
 const float PI = 3.14159265359;
@@ -17,11 +18,15 @@ struct PointLight
 	vec3  color;
 };
 
-struct DirectionalLight
+layout(bindless_sampler) struct DirectionalLight
 {
 	vec3  fragToLightDirection;
 	float intensity;
 	vec3  color;
+	bool  castShadows;
+	mat4  lightViewProjection;
+	sampler2D shadowMap;
+	vec2  padding;
 };
 
 struct FragData
@@ -29,6 +34,7 @@ struct FragData
 	vec3  pos;
 	vec3  viewDir;
 	vec3  normal;
+	vec3  geometryNormal;
 	float roughness;
 	float metalness;
 	vec3  color;
@@ -51,6 +57,7 @@ uniform sampler2D positionTexture;
 uniform sampler2D normalTexture;
 uniform sampler2D colorTexture;
 uniform sampler2D materialTexture;
+uniform sampler2D geometryNormalTexture;
 uniform sampler2D depthTexture;
 
 uniform int debug;
@@ -62,11 +69,13 @@ out vec4 out_Color;
 vec4 debugView();
 vec4 lighting();
 
+float isInShadow(int lightIndex);
 vec3 calculateLighting(vec3 radiance, vec3 L, vec3 H);
 
 vec3 getPosition();
 vec3 getColor();
 vec3 getNormal();
+vec3 getGeometryNormal();
 float getRoughness();
 float getMetallic();
 float getEmissive();
@@ -117,7 +126,7 @@ vec4 debugView()
 	{
 		texCoords.x = texCoords.x * 2;
 		texCoords.y = (texCoords.y - 0.5) * 2;
-		return texture(colorTexture, texCoords);
+		return texture(geometryNormalTexture, texCoords);
 	}
 	else
 	{
@@ -134,6 +143,7 @@ vec4 lighting()
 	fragData.pos               = getPosition();
 	fragData.viewDir           = normalize(vert2frag.ViewPos - fragData.pos);
 	fragData.normal            = getNormal();
+	fragData.geometryNormal    = getGeometryNormal();
 	fragData.roughness         = getRoughness();
 	fragData.metalness         = getMetallic();
 	fragData.color             = getColor();
@@ -159,15 +169,44 @@ vec4 lighting()
 	// Directional Light calculation
 	for(int i = 0; i < directionalLights.length(); ++i)
 	{
+		float shadow = directionalLights[i].castShadows ? isInShadow(i) : 0;
+		
 		// calculate light parameters
 		vec3 lightDir    = directionalLights[i].fragToLightDirection;
 		vec3 halfwayDir  = normalize(fragData.viewDir + lightDir);
 		vec3 radiance    = directionalLights[i].color * directionalLights[i].intensity;
 
-		finalColor += calculateLighting(radiance, lightDir, halfwayDir);
+		finalColor += calculateLighting(radiance, lightDir, halfwayDir) * (1 - shadow);
 	}
 
 	return reinhard_tone_mapping(finalColor);
+}
+
+float isInShadow(int lightIndex)
+{
+	vec4 shadowMapSpacePos = directionalLights[lightIndex].lightViewProjection * vec4(fragData.pos, 1);
+	vec3 projCoords = shadowMapSpacePos.xyz / shadowMapSpacePos.w;
+	projCoords = projCoords * 0.5 + 0.5;
+	
+	if (projCoords.z > 1) return 0.0;
+
+	float currentDepth = projCoords.z;
+	
+	float bias = max(0.01 * (1.0 - dot(fragData.geometryNormal, directionalLights[lightIndex].fragToLightDirection)), 0.005);
+
+	float shadow = 0.0;
+	vec2 texelSize = 1.0 / textureSize(directionalLights[lightIndex].shadowMap, 0);
+	for(int x = -1; x <= 1; x++)
+	{
+		for(int y = -1; y <= 1; y++)
+		{
+			float pcfDepth = texture(directionalLights[lightIndex].shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+		}
+	}
+	shadow /= 9.0;
+	
+	return shadow;
 }
 
 vec3 calculateLighting(vec3 radiance, vec3 L, vec3 H)
@@ -203,6 +242,11 @@ vec3 getColor()
 vec3 getNormal()
 {
 	return normalize(texture(normalTexture, vert2frag.TexCoords).rgb * 2.0 - 1.0);
+}
+
+vec3 getGeometryNormal()
+{
+	return normalize(texture(geometryNormalTexture, vert2frag.TexCoords).rgb * 2.0 - 1.0);
 }
 
 float getRoughness()

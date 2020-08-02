@@ -29,14 +29,14 @@ namespace Cyph3D.UI.Window
 			{
 				if (Selected != null)
 				{
-					switch (Selected)
+					if (Selected is SceneObject sceneObject)
 					{
-						case SceneObject sceneObject:
-							ShowSceneObject(sceneObject);
-							break;
-						case Material material:
-							ShowMaterial(material);
-							break;
+						ShowSceneObject(sceneObject);
+					}
+
+					if (Selected is Material material)
+					{
+						ShowMaterial(material);
 					}
 				}
 			}
@@ -88,62 +88,86 @@ namespace Cyph3D.UI.Window
             ImGui.Separator();
             
             ImGui.Text("Properties");
-
-            switch (Selected)
+            
+            if (Selected is MeshObject meshObject)
             {
-            	case MeshObject meshObject:
-            		Vector3 imGuiVelocity = ConvertHelper.Convert(meshObject.Velocity);
-            		if (ImGui.DragFloat3("Velocity", ref imGuiVelocity, 0.01f, 0, 0))
-            		{
-            			meshObject.Velocity = ConvertHelper.Convert(imGuiVelocity);
-            		}
-            	
-            		Vector3 imGuiAngularVelocity = ConvertHelper.Convert(meshObject.AngularVelocity);
-            		if (ImGui.DragFloat3("Angular Velocity", ref imGuiAngularVelocity, 0.01f, 0, 0))
-            		{
-            			meshObject.AngularVelocity = ConvertHelper.Convert(imGuiAngularVelocity);
-            		}
-
-                    string meshName = meshObject.Mesh?.Name ?? "None";
-                    ImGui.InputText("Mesh", ref meshName, 0, ImGuiInputTextFlags.ReadOnly);
-                    if (ImGui.BeginDragDropTarget())
-                    {
-	                    ImGuiPayloadPtr payload = ImGui.AcceptDragDropPayload("MeshDragDrop");
-	                    if (payload.IsValid())
-	                    {
-		                    string newMesh = (string) GCHandle.FromIntPtr(payload.Data).Target;
-		                    Engine.Scene.ResourceManager.RequestMesh(newMesh, mesh => meshObject.Mesh = mesh);
-	                    }
-	                    ImGui.EndDragDropTarget();
-                    }
-                    
-                    string materialName = meshObject.Material?.Name ?? "None";
-                    ImGui.InputText("Material", ref materialName, 0, ImGuiInputTextFlags.ReadOnly);
-                    if (ImGui.BeginDragDropTarget())
-                    {
-	                    ImGuiPayloadPtr payload = ImGui.AcceptDragDropPayload("MaterialDragDrop");
-	                    if (payload.IsValid())
-	                    {
-		                    string newMaterial = (string) GCHandle.FromIntPtr(payload.Data).Target;
-		                    meshObject.Material = Engine.Scene.ResourceManager.RequestMaterial(newMaterial);
-	                    }
-	                    ImGui.EndDragDropTarget();
-                    }
-            		break;
-            	case Light pointLight:
-            		Vector3 imGuiSrgbColor = ConvertHelper.Convert(pointLight.SrgbColor);
-            		if (ImGui.ColorEdit3("Color", ref imGuiSrgbColor))
-            		{
-            			pointLight.SrgbColor = ConvertHelper.Convert(imGuiSrgbColor);
-            		}
-            		
-            		float intensity = pointLight.Intensity;
-            		if (ImGui.DragFloat("Intensity", ref intensity, 0.01f, 0, float.MaxValue))
-            		{
-            			pointLight.Intensity = intensity;
-            		}
-            		break;
+	            ShowMeshObject(meshObject);
             }
+
+            if (Selected is Light light)
+            {
+	            ShowLight(light);
+            }
+
+            if (Selected is DirectionalLight directionalLight)
+            {
+	            ShowDirectionalLight(directionalLight);
+            }
+		}
+
+		private static void ShowMeshObject(MeshObject meshObject)
+		{
+			Vector3 imGuiVelocity = ConvertHelper.Convert(meshObject.Velocity);
+			if (ImGui.DragFloat3("Velocity", ref imGuiVelocity, 0.01f, 0, 0))
+			{
+				meshObject.Velocity = ConvertHelper.Convert(imGuiVelocity);
+			}
+            	
+			Vector3 imGuiAngularVelocity = ConvertHelper.Convert(meshObject.AngularVelocity);
+			if (ImGui.DragFloat3("Angular Velocity", ref imGuiAngularVelocity, 0.01f, 0, 0))
+			{
+				meshObject.AngularVelocity = ConvertHelper.Convert(imGuiAngularVelocity);
+			}
+
+			string meshName = meshObject.Mesh?.Name ?? "None";
+			ImGui.InputText("Mesh", ref meshName, 0, ImGuiInputTextFlags.ReadOnly);
+			if (ImGui.BeginDragDropTarget())
+			{
+				ImGuiPayloadPtr payload = ImGui.AcceptDragDropPayload("MeshDragDrop");
+				if (payload.IsValid())
+				{
+					string newMesh = (string) GCHandle.FromIntPtr(payload.Data).Target;
+					Engine.Scene.ResourceManager.RequestMesh(newMesh, mesh => meshObject.Mesh = mesh);
+				}
+				ImGui.EndDragDropTarget();
+			}
+                    
+			string materialName = meshObject.Material?.Name ?? "None";
+			ImGui.InputText("Material", ref materialName, 0, ImGuiInputTextFlags.ReadOnly);
+			if (ImGui.BeginDragDropTarget())
+			{
+				ImGuiPayloadPtr payload = ImGui.AcceptDragDropPayload("MaterialDragDrop");
+				if (payload.IsValid())
+				{
+					string newMaterial = (string) GCHandle.FromIntPtr(payload.Data).Target;
+					meshObject.Material = Engine.Scene.ResourceManager.RequestMaterial(newMaterial);
+				}
+				ImGui.EndDragDropTarget();
+			}
+		}
+		
+		private static void ShowLight(Light light)
+		{
+			Vector3 imGuiSrgbColor = ConvertHelper.Convert(light.SrgbColor);
+			if (ImGui.ColorEdit3("Color", ref imGuiSrgbColor))
+			{
+				light.SrgbColor = ConvertHelper.Convert(imGuiSrgbColor);
+			}
+            		
+			float intensity = light.Intensity;
+			if (ImGui.DragFloat("Intensity", ref intensity, 0.01f, 0, float.MaxValue))
+			{
+				light.Intensity = intensity;
+			}
+		}
+		
+		private static void ShowDirectionalLight(DirectionalLight light)
+		{
+			bool castShadows = light.CastShadows;
+			if (ImGui.Checkbox("Cast Shadows", ref castShadows))
+			{
+				light.CastShadows = castShadows;
+			}
 		}
 
 		private static void ShowMaterial(Material material)

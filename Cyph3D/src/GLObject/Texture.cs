@@ -13,6 +13,20 @@ namespace Cyph3D.GLObject
 		private int _ID;
 		private ivec2 _size;
 		private bool _useMipmaps;
+
+		private long _bindlessHandle;
+		public long BindlessHandle
+		{
+			get
+			{
+				if (!GL.Arb.IsTextureHandleResident(_bindlessHandle))
+				{
+					GL.Arb.MakeTextureHandleResident(_bindlessHandle);
+				}
+
+				return _bindlessHandle;
+			}
+		}
 		
 		public static implicit operator int(Texture texture) => texture._ID;
 
@@ -41,7 +55,16 @@ namespace Cyph3D.GLObject
 				GL.TextureParameter(_ID, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, anisoCount);
 			}
 
+			if (settings.IsShadowMap)
+			{
+				GL.TextureParameter(_ID, TextureParameterName.TextureWrapS, (int)All.ClampToBorder);
+				GL.TextureParameter(_ID, TextureParameterName.TextureWrapT, (int)All.ClampToBorder);
+				GL.TextureParameter(_ID, TextureParameterName.TextureBorderColor, new []{1f, 1f, 1f, 1f});
+			}
+
 			GL.TextureStorage2D(_ID, _useMipmaps ? CalculateMipmapCount(_size) : 1, (SizedInternalFormat)settings.InternalFormat, _size.x, _size.y);
+			
+			_bindlessHandle = GL.Arb.GetTextureHandle(_ID);
 		}
 
 		private static int CalculateMipmapCount(ivec2 size)

@@ -10,6 +10,7 @@ namespace Cyph3D.GLObject
 		public InternalFormat InternalFormat { get; set; } = InternalFormat.Rgb8;
 		public TextureFiltering Filtering { get; set; } = TextureFiltering.Nearest;
 		public bool UseMipmaps { get; set; } = false;
+		public bool IsShadowMap { get; set; } = false;
 
 		public Texture CreateTexture()
 		{

@@ -116,5 +116,9 @@ namespace Cyph3D.GLObject
 		{
 			GL.ProgramUniformMatrix4(_ID, GetLocation(variableName), 1, false, data.ToArray());
 		}
+		public void SetValue(string variableName, Texture data)
+		{
+			GL.Arb.ProgramUniformHandle(_ID, GetLocation(variableName), data.BindlessHandle);
+		}
 	}
 }

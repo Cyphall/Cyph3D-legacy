@@ -14,6 +14,7 @@ namespace Cyph3D
 		private Texture _normalTexture;
 		private Texture _colorTexture;
 		private Texture _materialTexture;
+		private Texture _geometryNormalTexture;
 		private Texture _depthTexture;
 		private int _skyboxVAO;
 		private ShaderProgram _lightingPassShader;
@@ -42,6 +43,10 @@ namespace Cyph3D
 				{
 					InternalFormat = InternalFormat.Rgba8
 				}, out _materialTexture)
+				.WithTexture(FramebufferAttachment.ColorAttachment4, new TextureSetting
+				{
+					InternalFormat = InternalFormat.Rgb16f
+				}, out _geometryNormalTexture)
 				.WithTexture(FramebufferAttachment.DepthAttachment, new TextureSetting
 				{
 					InternalFormat = (InternalFormat) All.DepthComponent24,
@@ -53,9 +58,6 @@ namespace Cyph3D
 			GL.DepthFunc(DepthFunction.Lequal);
 
 			GL.ClearColor(0, 0, 0, 0);
-
-			GL.Enable(EnableCap.CullFace);
-			GL.FrontFace(FrontFaceDirection.Ccw);
 			
 			_lightingPassShader = Engine.GlobalResourceManager.RequestShaderProgram("deferred/lightingPass");
 
@@ -63,7 +65,8 @@ namespace Cyph3D
 			_lightingPassShader.SetValue("normalTexture", 1);
 			_lightingPassShader.SetValue("colorTexture", 2);
 			_lightingPassShader.SetValue("materialTexture", 3);
-			_lightingPassShader.SetValue("depthTexture", 4);
+			_lightingPassShader.SetValue("geometryNormalTexture", 4);
+			_lightingPassShader.SetValue("depthTexture", 5);
 			
 			
 			float[] skyboxVertices = {
@@ -126,6 +129,12 @@ namespace Cyph3D
 
 		public void Render(Camera camera)
 		{
+			Engine.Scene.LightManager.UpdateShadowMaps();
+			
+			GL.Enable(EnableCap.CullFace);
+			GL.FrontFace(FrontFaceDirection.Ccw);
+			
+			GL.Viewport(0, 0, Engine.Window.Size.x, Engine.Window.Size.y);
 			_gbuffer.Bind();
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 			
@@ -139,8 +148,7 @@ namespace Cyph3D
 		{
 			_gbuffer.Bind();
 			
-			int objectCount = Engine.Scene.Objects.Count;
-			for (int i = 0; i < objectCount; i++)
+			for (int i = 0; i < Engine.Scene.Objects.Count; i++)
 			{
 				if (Engine.Scene.Objects[i] is MeshObject meshObject)
 					meshObject.Render(view, projection, viewPos);
@@ -187,6 +195,7 @@ namespace Cyph3D
 				_normalTexture,
 				_colorTexture,
 				_materialTexture,
+				_geometryNormalTexture,
 				_depthTexture
 			);
 		}

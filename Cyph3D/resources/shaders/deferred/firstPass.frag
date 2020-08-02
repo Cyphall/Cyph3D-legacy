@@ -22,6 +22,7 @@ layout(location = 0) out vec3 position;
 layout(location = 1) out vec3 normal;
 layout(location = 2) out vec3 color;
 layout(location = 3) out vec4 material;
+layout(location = 4) out vec3 geometryNormal;
 
 float getDepth(vec2 texCoords);
 vec2 POM(vec2 texCoords, vec3 viewDir);
@@ -42,6 +43,9 @@ void main()
 	material.g = texture(metallicMap, texCoords).r;
 	material.b = texture(emissiveMap, texCoords).r;
 	material.a = isLit;
+	
+	geometryNormal = frag.TangentToWorld * vec3(0, 0, 1);
+	geometryNormal = (geometryNormal + 1) * 0.5;
 }
 
 float getDepth(vec2 texCoords)

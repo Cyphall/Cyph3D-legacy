@@ -165,8 +165,9 @@ namespace Cyph3D
 					vec3 srgbColor = new vec3(colorArray[0], colorArray[1], colorArray[2]);
 					
 					float intensity = jsonData["intensity"];
+					bool castShadows = version >= 4 ? (bool)jsonData["castShadows"] : false;
 					
-					sceneObject = new DirectionalLight(parent, srgbColor, intensity, name, position, rotation);
+					sceneObject = new DirectionalLight(parent, srgbColor, intensity, name, position, rotation, castShadows);
 				}break;
 				default:
 					throw new InvalidOperationException($"The object type {jsonObject["type"]} is not recognized");
@@ -184,7 +185,7 @@ namespace Cyph3D
 		{
 			JsonObject jsonRoot = new JsonObject();
 			
-			jsonRoot.Add("version", 3);
+			jsonRoot.Add("version", 4);
 			
 
 			JsonObject jsonCamera = new JsonObject
@@ -251,6 +252,7 @@ namespace Cyph3D
 					
 					jsonData.Add("color", ConvertHelper.JsonConvert(directionalLight.SrgbColor));
 					jsonData.Add("intensity", directionalLight.Intensity);
+					jsonData.Add("castShadows", directionalLight.CastShadows);
 					break;
 				default:
 					throw new InvalidOperationException();
