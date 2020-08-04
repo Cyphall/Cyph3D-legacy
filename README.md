@@ -12,7 +12,7 @@ CTRL X: Quit
 
 #### Core
 
-- [x] Deferred rendering
+- [x] Deferred Rendering
 - [x] Scene Architecture
 
 #### Shader & Rendering
@@ -22,8 +22,8 @@ CTRL X: Quit
 - [x] Skybox
 - [x] Point Light
 - [x] Directional Light
-- [ ] Point Shadows
-- [x] Directional Shadows
+- [ ] Point Light Shadows
+- [x] Directional Light Shadows
 - [ ] Cascade Shadow Mapping
 - [x] Anisotropic Filtering
 
