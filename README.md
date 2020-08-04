@@ -19,11 +19,12 @@ CTRL X: Quit
 
 - [x] PBR Lighting
 - [x] Parallax Occlusion Mapping
+- [x] Skybox
 - [x] Point Light
 - [x] Directional Light
 - [ ] Point Shadows
-- [ ] Directional Shadows
-- [x] Skybox
+- [x] Directional Shadows
+- [ ] Cascade Shadow Mapping
 
 #### UI
 
