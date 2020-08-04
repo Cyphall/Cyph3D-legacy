@@ -10,8 +10,8 @@ namespace Cyph3D.Lighting
 	public class DirectionalLight : Light
 	{
 		public Texture ShadowMap { get; private set; }
-		private Framebuffer shadowMapFB;
-		private static ShaderProgram shadowMapProgram;
+		private Framebuffer _shadowMapFb;
+		private static ShaderProgram _shadowMapProgram;
 
 		private bool _castShadows;
 
@@ -22,7 +22,7 @@ namespace Cyph3D.Lighting
 		public DirectionalLight(Transform parent, vec3 srgbColor, float intensity, string name = "DirectionalLight", vec3? position = null, vec3? rotation = null, bool castShadows = false):
 			base(parent, srgbColor, intensity, name, position, rotation)
 		{
-			shadowMapProgram ??= Engine.GlobalResourceManager.RequestShaderProgram("shadowMapping/directionalLight");
+			_shadowMapProgram ??= Engine.GlobalResourceManager.RequestShaderProgram("shadowMapping/directionalLight");
 			CastShadows = castShadows;
 		}
 		
@@ -34,7 +34,7 @@ namespace Cyph3D.Lighting
 				_castShadows = value;
 				if (value)
 				{
-					shadowMapFB = new Framebuffer(new ivec2(SIZE))
+					_shadowMapFb = new Framebuffer(new ivec2(SIZE))
 						.WithTexture(FramebufferAttachment.DepthAttachment, new TextureSetting
 						{
 							InternalFormat = (InternalFormat) All.DepthComponent24,
@@ -45,7 +45,7 @@ namespace Cyph3D.Lighting
 				}
 				else
 				{
-					shadowMapFB?.Dispose();
+					_shadowMapFb?.Dispose();
 					ShadowMap?.Dispose();
 				}
 			}
@@ -63,9 +63,9 @@ namespace Cyph3D.Lighting
 				                 Engine.Scene.Camera.Position, 
 				                 new vec3(0, 1, 0));
 			
-			shadowMapFB.Bind();
-			shadowMapProgram.Bind();
-			shadowMapProgram.SetValue("viewProjection", ViewProjection);
+			_shadowMapFb.Bind();
+			_shadowMapProgram.Bind();
+			_shadowMapProgram.SetValue("viewProjection", ViewProjection);
 			
 			GL.Clear(ClearBufferMask.DepthBufferBit);
 			
@@ -73,7 +73,7 @@ namespace Cyph3D.Lighting
 			{
 				if (Engine.Scene.Objects[i] is MeshObject meshObject)
 				{
-					shadowMapProgram.SetValue("model", meshObject.Transform.WorldMatrix);
+					_shadowMapProgram.SetValue("model", meshObject.Transform.WorldMatrix);
 					meshObject.Mesh?.Render();
 				}
 			}

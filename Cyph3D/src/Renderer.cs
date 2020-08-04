@@ -54,9 +54,6 @@ namespace Cyph3D
 				}, out _depthTexture)
 				.Complete();
 
-			GL.Enable(EnableCap.DepthTest);
-			GL.DepthFunc(DepthFunction.Lequal);
-
 			GL.ClearColor(0, 0, 0, 0);
 			
 			_lightingPassShader = Engine.GlobalResourceManager.RequestShaderProgram("deferred/lightingPass");
@@ -121,6 +118,9 @@ namespace Cyph3D
 
 		public void Render(Camera camera)
 		{
+			GL.Enable(EnableCap.DepthTest);
+			GL.DepthFunc(DepthFunction.Lequal);
+			
 			Engine.Scene.LightManager.UpdateShadowMaps();
 			
 			GL.Enable(EnableCap.CullFace);
@@ -168,6 +168,8 @@ namespace Cyph3D
 
 		private void LightingPass(vec3 viewPos)
 		{
+			GL.Disable(EnableCap.DepthTest);
+			
 			_pointLightsBuffer.PutData(Engine.Scene.LightManager.PointLightsNative);
 			_pointLightsBuffer.Bind(0);
 			_directionalLightsBuffer.PutData(Engine.Scene.LightManager.DirectionalLightsNative);
