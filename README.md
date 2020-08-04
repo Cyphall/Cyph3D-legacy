@@ -15,7 +15,7 @@ CTRL X: Quit
 - [x] Deferred rendering
 - [x] Scene Architecture
 
-#### Shader
+#### Shader & Rendering
 
 - [x] PBR Lighting
 - [x] Parallax Occlusion Mapping
@@ -25,6 +25,7 @@ CTRL X: Quit
 - [ ] Point Shadows
 - [x] Directional Shadows
 - [ ] Cascade Shadow Mapping
+- [x] Anisotropic Filtering
 
 #### UI
 
