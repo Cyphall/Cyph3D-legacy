@@ -15,6 +15,8 @@ namespace Cyph3D.Lighting
 
 		private bool _castShadows;
 
+		public mat4 ViewProjection { get; private set; }
+
 		private const int SIZE = 4096;
 		
 		public DirectionalLight(Transform parent, vec3 srgbColor, float intensity, string name = "DirectionalLight", vec3? position = null, vec3? rotation = null, bool castShadows = false):
@@ -55,9 +57,15 @@ namespace Cyph3D.Lighting
 			
 			GL.Viewport(0, 0, SIZE, SIZE);
 			
+			ViewProjection = mat4.Ortho(-30, 30, -30, 30, 0, 100) *
+			                 mat4.LookAt(
+				                 Engine.Scene.Camera.Position - LightDirection * 50, 
+				                 Engine.Scene.Camera.Position, 
+				                 new vec3(0, 1, 0));
+			
 			shadowMapFB.Bind();
 			shadowMapProgram.Bind();
-			shadowMapProgram.SetValue("viewProjection", ShadowMapProjectionMatrix * ShadowMapViewMatrix);
+			shadowMapProgram.SetValue("viewProjection", ViewProjection);
 			
 			GL.Clear(ClearBufferMask.DepthBufferBit);
 			
@@ -71,14 +79,6 @@ namespace Cyph3D.Lighting
 			}
 		}
 
-		private mat4 ShadowMapViewMatrix => mat4.LookAt(
-			Engine.Scene.Camera.Position - LightDirection * 50,
-			Engine.Scene.Camera.Position,
-			new vec3(0, 1, 0)
-		);
-		
-		private mat4 ShadowMapProjectionMatrix => mat4.Ortho(-30, 30, -30, 30, 0, 100);
-
 		private vec3 LightDirection => (new mat4(new mat3(Transform.WorldMatrix)) * new vec4(0, -1, 0, 1)).xyz;
 		
 		public NativeLightData NativeLight =>
@@ -88,7 +88,7 @@ namespace Cyph3D.Lighting
 				Color = LinearColor,
 				Intensity = Intensity,
 				CastShadows = CastShadows ? 1 : 0,
-				LightViewProjection = CastShadows ? ShadowMapProjectionMatrix * ShadowMapViewMatrix : mat4.Identity,
+				LightViewProjection = CastShadows ? ViewProjection : mat4.Identity,
 				ShadowMap = CastShadows ? ShadowMap.BindlessHandle : 0
 			};
 
