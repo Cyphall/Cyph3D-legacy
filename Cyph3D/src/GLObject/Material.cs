@@ -37,13 +37,6 @@ namespace Cyph3D.GLObject
 		{
 			_shaderProgram = resourceManager.RequestShaderProgram("deferred/firstPass");
 			
-			_shaderProgram.SetValue("colorMap", 0);
-			_shaderProgram.SetValue("normalMap", 1);
-			_shaderProgram.SetValue("roughnessMap", 2);
-			_shaderProgram.SetValue("displacementMap", 3);
-			_shaderProgram.SetValue("metallicMap", 4);
-			_shaderProgram.SetValue("emissiveMap", 5);
-			
 			JsonObject jsonRoot = (JsonObject)JsonValue.Parse(File.ReadAllText($"resources/materials/{name}/material.json"));
 			
 			if (jsonRoot.ContainsKey("colorMap"))
@@ -114,14 +107,6 @@ namespace Cyph3D.GLObject
 		{
 			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram("deferred/firstPass");
 			
-			
-			_shaderProgram.SetValue("colorMap", 0);
-			_shaderProgram.SetValue("normalMap", 1);
-			_shaderProgram.SetValue("roughnessMap", 2);
-			_shaderProgram.SetValue("displacementMap", 3);
-			_shaderProgram.SetValue("metallicMap", 4);
-			_shaderProgram.SetValue("emissiveMap", 5);
-			
 			Name = "Default Material";
 			IsLit = false;
 		}
@@ -159,35 +144,12 @@ namespace Cyph3D.GLObject
 
 		public void Bind(mat4 model, mat4 view, mat4 projection, vec3 cameraPos)
 		{
-			if (_colorMap != null)
-				_colorMap.Bind(0);
-			else
-				_defaultColorMap.Bind(0);
-			
-			if (_normalMap != null)
-				_normalMap.Bind(1);
-			else
-				_defaultNormalMap.Bind(1);
-			
-			if (_roughnessMap != null)
-				_roughnessMap.Bind(2);
-			else
-				_defaultRoughnessMap.Bind(2);
-			
-			if (_displacementMap != null)
-				_displacementMap.Bind(3);
-			else
-				_defaultDisplacementMap.Bind(3);
-			
-			if (_metallicMap != null)
-				_metallicMap.Bind(4);
-			else
-				_defaultMetallicMap.Bind(4);
-			
-			if (_emissiveMap != null)
-				_emissiveMap.Bind(5);
-			else
-				_defaultEmissiveMap.Bind(5);
+			_shaderProgram.SetValue("colorMap", _colorMap ?? _defaultColorMap);
+			_shaderProgram.SetValue("normalMap", _normalMap ?? _defaultNormalMap);
+			_shaderProgram.SetValue("roughnessMap", _roughnessMap ?? _defaultRoughnessMap);
+			_shaderProgram.SetValue("displacementMap", _displacementMap ?? _defaultDisplacementMap);
+			_shaderProgram.SetValue("metallicMap", _metallicMap ?? _defaultMetallicMap);
+			_shaderProgram.SetValue("emissiveMap", _emissiveMap ?? _defaultEmissiveMap);
 			
 			_shaderProgram.SetValue("model", model);
 			_shaderProgram.SetValue("view", view);

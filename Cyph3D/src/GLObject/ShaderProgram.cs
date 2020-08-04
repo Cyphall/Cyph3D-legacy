@@ -120,5 +120,9 @@ namespace Cyph3D.GLObject
 		{
 			GL.Arb.ProgramUniformHandle(_ID, GetLocation(variableName), data.BindlessHandle);
 		}
+		public void SetValue(string variableName, Cubemap data)
+		{
+			GL.Arb.ProgramUniformHandle(_ID, GetLocation(variableName), data.BindlessHandle);
+		}
 	}
 }

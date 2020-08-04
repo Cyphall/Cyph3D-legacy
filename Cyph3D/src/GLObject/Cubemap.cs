@@ -10,6 +10,20 @@ namespace Cyph3D.GLObject
 		private int _ID;
 		private ivec2 _size;
 		
+		private long _bindlessHandle;
+		public long BindlessHandle
+		{
+			get
+			{
+				if (!GL.Arb.IsTextureHandleResident(_bindlessHandle))
+				{
+					GL.Arb.MakeTextureHandleResident(_bindlessHandle);
+				}
+
+				return _bindlessHandle;
+			}
+		}
+		
 		public static implicit operator int(Cubemap cubemap) => cubemap._ID;
 		
 		public Cubemap(ivec2 size, InternalFormat internalFormat, TextureFiltering filtering = TextureFiltering.Nearest)
@@ -33,6 +47,8 @@ namespace Cyph3D.GLObject
 
 
 			GL.TextureStorage2D(_ID, 1, (SizedInternalFormat)internalFormat, size.x, size.y);
+			
+			_bindlessHandle = GL.Arb.GetTextureHandle(_ID);
 		}
 		
 		public void PutData(byte[] data, int face, PixelFormat format = PixelFormat.Rgb, PixelType type = PixelType.UnsignedByte)

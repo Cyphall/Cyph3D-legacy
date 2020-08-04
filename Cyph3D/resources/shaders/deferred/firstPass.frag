@@ -1,4 +1,5 @@
 #version 460 core
+#extension GL_ARB_bindless_texture : enable
 
 in FRAG {
 	vec2 TexCoords;
@@ -9,12 +10,12 @@ in FRAG {
 
 uniform vec3 viewPos;
 
-uniform sampler2D colorMap;
-uniform sampler2D normalMap;
-uniform sampler2D roughnessMap;
-uniform sampler2D displacementMap;
-uniform sampler2D metallicMap;
-uniform sampler2D emissiveMap;
+layout(bindless_sampler) uniform sampler2D colorMap;
+layout(bindless_sampler) uniform sampler2D normalMap;
+layout(bindless_sampler) uniform sampler2D roughnessMap;
+layout(bindless_sampler) uniform sampler2D displacementMap;
+layout(bindless_sampler) uniform sampler2D metallicMap;
+layout(bindless_sampler) uniform sampler2D emissiveMap;
 
 uniform int isLit;
 

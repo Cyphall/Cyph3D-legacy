@@ -1,8 +1,9 @@
 #version 460 core
+#extension GL_ARB_bindless_texture : enable
 
 in vec2 TexCoords;
 
-uniform sampler2D Texture;
+layout(bindless_sampler) uniform sampler2D Texture;
 
 layout (location = 0) out vec4 Out_Color;
 

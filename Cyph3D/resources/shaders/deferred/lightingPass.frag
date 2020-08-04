@@ -53,12 +53,12 @@ layout(std430, binding = 1) buffer UselessNameBecauseItIsNeverUsedAnywhere2
 	DirectionalLight directionalLights[];
 };
 
-uniform sampler2D positionTexture;
-uniform sampler2D normalTexture;
-uniform sampler2D colorTexture;
-uniform sampler2D materialTexture;
-uniform sampler2D geometryNormalTexture;
-uniform sampler2D depthTexture;
+layout(bindless_sampler) uniform sampler2D positionTexture;
+layout(bindless_sampler) uniform sampler2D normalTexture;
+layout(bindless_sampler) uniform sampler2D colorTexture;
+layout(bindless_sampler) uniform sampler2D materialTexture;
+layout(bindless_sampler) uniform sampler2D geometryNormalTexture;
+layout(bindless_sampler) uniform sampler2D depthTexture;
 
 uniform int debug;
 

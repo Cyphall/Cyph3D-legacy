@@ -35,7 +35,7 @@ namespace Cyph3D.GLObject
 			_shaderProgram.SetValue("Texture", 0);
 		}
 
-		public static void DrawToDefault(ShaderProgram shader, params Texture[] textures)
+		public static void DrawToDefault(ShaderProgram shader, bool clearFramebuffer = false)
 		{
 			int previousBlend = GL.GetInteger(GetPName.Blend);
 			int previousBlendSrc= GL.GetInteger(GetPName.BlendSrc);
@@ -45,16 +45,14 @@ namespace Cyph3D.GLObject
 			
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 			
+			if (clearFramebuffer)
+				GL.Clear(ClearBufferMask.ColorBufferBit);
+			
 			GL.Enable(EnableCap.Blend);
 			GL.BlendEquation(BlendEquationMode.FuncAdd);
 			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 			
 			shader.Bind();
-
-			for (int i = 0; i < textures.Length; i++)
-			{
-				textures[i].Bind(i);
-			}
 			
 			_quadVAO.Bind();
 			GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
@@ -67,9 +65,10 @@ namespace Cyph3D.GLObject
 			GL.BlendEquationSeparate((BlendEquationMode)previousBlendEquationRgb, (BlendEquationMode)previousBlendEquationAlpha);
 		}
 		
-		public static void DrawToDefault(Texture texture)
+		public static void DrawToDefault(Texture texture, bool clearFramebuffer = false)
 		{
-			DrawToDefault(_shaderProgram, texture);
+			_shaderProgram.SetValue("Texture", texture);
+			DrawToDefault(_shaderProgram, clearFramebuffer);
 		}
 	}
 }

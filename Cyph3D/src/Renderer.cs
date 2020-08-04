@@ -60,14 +60,6 @@ namespace Cyph3D
 			GL.ClearColor(0, 0, 0, 0);
 			
 			_lightingPassShader = Engine.GlobalResourceManager.RequestShaderProgram("deferred/lightingPass");
-
-			_lightingPassShader.SetValue("positionTexture", 0);
-			_lightingPassShader.SetValue("normalTexture", 1);
-			_lightingPassShader.SetValue("colorTexture", 2);
-			_lightingPassShader.SetValue("materialTexture", 3);
-			_lightingPassShader.SetValue("geometryNormalTexture", 4);
-			_lightingPassShader.SetValue("depthTexture", 5);
-			
 			
 			float[] skyboxVertices = {
 				-1.0f,  1.0f, -1.0f,
@@ -166,7 +158,7 @@ namespace Cyph3D
 			_skyboxShader.SetValue("view", new mat4(new mat3(view)));
 			_skyboxShader.SetValue("projection", projection);
 			
-			Engine.Scene.Skybox.Bind(0);
+			_skyboxShader.SetValue("skybox", Engine.Scene.Skybox);
 			
 			GL.BindVertexArray(_skyboxVAO);
 			
@@ -181,23 +173,18 @@ namespace Cyph3D
 			_directionalLightsBuffer.PutData(Engine.Scene.LightManager.DirectionalLightsNative);
 			_directionalLightsBuffer.Bind(1);
 
-			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-
-			GL.Clear(ClearBufferMask.ColorBufferBit);
-
 			_lightingPassShader.SetValue("viewPos", viewPos);
 
 			_lightingPassShader.SetValue("debug", Debug ? 1 : 0);
+			
+			_lightingPassShader.SetValue("positionTexture", _positionTexture);
+			_lightingPassShader.SetValue("normalTexture", _normalTexture);
+			_lightingPassShader.SetValue("colorTexture", _colorTexture);
+			_lightingPassShader.SetValue("materialTexture", _materialTexture);
+			_lightingPassShader.SetValue("geometryNormalTexture", _geometryNormalTexture);
+			_lightingPassShader.SetValue("depthTexture", _depthTexture);
 
-			Framebuffer.DrawToDefault(
-				_lightingPassShader,
-				_positionTexture,
-				_normalTexture,
-				_colorTexture,
-				_materialTexture,
-				_geometryNormalTexture,
-				_depthTexture
-			);
+			Framebuffer.DrawToDefault(_lightingPassShader, true);
 		}
 	}
 }

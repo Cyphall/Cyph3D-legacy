@@ -1,7 +1,9 @@
 ﻿#version 330 core
+#extension GL_ARB_bindless_texture : enable
+
 in vec3 TexCoords;
 
-uniform samplerCube skybox;
+layout(bindless_sampler) uniform samplerCube skybox;
 
 layout(location = 0) out vec3 position;
 layout(location = 1) out vec3 normal;
