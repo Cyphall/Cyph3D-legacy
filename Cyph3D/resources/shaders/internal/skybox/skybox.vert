@@ -1,6 +1,4 @@
-﻿#version 460 core
-
-layout (location = 0) in vec3 in_Vertex;
+﻿layout (location = 0) in vec3 in_Vertex;
 
 out vec3 TexCoords;
 

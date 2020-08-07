@@ -297,7 +297,14 @@ namespace Cyph3D.Misc
 			if (!_shaderPrograms.ContainsKey(name))
 			{
 				Logger.Info($"Loading shader program \"{name}\"");
-				ShaderProgram shaderProgram = new ShaderProgram(name);
+				ShaderProgram shaderProgram = new ShaderProgram()
+					.WithShader(ShaderType.VertexShader,
+						"internal/shaderHeader.vert",
+						$"{name}.vert")
+					.WithShader(ShaderType.FragmentShader,
+						"internal/shaderHeader.frag",
+						$"{name}.frag")
+					.Build();
 				_shaderPrograms.Add(name, shaderProgram);
 				Logger.Info($"Shader program \"{name}\" loaded (id: {(int)shaderProgram})");
 			}

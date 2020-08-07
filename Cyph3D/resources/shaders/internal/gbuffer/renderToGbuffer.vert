@@ -1,5 +1,3 @@
-#version 460 core
-
 layout(location = 0) in vec3 in_Vertex;
 layout(location = 1) in vec2 in_UV;
 layout(location = 2) in vec3 in_Normals;

@@ -1,6 +1,3 @@
-#version 460 core
-#extension GL_ARB_bindless_texture : enable
-
 in FRAG {
 	vec2 TexCoords;
 	mat3 TangentToWorld;

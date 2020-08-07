@@ -1,6 +1,3 @@
-#version 460 core
-#extension GL_ARB_bindless_texture : enable
-
 /* ------ consts ------ */
 const float PI = 3.14159265359;
 
