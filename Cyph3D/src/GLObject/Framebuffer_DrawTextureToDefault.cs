@@ -31,7 +31,7 @@ namespace Cyph3D.GLObject
 			_quadVAO.RegisterAttrib(_quadVBO, 0, 2, VertexAttribType.Float, 0);
 			_quadVAO.RegisterAttrib(_quadVBO, 1, 2, VertexAttribType.Float, 2 * sizeof(float));
 			
-			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram("framebuffer/drawToDefault");
+			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram("internal/framebuffer/drawToDefault");
 			_shaderProgram.SetValue("Texture", 0);
 		}
 

@@ -56,7 +56,7 @@ namespace Cyph3D
 
 			GL.ClearColor(0, 0, 0, 0);
 			
-			_lightingPassShader = Engine.GlobalResourceManager.RequestShaderProgram("deferred/lightingPass");
+			_lightingPassShader = Engine.GlobalResourceManager.RequestShaderProgram("lightingPass");
 			
 			float[] skyboxVertices = {
 				-1.0f,  1.0f, -1.0f,
@@ -110,7 +110,7 @@ namespace Cyph3D
 			GL.EnableVertexAttribArray(0);
 			GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
 			
-			_skyboxShader = Engine.GlobalResourceManager.RequestShaderProgram("deferred/skybox");
+			_skyboxShader = Engine.GlobalResourceManager.RequestShaderProgram("internal/skybox/skybox");
 			
 			_pointLightsBuffer = new ShaderStorageBuffer<PointLight.NativeLightData>();
 			_directionalLightsBuffer = new ShaderStorageBuffer<DirectionalLight.NativeLightData>();

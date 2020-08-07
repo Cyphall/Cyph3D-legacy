@@ -22,7 +22,7 @@ namespace Cyph3D.Lighting
 		public DirectionalLight(Transform parent, vec3 srgbColor, float intensity, string name = "DirectionalLight", vec3? position = null, vec3? rotation = null, bool castShadows = false):
 			base(parent, srgbColor, intensity, name, position, rotation)
 		{
-			_shadowMapProgram ??= Engine.GlobalResourceManager.RequestShaderProgram("shadowMapping/directionalLight");
+			_shadowMapProgram ??= Engine.GlobalResourceManager.RequestShaderProgram("internal/shadowMapping/directionalLight");
 			CastShadows = castShadows;
 		}
 		

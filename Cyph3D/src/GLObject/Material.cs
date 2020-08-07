@@ -35,7 +35,7 @@ namespace Cyph3D.GLObject
 
 		public Material(string name, ResourceManager resourceManager)
 		{
-			_shaderProgram = resourceManager.RequestShaderProgram("deferred/firstPass");
+			_shaderProgram = resourceManager.RequestShaderProgram("internal/gbuffer/renderToGbuffer");
 			
 			JsonObject jsonRoot = (JsonObject)JsonValue.Parse(File.ReadAllText($"resources/materials/{name}/material.json"));
 			
@@ -105,7 +105,7 @@ namespace Cyph3D.GLObject
 
 		private Material()
 		{
-			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram("deferred/firstPass");
+			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram("internal/gbuffer/renderToGbuffer");
 			
 			Name = "Default Material";
 			IsLit = false;
