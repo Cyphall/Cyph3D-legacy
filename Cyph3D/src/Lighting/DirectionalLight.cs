@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using Cyph3D.GLObject;
 using Cyph3D.Misc;
+using Cyph3D.ResourceManagement;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 
@@ -11,7 +12,7 @@ namespace Cyph3D.Lighting
 	{
 		public Texture ShadowMap { get; private set; }
 		private Framebuffer _shadowMapFb;
-		private static ShaderProgram _shadowMapProgram;
+		private ShaderProgram _shadowMapProgram;
 
 		private bool _castShadows;
 
@@ -22,7 +23,13 @@ namespace Cyph3D.Lighting
 		public DirectionalLight(Transform parent, vec3 srgbColor, float intensity, string name = "DirectionalLight", vec3? position = null, vec3? rotation = null, bool castShadows = false):
 			base(parent, srgbColor, intensity, name, position, rotation)
 		{
-			_shadowMapProgram ??= Engine.GlobalResourceManager.RequestShaderProgram("internal/shadowMapping/directionalLight");
+			_shadowMapProgram = Engine.GlobalResourceManager.RequestShaderProgram(
+				new ShaderProgramRequest()
+					.WithShader(ShaderType.VertexShader,
+						"internal/shadowMapping/directionalLight")
+					.WithShader(ShaderType.FragmentShader,
+						"internal/shadowMapping/directionalLight")
+			);
 			CastShadows = castShadows;
 		}
 		

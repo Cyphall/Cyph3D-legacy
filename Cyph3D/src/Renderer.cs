@@ -2,6 +2,7 @@
 using Cyph3D.Enumerable;
 using Cyph3D.GLObject;
 using Cyph3D.Lighting;
+using Cyph3D.ResourceManagement;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 
@@ -55,8 +56,15 @@ namespace Cyph3D
 				.Complete();
 
 			GL.ClearColor(0, 0, 0, 0);
-			
-			_lightingPassShader = Engine.GlobalResourceManager.RequestShaderProgram("lightingPass");
+
+			_lightingPassShader = Engine.GlobalResourceManager.RequestShaderProgram(
+				new ShaderProgramRequest()
+					.WithShader(ShaderType.VertexShader,
+						"lightingPass")
+					.WithShader(ShaderType.FragmentShader,
+						"lightingPass")
+				);
+				
 			
 			float[] skyboxVertices = {
 				-1.0f,  1.0f, -1.0f,
@@ -109,9 +117,15 @@ namespace Cyph3D
 			GL.BufferData(BufferTarget.ArrayBuffer, skyboxVertices.Length * sizeof(float), skyboxVertices, BufferUsageHint.StaticDraw);
 			GL.EnableVertexAttribArray(0);
 			GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
-			
-			_skyboxShader = Engine.GlobalResourceManager.RequestShaderProgram("internal/skybox/skybox");
-			
+
+			_skyboxShader = Engine.GlobalResourceManager.RequestShaderProgram(
+				new ShaderProgramRequest()
+					.WithShader(ShaderType.VertexShader,
+						"internal/skybox/skybox")
+					.WithShader(ShaderType.FragmentShader,
+						"internal/skybox/skybox")
+				);
+
 			_pointLightsBuffer = new ShaderStorageBuffer<PointLight.NativeLightData>();
 			_directionalLightsBuffer = new ShaderStorageBuffer<DirectionalLight.NativeLightData>();
 		}

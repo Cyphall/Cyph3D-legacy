@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Cyph3D.Enumerable;
 using Cyph3D.GLObject;
+using Cyph3D.Misc;
+using Cyph3D.ResourceManagement;
 using GlmSharp;
 using ImGuiNET;
 using OpenToolkit.Graphics.OpenGL4;
@@ -59,8 +61,14 @@ namespace Cyph3D.UI.Impl
 		public static void CreateDeviceObjects()
 		{
 			ImGuiIOPtr io = ImGui.GetIO();
-
-			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram("internal/imgui/imgui");
+			
+			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram(
+				new ShaderProgramRequest()
+					.WithShader(ShaderType.VertexShader,
+						"internal/imgui/imgui")
+					.WithShader(ShaderType.FragmentShader,
+						"internal/imgui/imgui")
+			);
 
 			_VBO = GL.GenBuffer();
 			_EBO = GL.GenBuffer();

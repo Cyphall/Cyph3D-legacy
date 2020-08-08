@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Cyph3D.Misc
+namespace Cyph3D.ResourceManagement
 {
 	public class ResourceHandler<T> : IDisposable where T : IDisposable
 	{

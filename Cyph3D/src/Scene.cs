@@ -6,6 +6,7 @@ using Cyph3D.Extension;
 using Cyph3D.GLObject;
 using Cyph3D.Lighting;
 using Cyph3D.Misc;
+using Cyph3D.ResourceManagement;
 using GlmSharp;
 
 namespace Cyph3D

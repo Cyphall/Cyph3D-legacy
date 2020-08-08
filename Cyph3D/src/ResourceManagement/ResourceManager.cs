@@ -3,13 +3,15 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Json;
+using System.Linq;
 using Cyph3D.Enumerable;
 using Cyph3D.GLObject;
+using Cyph3D.Misc;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 using StbImageNET;
 
-namespace Cyph3D.Misc
+namespace Cyph3D.ResourceManagement
 {
 	public class ResourceManager : IDisposable
 	{
@@ -290,26 +292,21 @@ namespace Cyph3D.Misc
 
 		#region ShaderPrograms
 
-		private Dictionary<string, ShaderProgram> _shaderPrograms = new Dictionary<string, ShaderProgram>();
+		private Dictionary<Dictionary<ShaderType, string[]>, ShaderProgram> _shaderPrograms = new Dictionary<Dictionary<ShaderType, string[]>, ShaderProgram>(new ShaderProgramEqualityComparer());
 
-		public ShaderProgram RequestShaderProgram(string name)
+		public ShaderProgram RequestShaderProgram(ShaderProgramRequest request)
 		{
-			if (!_shaderPrograms.ContainsKey(name))
+			if (!_shaderPrograms.ContainsKey(request.Data))
 			{
-				Logger.Info($"Loading shader program \"{name}\"");
-				ShaderProgram shaderProgram = new ShaderProgram()
-					.WithShader(ShaderType.VertexShader,
-						"internal/shaderHeader.vert",
-						$"{name}.vert")
-					.WithShader(ShaderType.FragmentShader,
-						"internal/shaderHeader.frag",
-						$"{name}.frag")
-					.Build();
-				_shaderPrograms.Add(name, shaderProgram);
-				Logger.Info($"Shader program \"{name}\" loaded (id: {(int)shaderProgram})");
+				Logger.Info("Loading shader program");
+				
+				ShaderProgram shaderProgram = new ShaderProgram(request.Data);
+				
+				_shaderPrograms.Add(request.Data, shaderProgram);
+				Logger.Info($"Shader program loaded (id: {(int)shaderProgram})");
 			}
 
-			return _shaderPrograms[name];
+			return _shaderPrograms[request.Data];
 		}
 
 		#endregion

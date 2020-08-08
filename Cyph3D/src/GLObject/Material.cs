@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Json;
 using Cyph3D.Enumerable;
 using Cyph3D.Misc;
+using Cyph3D.ResourceManagement;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 
@@ -35,7 +35,13 @@ namespace Cyph3D.GLObject
 
 		public Material(string name, ResourceManager resourceManager)
 		{
-			_shaderProgram = resourceManager.RequestShaderProgram("internal/gbuffer/renderToGbuffer");
+			_shaderProgram = resourceManager.RequestShaderProgram(
+				new ShaderProgramRequest()
+					.WithShader(ShaderType.VertexShader,
+						"internal/gbuffer/renderToGbuffer")
+					.WithShader(ShaderType.FragmentShader,
+						"internal/gbuffer/renderToGbuffer")
+			);
 			
 			JsonObject jsonRoot = (JsonObject)JsonValue.Parse(File.ReadAllText($"resources/materials/{name}/material.json"));
 			
@@ -105,7 +111,13 @@ namespace Cyph3D.GLObject
 
 		private Material()
 		{
-			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram("internal/gbuffer/renderToGbuffer");
+			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram(
+				new ShaderProgramRequest()
+					.WithShader(ShaderType.VertexShader,
+						"internal/gbuffer/renderToGbuffer")
+					.WithShader(ShaderType.FragmentShader,
+						"internal/gbuffer/renderToGbuffer")
+			);
 			
 			Name = "Default Material";
 			IsLit = false;
