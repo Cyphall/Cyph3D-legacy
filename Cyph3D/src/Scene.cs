@@ -68,8 +68,11 @@ namespace Cyph3D
 			}
 		}
 
-		public static Scene Load(string name)
+		public static void Load(string name)
 		{
+			Engine.Scene.Dispose();
+			Engine.Scene = null;
+			
 			JsonObject jsonRoot = (JsonObject)JsonValue.Parse(File.ReadAllText($"resources/scenes/{name}.json"));
 
 			int version = jsonRoot["version"];
@@ -83,13 +86,13 @@ namespace Cyph3D
 				new vec2(cameraSphCoordsArray[0], cameraSphCoordsArray[1])
 			);
 			
-			Scene scene = new Scene(camera, name);
+			Engine.Scene = new Scene(camera, name);
 
 			if (version == 2)
 			{
 				if (!string.IsNullOrEmpty(jsonRoot["skybox"]))
 				{
-					scene.ResourceManager.RequestSkybox(jsonRoot["skybox"], skybox => scene.Skybox = skybox);
+					Engine.Scene.ResourceManager.RequestSkybox(jsonRoot["skybox"], skybox => Engine.Scene.Skybox = skybox);
 				}
 			}
 			else if (version >= 3)
@@ -97,9 +100,9 @@ namespace Cyph3D
 				if (jsonRoot["skybox"].Count > 0)
 				{
 					float skyboxRotation = jsonRoot["skybox"]["rotation"];
-					scene.ResourceManager.RequestSkybox(jsonRoot["skybox"]["name"], skybox => {
+					Engine.Scene.ResourceManager.RequestSkybox(jsonRoot["skybox"]["name"], skybox => {
 						skybox.Rotation = skyboxRotation;
-						scene.Skybox = skybox;
+						Engine.Scene.Skybox = skybox;
 					});
 				}
 			}
@@ -109,13 +112,11 @@ namespace Cyph3D
 
 			foreach (JsonValue value in jsonSceneObjects)
 			{
-				ParseSceneObject((JsonObject)value, scene, scene.Root, version);
+				ParseSceneObject((JsonObject)value, Engine.Scene.Root, version);
 			}
-
-			return scene;
 		}
 
-		private static void ParseSceneObject(JsonObject jsonObject, Scene scene, Transform parent, int version)
+		private static void ParseSceneObject(JsonObject jsonObject, Transform parent, int version)
 		{
 			JsonObject jsonData = (JsonObject)jsonObject["data"];
 			
@@ -142,13 +143,13 @@ namespace Cyph3D
 					vec3 angularVelocity = new vec3(angularVelocityArray[0], angularVelocityArray[1], angularVelocityArray[2]);
 					
 					string materialName = jsonData["material"];
-					Material material = string.IsNullOrEmpty(materialName) ? null : scene.ResourceManager.RequestMaterial(materialName);
+					Material material = string.IsNullOrEmpty(materialName) ? null : Engine.Scene.ResourceManager.RequestMaterial(materialName);
 					
 					sceneObject = new MeshObject(parent, material, null, name, position, rotation, scale, velocity, angularVelocity);
 					
 					string meshName = jsonData["mesh"];
 					if (!string.IsNullOrEmpty(meshName))
-						scene.ResourceManager.RequestMesh(meshName, mesh => ((MeshObject)sceneObject).Mesh = mesh);
+						Engine.Scene.ResourceManager.RequestMesh(meshName, mesh => ((MeshObject)sceneObject).Mesh = mesh);
 					
 					break;
 				case "point_light":
@@ -174,11 +175,11 @@ namespace Cyph3D
 					throw new InvalidOperationException($"The object type {jsonObject["type"]} is not recognized");
 			}
 			
-			scene.Add(sceneObject);
+			Engine.Scene.Add(sceneObject);
 
 			foreach (JsonValue value in jsonObject["children"])
 			{
-				ParseSceneObject((JsonObject)value, scene, sceneObject.Transform, version);
+				ParseSceneObject((JsonObject)value, sceneObject.Transform, version);
 			}
 		}
 

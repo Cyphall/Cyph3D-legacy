@@ -80,8 +80,7 @@ namespace Cyph3D.UI.Window
 
 				if (ImGui.Button("Load scene"))
 				{
-					Engine.Scene.Dispose();
-					Engine.Scene = Scene.Load(_selectedScene);
+					Scene.Load(_selectedScene);
 				}
 			
 				ImGui.SameLine();
