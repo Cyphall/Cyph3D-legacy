@@ -1,4 +1,4 @@
 {
-	"colorMap": "col.jpg",
-	"lit": false
+	"shader": "unlit",
+	"colorMap": "col.jpg"
 }

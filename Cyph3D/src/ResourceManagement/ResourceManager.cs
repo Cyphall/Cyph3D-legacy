@@ -5,6 +5,7 @@ using System.IO;
 using System.Json;
 using System.Linq;
 using Cyph3D.Enumerable;
+using Cyph3D.Extension;
 using Cyph3D.GLObject;
 using Cyph3D.Misc;
 using GlmSharp;
@@ -77,41 +78,7 @@ namespace Cyph3D.ResourceManagement
 				throw new IOException($"Unable to load image {path} from disk");
 			}
 
-			InternalFormat internalFormat;
-			PixelFormat pixelFormat;
-			switch (comp)
-			{
-				case Components.Grey:
-					pixelFormat = PixelFormat.Luminance;
-					if (compressed)
-						internalFormat = sRGB ? InternalFormat.CompressedSrgbS3tcDxt1Ext : InternalFormat.CompressedRedRgtc1;
-					else
-						internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Red;
-					break;
-				case Components.GreyAlpha:
-					pixelFormat = PixelFormat.LuminanceAlpha;
-					if (compressed)
-						internalFormat = sRGB ? InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext : InternalFormat.CompressedRgbaS3tcDxt5Ext;
-					else
-						internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba8;
-					break;
-				case Components.RedGreenBlue:
-					pixelFormat = PixelFormat.Rgb;
-					if (compressed)
-						internalFormat = sRGB ? InternalFormat.CompressedSrgbS3tcDxt1Ext : InternalFormat.CompressedRgbS3tcDxt1Ext;
-					else
-						internalFormat = sRGB ? InternalFormat.Srgb8 : InternalFormat.Rgb8;
-					break;
-				case Components.RedGreenBlueAlpha:
-					pixelFormat = PixelFormat.Rgba;
-					if (compressed)
-						internalFormat = sRGB ? InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext : InternalFormat.CompressedRgbaS3tcDxt5Ext;
-					else
-						internalFormat = sRGB ? InternalFormat.Srgb8Alpha8 : InternalFormat.Rgba8;
-					break;
-				default:
-					throw new NotSupportedException($"The colors format {comp} is not supported");
-			}
+			(InternalFormat internalFormat, PixelFormat pixelFormat) = TextureHelper.GetTextureSetting((int) comp, compressed, sRGB);
 			
 			Texture texture = new TextureSetting
 			{
@@ -282,7 +249,7 @@ namespace Cyph3D.ResourceManagement
 			if (!_materials.ContainsKey(name))
 			{
 				Logger.Info($"Loading material \"{name}\"");
-				_materials.Add(name, new Material(name, this));
+				_materials.Add(name, new Material(name));
 			}
 
 			return _materials[name];

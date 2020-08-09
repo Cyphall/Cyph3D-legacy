@@ -14,8 +14,6 @@ layout(bindless_sampler) uniform sampler2D displacementMap;
 layout(bindless_sampler) uniform sampler2D metallicMap;
 layout(bindless_sampler) uniform sampler2D emissiveMap;
 
-uniform int isLit;
-
 layout(location = 0) out vec3 position;
 layout(location = 1) out vec3 normal;
 layout(location = 2) out vec3 color;
@@ -40,7 +38,7 @@ void main()
 	material.r = texture(roughnessMap, texCoords).r;
 	material.g = texture(metallicMap, texCoords).r;
 	material.b = texture(emissiveMap, texCoords).r;
-	material.a = isLit;
+	material.a = 1;
 	
 	geometryNormal = frag.TangentToWorld * vec3(0, 0, 1);
 	geometryNormal = (geometryNormal + 1) * 0.5;

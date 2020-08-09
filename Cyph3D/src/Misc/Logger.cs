@@ -28,35 +28,35 @@ namespace Cyph3D.Misc
 		{
 			if (LogLevel < LogLevel.Full) return;
 
-			lock (_lock)
-			{
-				Print(message.ToString(), context, "INFO", ConsoleColor.Green);
-			}
+			Print(message.ToString(), context, "INFO", ConsoleColor.Green);
 		}
 
 		private static void Print(string message, string context, string prefix, ConsoleColor color)
 		{
-			ConsoleColor oldColor = Console.ForegroundColor;
-			
-			TimeSpan ts = Time.Elapsed;
-			Console.ForegroundColor = ConsoleColor.Gray;
-			Console.Write($"{(long)ts.TotalSeconds}.{ts:ffff} ");
-
-			if (!string.IsNullOrEmpty(context))
+			lock (_lock)
 			{
+				ConsoleColor oldColor = Console.ForegroundColor;
+			
+				TimeSpan ts = Time.Elapsed;
 				Console.ForegroundColor = ConsoleColor.Gray;
-				Console.Write($"[{context}] ");
-			}
+				Console.Write($"{(long)ts.TotalSeconds}.{ts:ffff} ");
 
-			Console.ForegroundColor = color;
-			Console.Write($"{prefix}");
+				if (!string.IsNullOrEmpty(context))
+				{
+					Console.ForegroundColor = ConsoleColor.Gray;
+					Console.Write($"[{context}] ");
+				}
+
+				Console.ForegroundColor = color;
+				Console.Write($"{prefix}");
 			
-			Console.ForegroundColor = ConsoleColor.Gray;
-			Console.Write($" > {message}");
+				Console.ForegroundColor = ConsoleColor.Gray;
+				Console.Write($" > {message}");
 			
-			Console.WriteLine();
+				Console.WriteLine();
 			
-			Console.ForegroundColor = oldColor;
+				Console.ForegroundColor = oldColor;
+			}
 		}
 	}
 

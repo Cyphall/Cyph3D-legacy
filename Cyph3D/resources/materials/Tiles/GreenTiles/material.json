@@ -1,7 +1,7 @@
 {
+	"shader": "basicPBR",
 	"colorMap": "col.png",
 	"normalMap": "nrm.png",
 	"roughnessMap": "rgh.png",
-	"displacementMap": "disp.png",
-	"lit": true
+	"displacementMap": "disp.png"
 }
