@@ -119,3 +119,83 @@ vec2 POM(vec2 texCoords, vec3 viewDir)
 
 	return texCoords;
 }
+
+// POM algorithm supporting height + depth (height range from -1 to 1)
+/*
+float getHeight(vec2 texCoords)
+{
+	return texture(displacementMap, texCoords).r * 2 - 1;
+}
+
+vec2 POM(vec2 texCoords, vec3 viewDir)
+{
+	const float maxHeight            = 0.1;
+	const float minHeight            = -0.1;
+	const int   layerCount           = 12;
+	const int   resamplingLoopCount  = 6;
+
+	// Initial sampling pass
+	vec2 currentTexCoords = texCoords + (viewDir.xy / viewDir.z) * maxHeight;
+
+	float currentTexHeight = getHeight(currentTexCoords);
+	float previousTexHeight;
+
+	if (currentTexHeight == 0 || layerCount == 0) return texCoords;
+
+	if (viewDir.z <= 0) return texCoords;
+
+	// Offsets applied at each steps
+	vec2  texCoordsStepOffset = -(viewDir.xy / viewDir.z) / layerCount * (minHeight - maxHeight);
+	float heightStepOffset     = -2.0 / layerCount;
+
+	float currentHeight = 1;
+
+	while (currentHeight > currentTexHeight)
+	{
+		currentTexCoords += texCoordsStepOffset;
+
+		previousTexHeight = currentTexHeight;
+		currentTexHeight = getHeight(currentTexCoords);
+
+		currentHeight += heightStepOffset;
+	}
+
+	vec2 previousTexCoords = currentTexCoords - texCoordsStepOffset;
+	float previousHeight = currentHeight - heightStepOffset;
+
+	// Resampling pass
+
+	for (int i = 0; i < resamplingLoopCount; i++)
+	{
+		texCoordsStepOffset *= 0.5;
+		heightStepOffset *= 0.5;
+
+		vec2  halfwayTexCoords = previousTexCoords + texCoordsStepOffset;
+		float halfwayTexHeight  = getHeight(halfwayTexCoords);
+		float halfwayHeight     = previousHeight + heightStepOffset;
+
+		// If we are still above the surface
+		if (halfwayHeight > halfwayTexHeight)
+		{
+			previousTexCoords = halfwayTexCoords;
+			previousTexHeight  = halfwayTexHeight;
+			previousHeight     = halfwayHeight;
+		}
+		else
+		{
+			currentTexCoords = halfwayTexCoords;
+			currentTexHeight  = halfwayTexHeight;
+			currentHeight     = halfwayHeight;
+		}
+	}
+
+	// Interpolation
+	float afterHeight  = currentTexHeight - currentHeight;
+	float beforeHeight = previousTexHeight - currentHeight + heightStepOffset;
+
+	float weight = afterHeight / (afterHeight - beforeHeight);
+	texCoords = previousTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+	return texCoords;
+}
+*/
