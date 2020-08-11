@@ -12,7 +12,7 @@ CTRL X: Quit
 
 #### Core
 
-- [x] Deferred Rendering
+- [x] Deferred Lighting
 - [x] Scene Architecture
 
 #### Shader & Rendering
