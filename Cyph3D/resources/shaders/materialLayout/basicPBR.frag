@@ -51,9 +51,9 @@ float getDepth(vec2 texCoords)
 
 vec2 POM(vec2 texCoords, vec3 viewDir)
 {
-	const float depthScale           = 0.05;
-	const int   layerCount           = 8;
-	const int   resamplingLoopCount  = 6;
+	const float depthScale     = 0.05;
+	const int   linearSamples  = 8;
+	const int   binarySamples  = 6;
 
 	// Initial sampling pass
 	vec2 currentTexCoords = texCoords;
@@ -61,13 +61,13 @@ vec2 POM(vec2 texCoords, vec3 viewDir)
 	float currentTexDepth  = getDepth(currentTexCoords);
 	float previousTexDepth;
 
-	if (currentTexDepth == 0 || layerCount == 0) return texCoords;
+	if (currentTexDepth == 0 || linearSamples == 0) return texCoords;
 
 	if (viewDir.z <= 0) return texCoords;
 
 	// Offsets applied at each steps
-	vec2  texCoordsStepOffset = -(viewDir.xy / viewDir.z) / layerCount * depthScale;
-	float depthStepOffset     = 1.0 / layerCount;
+	vec2  texCoordsStepOffset = -(viewDir.xy / viewDir.z) / linearSamples * depthScale;
+	float depthStepOffset     = 1.0 / linearSamples;
 
 	float currentDepth = 0;
 
@@ -86,7 +86,7 @@ vec2 POM(vec2 texCoords, vec3 viewDir)
 
 	// Resampling pass
 
-	for (int i = 0; i < resamplingLoopCount; i++)
+	for (int i = 0; i < binarySamples; i++)
 	{
 		texCoordsStepOffset *= 0.5;
 		depthStepOffset *= 0.5;
@@ -129,10 +129,10 @@ float getHeight(vec2 texCoords)
 
 vec2 POM(vec2 texCoords, vec3 viewDir)
 {
-	const float maxHeight            = 0.1;
-	const float minHeight            = -0.1;
-	const int   layerCount           = 12;
-	const int   resamplingLoopCount  = 6;
+	const float maxHeight      = 0.1;
+	const float minHeight      = -0.1;
+	const int   linearSamples  = 12;
+	const int   binarySamples  = 6;
 
 	// Initial sampling pass
 	vec2 currentTexCoords = texCoords + (viewDir.xy / viewDir.z) * maxHeight;
@@ -140,13 +140,13 @@ vec2 POM(vec2 texCoords, vec3 viewDir)
 	float currentTexHeight = getHeight(currentTexCoords);
 	float previousTexHeight;
 
-	if (currentTexHeight == 0 || layerCount == 0) return texCoords;
+	if (currentTexHeight == 0 || linearSamples == 0) return texCoords;
 
 	if (viewDir.z <= 0) return texCoords;
 
 	// Offsets applied at each steps
-	vec2  texCoordsStepOffset = -(viewDir.xy / viewDir.z) / layerCount * (minHeight - maxHeight);
-	float heightStepOffset     = -2.0 / layerCount;
+	vec2  texCoordsStepOffset = -(viewDir.xy / viewDir.z) / linearSamples * (minHeight - maxHeight);
+	float heightStepOffset     = -2.0 / linearSamples;
 
 	float currentHeight = 1;
 
@@ -165,7 +165,7 @@ vec2 POM(vec2 texCoords, vec3 viewDir)
 
 	// Resampling pass
 
-	for (int i = 0; i < resamplingLoopCount; i++)
+	for (int i = 0; i < binarySamples; i++)
 	{
 		texCoordsStepOffset *= 0.5;
 		heightStepOffset *= 0.5;
