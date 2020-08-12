@@ -100,6 +100,7 @@ namespace Cyph3D.GLObject
 				_shaderProgram.ShaderProgram.SetValue(name, texture);
 			}
 			
+			_shaderProgram.ShaderProgram.SetValue("normalMatrix", new mat3(model).Inverse.Transposed);
 			_shaderProgram.ShaderProgram.SetValue("model", model);
 			_shaderProgram.ShaderProgram.SetValue("view", view);
 			_shaderProgram.ShaderProgram.SetValue("projection", projection);

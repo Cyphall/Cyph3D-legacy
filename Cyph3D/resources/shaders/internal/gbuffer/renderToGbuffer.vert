@@ -3,6 +3,7 @@ layout(location = 1) in vec2 in_UV;
 layout(location = 2) in vec3 in_Normals;
 layout(location = 3) in vec3 in_tangents;
 
+uniform mat3 normalMatrix;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
@@ -19,7 +20,6 @@ void main()
 	frag.TexCoords = in_UV;
 	frag.FragPos = vec3(model * vec4(in_Vertex, 1.0));
 
-	mat3 normalMatrix = transpose(inverse(mat3(model)));
 	vec3 T = normalize(normalMatrix * in_tangents);
 	vec3 N = normalize(normalMatrix * in_Normals);
 	vec3 B = cross(N, T);
