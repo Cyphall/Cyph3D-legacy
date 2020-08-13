@@ -14,11 +14,10 @@ layout(bindless_sampler) uniform sampler2D displacementMap;
 layout(bindless_sampler) uniform sampler2D metallicMap;
 layout(bindless_sampler) uniform sampler2D emissiveMap;
 
-layout(location = 0) out vec3 position;
-layout(location = 1) out vec3 normal;
-layout(location = 2) out vec3 color;
-layout(location = 3) out vec4 material;
-layout(location = 4) out vec3 geometryNormal;
+layout(location = 0) out vec3 normal;
+layout(location = 1) out vec3 color;
+layout(location = 2) out vec4 material;
+layout(location = 3) out vec3 geometryNormal;
 
 float getDepth(vec2 texCoords);
 vec2 POM(vec2 texCoords, vec3 viewDir);
@@ -28,8 +27,6 @@ void main()
 	vec2 texCoords = POM(frag.TexCoords, normalize(frag.WorldToTangent * (viewPos - frag.FragPos)));
 
 	color = texture(colorMap, texCoords).rgb;
-
-	position = frag.FragPos;
 
 	normal = normalize(texture(normalMap, texCoords).rgb * 2.0 - 1.0);
 	normal = frag.TangentToWorld * normal;

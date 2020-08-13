@@ -11,7 +11,6 @@ namespace Cyph3D
 	public class Renderer
 	{
 		private Framebuffer _gbuffer;
-		private Texture _positionTexture;
 		private Texture _normalTexture;
 		private Texture _colorTexture;
 		private Texture _materialTexture;
@@ -30,21 +29,17 @@ namespace Cyph3D
 			_gbuffer = new Framebuffer(Engine.Window.Size)
 				.WithTexture(FramebufferAttachment.ColorAttachment0, new TextureSetting
 				{
-					InternalFormat = (InternalFormat) All.Rgb32f
-				}, out _positionTexture)
+					InternalFormat = InternalFormat.Rgb16f
+				}, out _normalTexture)
 				.WithTexture(FramebufferAttachment.ColorAttachment1, new TextureSetting
 				{
 					InternalFormat = InternalFormat.Rgb16f
-				}, out _normalTexture)
-				.WithTexture(FramebufferAttachment.ColorAttachment2, new TextureSetting
-				{
-					InternalFormat = InternalFormat.Rgb16f
 				}, out _colorTexture)
-				.WithTexture(FramebufferAttachment.ColorAttachment3, new TextureSetting
+				.WithTexture(FramebufferAttachment.ColorAttachment2, new TextureSetting
 				{
 					InternalFormat = InternalFormat.Rgba8
 				}, out _materialTexture)
-				.WithTexture(FramebufferAttachment.ColorAttachment4, new TextureSetting
+				.WithTexture(FramebufferAttachment.ColorAttachment3, new TextureSetting
 				{
 					InternalFormat = InternalFormat.Rgb16f
 				}, out _geometryNormalTexture)
@@ -147,7 +142,7 @@ namespace Cyph3D
 			FirstPass(camera.View, camera.Projection, camera.Position);
 			if (Engine.Scene.Skybox != null)
 				SkyboxPass(camera.View, camera.Projection);
-			LightingPass(camera.Position);
+			LightingPass(camera.Position, camera.View, camera.Projection);
 		}
 
 		private void FirstPass(mat4 view, mat4 projection, vec3 viewPos)
@@ -180,7 +175,7 @@ namespace Cyph3D
 			GL.DepthMask(true);
 		}
 
-		private void LightingPass(vec3 viewPos)
+		private void LightingPass(vec3 viewPos, mat4 view, mat4 projection)
 		{
 			GL.Disable(EnableCap.DepthTest);
 			
@@ -192,8 +187,8 @@ namespace Cyph3D
 			_lightingPassShader.SetValue("viewPos", viewPos);
 
 			_lightingPassShader.SetValue("debug", Debug ? 1 : 0);
+			_lightingPassShader.SetValue("viewProjectionInv", (projection * view).Inverse);
 			
-			_lightingPassShader.SetValue("positionTexture", _positionTexture);
 			_lightingPassShader.SetValue("normalTexture", _normalTexture);
 			_lightingPassShader.SetValue("colorTexture", _colorTexture);
 			_lightingPassShader.SetValue("materialTexture", _materialTexture);

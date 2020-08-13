@@ -28,6 +28,8 @@ layout(bindless_sampler) struct DirectionalLight
 
 struct FragData
 {
+	vec2  texCoords;
+	float depth;
 	vec3  pos;
 	vec3  viewDir;
 	vec3  normal;
@@ -50,14 +52,14 @@ layout(std430, binding = 1) buffer UselessNameBecauseItIsNeverUsedAnywhere2
 	DirectionalLight directionalLights[];
 };
 
-layout(bindless_sampler) uniform sampler2D positionTexture;
 layout(bindless_sampler) uniform sampler2D normalTexture;
 layout(bindless_sampler) uniform sampler2D colorTexture;
 layout(bindless_sampler) uniform sampler2D materialTexture;
 layout(bindless_sampler) uniform sampler2D geometryNormalTexture;
 layout(bindless_sampler) uniform sampler2D depthTexture;
 
-uniform int debug;
+uniform bool debug;
+uniform mat4 viewProjectionInv;
 
 /* ------ outputs ------ */
 out vec4 out_Color;
@@ -90,7 +92,10 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0);
 /* ------ code ------ */
 void main()
 {
-	if (debug == 1)
+	// Mandatory data
+	fragData.texCoords = vert2frag.TexCoords;
+	
+	if (debug)
 	{
 		out_Color = debugView();
 	}
@@ -106,46 +111,70 @@ void main()
 
 vec4 debugView()
 {
-	vec2 texCoords = vert2frag.TexCoords;
-	if (texCoords.x >= 0.5 && texCoords.y >= 0.5)
+	if (fragData.texCoords.x <= 1.0/3.0 && fragData.texCoords.y >= 2.0/3.0)
 	{
-		texCoords.x = (texCoords.x - 0.5) * 2;
-		texCoords.y = (texCoords.y - 0.5) * 2;
-		return texture(positionTexture, texCoords);
+		fragData.texCoords.x = (fragData.texCoords.x - 0.0/3.0) * 3;
+		fragData.texCoords.y = (fragData.texCoords.y - 2.0/3.0) * 3;
+		fragData.depth = getDepth();
+		return fragData.depth < 1 ? vec4(getPosition(), 1) : vec4(0);
 	}
-	else if (texCoords.x >= 0.5 && texCoords.y < 0.5)
+	else if (fragData.texCoords.x <= 2.0/3.0 && fragData.texCoords.y >= 2.0/3.0)
 	{
-		texCoords.x = (texCoords.x - 0.5) * 2;
-		texCoords.y = texCoords.y * 2;
-		return texture(normalTexture, texCoords);
+		fragData.texCoords.x = (fragData.texCoords.x - 1.0/3.0) * 3;
+		fragData.texCoords.y = (fragData.texCoords.y - 2.0/3.0) * 3;
+		fragData.depth = getDepth();
+		return fragData.depth < 1 ? texture(normalTexture, fragData.texCoords) : vec4(0);
 	}
-	else if (texCoords.x < 0.5 && texCoords.y >= 0.5)
+	else if (fragData.texCoords.x <= 3.0/3.0 && fragData.texCoords.y >= 2.0/3.0)
 	{
-		texCoords.x = texCoords.x * 2;
-		texCoords.y = (texCoords.y - 0.5) * 2;
-		return texture(geometryNormalTexture, texCoords);
+		fragData.texCoords.x = (fragData.texCoords.x - 2.0/3.0) * 3;
+		fragData.texCoords.y = (fragData.texCoords.y - 2.0/3.0) * 3;
+		fragData.depth = getDepth();
+		return fragData.depth < 1 ? texture(geometryNormalTexture, fragData.texCoords) : vec4(0);
 	}
-	else
+	else if (fragData.texCoords.x <= 1.0/3.0 && fragData.texCoords.y >= 1.0/3.0)
 	{
-		texCoords.x = texCoords.x * 2;
-		texCoords.y = texCoords.y * 2;
-		return texture(materialTexture, texCoords);
+		fragData.texCoords.x = (fragData.texCoords.x - 0.0/3.0) * 3;
+		fragData.texCoords.y = (fragData.texCoords.y - 1.0/3.0) * 3;
+		fragData.depth = getDepth();
+		return fragData.depth < 1 ? texture(materialTexture, fragData.texCoords) : vec4(0);
 	}
+	else if (fragData.texCoords.x <= 2.0/3.0 && fragData.texCoords.y >= 1.0/3.0)
+	{
+		fragData.texCoords.x = (fragData.texCoords.x - 1.0/3.0) * 3;
+		fragData.texCoords.y = (fragData.texCoords.y - 1.0/3.0) * 3;
+		fragData.depth = getDepth();
+		return fragData.depth < 1 ? vec4(toSRGB(texture(colorTexture, fragData.texCoords).rgb), 1) : vec4(0);
+	}
+	else if (fragData.texCoords.x <= 3.0/3.0 && fragData.texCoords.y >= 1.0/3.0)
+	{
+		fragData.texCoords.x = (fragData.texCoords.x - 2.0/3.0) * 3;
+		fragData.texCoords.y = (fragData.texCoords.y - 1.0/3.0) * 3;
+		fragData.depth = getDepth();
+		return vec4(1 - fragData.depth, 1 - fragData.depth, 1 - fragData.depth, 1);
+	}
+	
+	return vec4(0);
 }
 
 // Based on the code at https://learnopengl.com/PBR/Lighting by Joey de Vries (https://twitter.com/JoeyDeVriez)
 vec4 lighting()
 {
-	// Fragment parameters initialization
+	fragData.color             = getColor();
+	fragData.depth             = getDepth();
 	fragData.pos               = getPosition();
 	fragData.viewDir           = normalize(vert2frag.ViewPos - fragData.pos);
 	fragData.normal            = getNormal();
 	fragData.geometryNormal    = getGeometryNormal();
 	fragData.roughness         = getRoughness();
 	fragData.metalness         = getMetallic();
-	fragData.color             = getColor();
 	fragData.emissiveIntensity = getEmissive();
 	fragData.F0                = mix(vec3(0.04), fragData.color, fragData.metalness);
+	
+	if (fragData.depth == 1)
+	{
+		return vec4(0, 0, 0, 1);
+	}
 	
 	// aka Lo
 	vec3 finalColor = fragData.color * fragData.emissiveIntensity;
@@ -179,6 +208,7 @@ vec4 lighting()
 	return reinhard_tone_mapping(finalColor);
 }
 
+// Based on the code at https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping by Joey de Vries (https://twitter.com/JoeyDeVriez)
 float isInShadow(int lightIndex)
 {
 	vec4 shadowMapSpacePos = directionalLights[lightIndex].lightViewProjection * vec4(fragData.pos, 1);
@@ -228,47 +258,49 @@ vec3 calculateLighting(vec3 radiance, vec3 L, vec3 H)
 
 vec3 getPosition()
 {
-	return texture(positionTexture, vert2frag.TexCoords).rgb;
+	vec4 clipSpacePosition = vec4(fragData.texCoords, fragData.depth, 1) * 2.0 - 1.0;
+	vec4 worldSpacePosition = viewProjectionInv * clipSpacePosition;
+	return worldSpacePosition.xyz / worldSpacePosition.w;
 }
 
 vec3 getColor()
 {
-	return texture(colorTexture, vert2frag.TexCoords).rgb;
+	return texture(colorTexture, fragData.texCoords).rgb;
 }
 
 vec3 getNormal()
 {
-	return normalize(texture(normalTexture, vert2frag.TexCoords).rgb * 2.0 - 1.0);
+	return normalize(texture(normalTexture, fragData.texCoords).rgb * 2.0 - 1.0);
 }
 
 vec3 getGeometryNormal()
 {
-	return normalize(texture(geometryNormalTexture, vert2frag.TexCoords).rgb * 2.0 - 1.0);
+	return normalize(texture(geometryNormalTexture, fragData.texCoords).rgb * 2.0 - 1.0);
 }
 
 float getRoughness()
 {
-	return texture(materialTexture, vert2frag.TexCoords).r;
+	return texture(materialTexture, fragData.texCoords).r;
 }
 
 float getMetallic()
 {
-	return texture(materialTexture, vert2frag.TexCoords).g;
+	return texture(materialTexture, fragData.texCoords).g;
 }
 
 float getEmissive()
 {
-	return texture(materialTexture, vert2frag.TexCoords).b;
+	return texture(materialTexture, fragData.texCoords).b;
 }
 
 float getDepth()
 {
-	return texture(depthTexture, vert2frag.TexCoords).r;
+	return texture(depthTexture, fragData.texCoords).r;
 }
 
 int isLit()
 {
-	return int(texture(materialTexture, vert2frag.TexCoords).a);
+	return int(texture(materialTexture, fragData.texCoords).a);
 }
 
 vec3 toSRGB(vec3 linear)
