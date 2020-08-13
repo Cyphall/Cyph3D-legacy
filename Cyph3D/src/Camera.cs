@@ -28,15 +28,23 @@ namespace Cyph3D
 				return _sideOrientation;
 			}
 		}
+		
+		private bool _viewChanged = true;
 
-		private vec2 _previousMousePos;
-
-		public mat4 Projection { get; }
-		public mat4 View => mat4.LookAt(Position,  Position + Orientation, new vec3(0, 1, 0));
+		private mat4 _view;
+		public mat4 View
+		{
+			get
+			{
+				if (_viewChanged) RecalculateView();
+				return _view;
+			}
+		}
 
 		// x: phi (horizontal) 0 to 360
 		// y: theta (vertical) -89 to 89
 		private vec2 _sphericalCoords = new vec2(0, 0);
+
 		public vec2 SphericalCoords
 		{
 			get => _sphericalCoords;
@@ -44,9 +52,10 @@ namespace Cyph3D
 			{
 				_sphericalCoords = value;
 				_orientationChanged = true;
+				_viewChanged = true;
 			}
 		}
-
+		
 		private vec3 _position;
 		public vec3 Position
 		{
@@ -54,11 +63,15 @@ namespace Cyph3D
 			set
 			{
 				_position = value;
-				_orientationChanged = true;
+				_viewChanged = true;
 			}
 		}
 
-		public float Speed { get; set; } = 1;
+		public float Speed { get; set; } = 2;
+		
+		private vec2 _previousMousePos;
+
+		public mat4 Projection { get; }
 
 		public Camera(vec3 position = default, vec2 sphericalCoords = default)
 		{
@@ -92,6 +105,13 @@ namespace Cyph3D
 
 			_orientationChanged = false;
 		}
+		
+		private void RecalculateView()
+		{
+			_view = mat4.LookAt(Position, Position + Orientation, new vec3(0, 1, 0));
+
+			_viewChanged = false;
+		}
 
 		public void Update(double deltaTime)
 		{
@@ -101,7 +121,7 @@ namespace Cyph3D
 				return;
 			}
 			
-			float ratio = (float)deltaTime * 2 * Speed;
+			float ratio = (float)deltaTime * Speed;
 
 			if (Engine.Window.GetKey(Keys.LeftControl) == InputAction.Press)
 			{
@@ -128,9 +148,6 @@ namespace Cyph3D
 			{
 				Position -= SideOrientation * ratio;
 			}
-
-			// Context.Window.LeftClickCallback = LeftClick;
-			// Context.Window.RightClickCallback = RightClick;
 			
 			vec2 currentMousePos = Engine.Window.CursorPos;
 			
