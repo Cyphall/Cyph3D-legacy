@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Cyph3D.Helper;
 using Cyph3D.Misc;
-using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D.GLObject
 {
-	public class ShaderProgram : IDisposable
+	public partial class ShaderProgram : IDisposable
 	{
 		private int _ID;
 
@@ -143,47 +141,6 @@ namespace Cyph3D.GLObject
 		public void Bind()
 		{
 			GL.UseProgram(_ID);
-		}
-		
-		public void SetValue(string variableName, float data)
-		{
-			GL.ProgramUniform1(_ID, GetLocation(variableName), data);
-		}
-		public void SetValue(string variableName, vec2 data)
-		{
-			GL.ProgramUniform2(_ID, GetLocation(variableName), data.x, data.y);
-		}
-		public void SetValue(string variableName, vec3 data)
-		{
-			GL.ProgramUniform3(_ID, GetLocation(variableName), data.x, data.y, data.z);
-		}
-		public void SetValue(string variableName, int data)
-		{
-			GL.ProgramUniform1(_ID, GetLocation(variableName), data);
-		}
-		public void SetValue(string variableName, ivec2 data)
-		{
-			GL.ProgramUniform2(_ID, GetLocation(variableName), data.x, data.y);
-		}
-		public void SetValue(string variableName, ivec3 data)
-		{
-			GL.ProgramUniform3(_ID, GetLocation(variableName), data.x, data.y, data.z);
-		}
-		public void SetValue(string variableName, mat4 data)
-		{
-			GL.ProgramUniformMatrix4(_ID, GetLocation(variableName), 1, false, data.ToArray());
-		}
-		public void SetValue(string variableName, mat3 data)
-		{
-			GL.ProgramUniformMatrix3(_ID, GetLocation(variableName), 1, false, data.ToArray());
-		}
-		public void SetValue(string variableName, Texture data)
-		{
-			GL.Arb.ProgramUniformHandle(_ID, GetLocation(variableName), data.BindlessHandle);
-		}
-		public void SetValue(string variableName, Cubemap data)
-		{
-			GL.Arb.ProgramUniformHandle(_ID, GetLocation(variableName), data.BindlessHandle);
 		}
 	}
 }
