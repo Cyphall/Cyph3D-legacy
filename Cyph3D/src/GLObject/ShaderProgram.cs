@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Cyph3D.Extension;
 using Cyph3D.Helper;
 using Cyph3D.Misc;
 using OpenToolkit.Graphics.OpenGL4;
@@ -56,21 +57,34 @@ namespace Cyph3D.GLObject
 
 			for (int i = 0; i < uniformCount; i++)
 			{
-				int[] values = new int[1];
+				int[] values = new int[2];
 				GL.GetProgramResource(
 					_ID,
 					ProgramInterface.Uniform,
 					i,
-					1,
-					new [] {ProgramProperty.NameLength},
-					1,
+					2,
+					new [] {ProgramProperty.NameLength, ProgramProperty.ArraySize},
+					2,
 					out int _,
 					values
 				);
 				
 				GL.GetProgramResourceName(_ID, ProgramInterface.Uniform, i, values[0], out int _, out string name);
-				
-				_uniforms.Add(name, i);
+
+				if (values[1] > 1)
+				{
+					string arrayName = name.Remove("[0]");
+					_uniforms.Add(arrayName, i);
+					for (int j = 0; j < values[1]; j++)
+					{
+						string fullName = $"{arrayName}[{j}]";
+						_uniforms.Add(fullName, GL.GetUniformLocation(_ID, fullName));
+					}
+				}
+				else
+				{
+					_uniforms.Add(name, i);
+				}
 			}
 		}
 
