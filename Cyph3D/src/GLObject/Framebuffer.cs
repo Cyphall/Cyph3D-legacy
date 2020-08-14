@@ -11,7 +11,6 @@ namespace Cyph3D.GLObject
 		private ivec2 _size;
 
 		private List<DrawBuffersEnum> _drawBuffers = new List<DrawBuffersEnum>();
-		private List<FramebufferAttachment> _usedAttachments = new List<FramebufferAttachment>();
 
 		public static implicit operator int(Framebuffer framebuffer) => framebuffer._ID;
 
@@ -19,47 +18,6 @@ namespace Cyph3D.GLObject
 		{
 			_size = size;
 			GL.CreateFramebuffers(1, out _ID);
-		}
-
-		public Framebuffer SetTexture(FramebufferAttachment attachment, TextureSetting textureSetting, out Texture texture)
-		{
-			if (_usedAttachments.Contains(attachment))
-			{
-				throw new InvalidOperationException("This framebuffer attachment is alreay used");
-			}
-
-			textureSetting.Size = _size;
-			texture = textureSetting.CreateTexture();
-			
-			GL.NamedFramebufferTexture(_ID, attachment, texture, 0);
-			
-			_usedAttachments.Add(attachment);
-			
-			if (IsDrawBuffer(attachment))
-				_drawBuffers.Add((DrawBuffersEnum)attachment);
-			
-			CheckState();
-			
-			return this;
-		}
-
-		public Framebuffer SetRenderbuffer(FramebufferAttachment attachment, RenderbufferStorage internalFormat)
-		{
-			if (_usedAttachments.Contains(attachment))
-			{
-				throw new InvalidOperationException("This framebuffer attachment is alreay used");
-			}
-			
-			Renderbuffer renderbuffer = new Renderbuffer(_size, internalFormat);
-			
-			GL.NamedFramebufferRenderbuffer(_ID, attachment, RenderbufferTarget.Renderbuffer, renderbuffer);
-			
-			if (IsDrawBuffer(attachment))
-				_drawBuffers.Add((DrawBuffersEnum)attachment);
-			
-			CheckState();
-			
-			return this;
 		}
 
 		private void CheckState()
@@ -76,7 +34,7 @@ namespace Cyph3D.GLObject
 
 		private static bool IsDrawBuffer(FramebufferAttachment attachment)
 		{
-			return attachment >= FramebufferAttachment.ColorAttachment0 && attachment <= FramebufferAttachment.ColorAttachment31;
+			return Enum.IsDefined(typeof(DrawBuffersEnum), (int)attachment);
 		}
 
 		public void Dispose()
