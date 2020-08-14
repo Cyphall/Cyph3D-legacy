@@ -9,6 +9,7 @@ namespace Cyph3D.GLObject
 	{
 		private int _ID;
 		private ivec2 _size;
+		public ivec2 Size => _size;
 		
 		private long _bindlessHandle;
 		public long BindlessHandle
