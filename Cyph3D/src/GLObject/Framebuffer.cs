@@ -9,7 +9,6 @@ namespace Cyph3D.GLObject
 	{
 		private int _ID;
 		private ivec2 _size;
-		private bool _completed;
 
 		private List<DrawBuffersEnum> _drawBuffers = new List<DrawBuffersEnum>();
 		private List<FramebufferAttachment> _usedAttachments = new List<FramebufferAttachment>();
@@ -22,7 +21,7 @@ namespace Cyph3D.GLObject
 			GL.CreateFramebuffers(1, out _ID);
 		}
 
-		public Framebuffer WithTexture(FramebufferAttachment attachment, TextureSetting textureSetting, out Texture texture)
+		public Framebuffer SetTexture(FramebufferAttachment attachment, TextureSetting textureSetting, out Texture texture)
 		{
 			if (_usedAttachments.Contains(attachment))
 			{
@@ -39,10 +38,12 @@ namespace Cyph3D.GLObject
 			if (IsDrawBuffer(attachment))
 				_drawBuffers.Add((DrawBuffersEnum)attachment);
 			
+			CheckState();
+			
 			return this;
 		}
 
-		public Framebuffer WithRenderbuffer(FramebufferAttachment attachment, RenderbufferStorage internalFormat)
+		public Framebuffer SetRenderbuffer(FramebufferAttachment attachment, RenderbufferStorage internalFormat)
 		{
 			if (_usedAttachments.Contains(attachment))
 			{
@@ -56,10 +57,12 @@ namespace Cyph3D.GLObject
 			if (IsDrawBuffer(attachment))
 				_drawBuffers.Add((DrawBuffersEnum)attachment);
 			
+			CheckState();
+			
 			return this;
 		}
 
-		public Framebuffer Complete()
+		private void CheckState()
 		{
 			GL.NamedFramebufferDrawBuffers(_ID, _drawBuffers.Count, _drawBuffers.ToArray());
 			GL.NamedFramebufferReadBuffer(_ID, ReadBufferMode.None);
@@ -69,10 +72,6 @@ namespace Cyph3D.GLObject
 			{
 				throw new InvalidOperationException($"Error while creating framebuffer: {state}");
 			}
-
-			_completed = true;
-
-			return this;
 		}
 
 		private static bool IsDrawBuffer(FramebufferAttachment attachment)
@@ -88,15 +87,7 @@ namespace Cyph3D.GLObject
 
 		public void Bind()
 		{
-			if (!_completed)
-				throw new InvalidOperationException("An incomplete framebuffer has been bound.");
-			
-			BindUnsafe(this);
-		}
-
-		private static void BindUnsafe(int framebuffer)
-		{
-			GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
+			GL.BindFramebuffer(FramebufferTarget.Framebuffer, this);
 		}
 	}
 }

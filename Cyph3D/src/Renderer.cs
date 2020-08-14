@@ -27,28 +27,27 @@ namespace Cyph3D
 		public Renderer()
 		{
 			_gbuffer = new Framebuffer(Engine.Window.Size)
-				.WithTexture(FramebufferAttachment.ColorAttachment0, new TextureSetting
+				.SetTexture(FramebufferAttachment.ColorAttachment0, new TextureSetting
 				{
 					InternalFormat = InternalFormat.Rgb16f
 				}, out _normalTexture)
-				.WithTexture(FramebufferAttachment.ColorAttachment1, new TextureSetting
+				.SetTexture(FramebufferAttachment.ColorAttachment1, new TextureSetting
 				{
 					InternalFormat = InternalFormat.Rgb16f
 				}, out _colorTexture)
-				.WithTexture(FramebufferAttachment.ColorAttachment2, new TextureSetting
+				.SetTexture(FramebufferAttachment.ColorAttachment2, new TextureSetting
 				{
 					InternalFormat = InternalFormat.Rgba8
 				}, out _materialTexture)
-				.WithTexture(FramebufferAttachment.ColorAttachment3, new TextureSetting
+				.SetTexture(FramebufferAttachment.ColorAttachment3, new TextureSetting
 				{
 					InternalFormat = InternalFormat.Rgb16f
 				}, out _geometryNormalTexture)
-				.WithTexture(FramebufferAttachment.DepthAttachment, new TextureSetting
+				.SetTexture(FramebufferAttachment.DepthAttachment, new TextureSetting
 				{
 					InternalFormat = (InternalFormat) All.DepthComponent24,
 					Filtering = TextureFiltering.Linear
-				}, out _depthTexture)
-				.Complete();
+				}, out _depthTexture);
 
 			GL.ClearColor(0, 0, 0, 0);
 
