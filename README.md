@@ -22,7 +22,7 @@ CTRL X: Quit
 - [x] Skybox
 - [x] Point Light
 - [x] Directional Light
-- [ ] Point Light Shadows
+- [x] Point Light Shadows
 - [x] Directional Light Shadows
 - [ ] Cascade Shadow Mapping
 - [x] Anisotropic Filtering
