@@ -20,7 +20,7 @@
 
     <ItemGroup>
         <None Include="resources/**">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
         <None Include="../README.MD">
