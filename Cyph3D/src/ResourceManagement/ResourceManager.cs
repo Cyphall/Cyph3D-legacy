@@ -193,7 +193,7 @@ namespace Cyph3D.ResourceManagement
 					throw new NotSupportedException($"The colors format {comp} is not supported");
 			}
 			
-			Skybox skybox = new Skybox(new ivec2(x, y), name, internalFormat, TextureFiltering.Linear);
+			Skybox skybox = new Skybox(new ivec2(x, y), name, internalFormat);
 
 			GL.Finish();
 
