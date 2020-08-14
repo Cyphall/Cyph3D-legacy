@@ -11,6 +11,7 @@ namespace Cyph3D
 
 		public vec3 Velocity { get; set; }
 		public vec3 AngularVelocity { get; set; }
+		public bool ContributeShadows { get; set; }
 		
 		public MeshObject(
 			Transform parent,

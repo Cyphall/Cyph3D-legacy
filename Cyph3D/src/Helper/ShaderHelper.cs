@@ -11,6 +11,7 @@ namespace Cyph3D.Helper
 			{
 				ShaderType.VertexShader => "vert",
 				ShaderType.FragmentShader => "frag",
+				ShaderType.GeometryShader => "geom",
 				_ => throw new NotSupportedException($"Shader type {type} is not currently supported")
 			};
 		}

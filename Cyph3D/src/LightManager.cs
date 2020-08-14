@@ -91,6 +91,14 @@ namespace Cyph3D
 					_directionalLights[i].UpdateShadowMap();
 				}
 			}
+			
+			for (int i = 0; i < _pointLights.Count; i++)
+			{
+				if (_pointLights[i].CastShadows)
+				{
+					_pointLights[i].UpdateShadowMap();
+				}
+			}
 		}
 	}
 }

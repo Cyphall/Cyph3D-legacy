@@ -77,7 +77,7 @@ namespace Cyph3D.Lighting
 			
 			for (int i = 0; i < Engine.Scene.Objects.Count; i++)
 			{
-				if (Engine.Scene.Objects[i] is MeshObject meshObject)
+				if (Engine.Scene.Objects[i] is MeshObject meshObject && meshObject.ContributeShadows)
 				{
 					_shadowMapProgram.SetValue("model", meshObject.Transform.WorldMatrix);
 					meshObject.Mesh?.Render();

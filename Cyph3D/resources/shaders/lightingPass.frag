@@ -8,11 +8,15 @@ in VERT2FRAG {
 } vert2frag;
 
 /* ------ data structures ------ */
-struct PointLight
+layout(bindless_sampler) struct PointLight
 {
 	vec3  pos;
 	float intensity;
 	vec3  color;
+	bool  castShadows;
+	samplerCube shadowMap;
+	float far;
+	float padding;
 };
 
 layout(bindless_sampler) struct DirectionalLight
@@ -68,7 +72,8 @@ out vec4 out_Color;
 vec4 debugView();
 vec4 lighting();
 
-float isInShadow(int lightIndex);
+float isInDirectionalShadow(int lightIndex);
+float isInPointShadow(int lightIndex);
 vec3 calculateLighting(vec3 radiance, vec3 L, vec3 H);
 
 vec3 getPosition();
@@ -182,6 +187,8 @@ vec4 lighting()
 	// Point Light calculation
 	for(int i = 0; i < pointLights.length(); ++i)
 	{
+		float shadow = pointLights[i].castShadows ? isInPointShadow(i) : 0;
+		
 		// calculate light parameters
 		vec3  lightDir    = normalize(pointLights[i].pos - fragData.pos);
 		vec3  halfwayDir  = normalize(fragData.viewDir + lightDir);
@@ -189,13 +196,13 @@ vec4 lighting()
 		float attenuation = 1.0 / (1 + distance * distance);
 		vec3  radiance    = pointLights[i].color * pointLights[i].intensity * attenuation;
 
-		finalColor += calculateLighting(radiance, lightDir, halfwayDir);
+		finalColor += calculateLighting(radiance, lightDir, halfwayDir) * (1 - shadow);
 	}
 
 	// Directional Light calculation
 	for(int i = 0; i < directionalLights.length(); ++i)
 	{
-		float shadow = directionalLights[i].castShadows ? isInShadow(i) : 0;
+		float shadow = directionalLights[i].castShadows ? isInDirectionalShadow(i) : 0;
 		
 		// calculate light parameters
 		vec3 lightDir    = directionalLights[i].fragToLightDirection;
@@ -209,7 +216,7 @@ vec4 lighting()
 }
 
 // Based on the code at https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping by Joey de Vries (https://twitter.com/JoeyDeVriez)
-float isInShadow(int lightIndex)
+float isInDirectionalShadow(int lightIndex)
 {
 	vec4 shadowMapSpacePos = directionalLights[lightIndex].lightViewProjection * vec4(fragData.pos, 1);
 	vec3 projCoords = shadowMapSpacePos.xyz / shadowMapSpacePos.w;
@@ -233,6 +240,24 @@ float isInShadow(int lightIndex)
 	}
 	shadow /= 9.0;
 	
+	return shadow;
+}
+
+// Based on the code at https://learnopengl.com/Advanced-Lighting/Shadows/Point-Shadows by Joey de Vries (https://twitter.com/JoeyDeVriez)
+float isInPointShadow(int lightIndex)
+{
+	// get vector between fragment position and light position
+	vec3 fragToLight = fragData.pos - pointLights[lightIndex].pos;
+	// use the light to fragment vector to sample from the depth map    
+	float closestDepth = texture(pointLights[lightIndex].shadowMap, fragToLight).r;
+	// it is currently in linear range between [0,1]. Re-transform back to original value
+	closestDepth *= pointLights[lightIndex].far;
+	// now get current linear depth as the length between the fragment and light position
+	float currentDepth = length(fragToLight);
+	// now test for shadows
+	float bias = max(0.1 * (1.0 - dot(fragData.geometryNormal, normalize(fragToLight))), 0.005);
+	float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+
 	return shadow;
 }
 

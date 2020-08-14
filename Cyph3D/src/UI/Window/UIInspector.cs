@@ -98,11 +98,6 @@ namespace Cyph3D.UI.Window
             {
 	            ShowLight(light);
             }
-
-            if (Selected is DirectionalLight directionalLight)
-            {
-	            ShowDirectionalLight(directionalLight);
-            }
 		}
 
 		private static void ShowMeshObject(MeshObject meshObject)
@@ -144,6 +139,12 @@ namespace Cyph3D.UI.Window
 				}
 				ImGui.EndDragDropTarget();
 			}
+			
+			bool contributeShadows = meshObject.ContributeShadows;
+			if (ImGui.Checkbox("Contribute Shadows", ref contributeShadows))
+			{
+				meshObject.ContributeShadows = contributeShadows;
+			}
 		}
 		
 		private static void ShowLight(Light light)
@@ -159,9 +160,28 @@ namespace Cyph3D.UI.Window
 			{
 				light.Intensity = intensity;
 			}
+			
+			if (light is DirectionalLight directionalLight)
+			{
+				ShowDirectionalLight(directionalLight);
+			}
+			
+			if (light is PointLight pointLight)
+			{
+				ShowPointLight(pointLight);
+			}
 		}
 		
 		private static void ShowDirectionalLight(DirectionalLight light)
+		{
+			bool castShadows = light.CastShadows;
+			if (ImGui.Checkbox("Cast Shadows", ref castShadows))
+			{
+				light.CastShadows = castShadows;
+			}
+		}
+		
+		private static void ShowPointLight(PointLight light)
 		{
 			bool castShadows = light.CastShadows;
 			if (ImGui.Checkbox("Cast Shadows", ref castShadows))

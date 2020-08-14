@@ -150,6 +150,8 @@ namespace Cyph3D
 					string meshName = jsonData["mesh"];
 					if (!string.IsNullOrEmpty(meshName))
 						Engine.Scene.ResourceManager.RequestMesh(meshName, mesh => ((MeshObject)sceneObject).Mesh = mesh);
+
+					((MeshObject)sceneObject).ContributeShadows = version >= 5 ? (bool)jsonData["contributeShadows"] : true;
 					
 					break;
 				case "point_light":
@@ -158,8 +160,9 @@ namespace Cyph3D
 					vec3 srgbColor = new vec3(colorArray[0], colorArray[1], colorArray[2]);
 					
 					float intensity = jsonData["intensity"];
+					bool castShadows = version >= 5 ? (bool)jsonData["castShadows"] : false;
 					
-					sceneObject = new PointLight(parent, srgbColor, intensity, name, position);
+					sceneObject = new PointLight(parent, srgbColor, intensity, name, position, rotation, castShadows);
 				}break;
 				case "directional_light":
 				{
@@ -187,7 +190,7 @@ namespace Cyph3D
 		{
 			JsonObject jsonRoot = new JsonObject();
 			
-			jsonRoot.Add("version", 4);
+			jsonRoot.Add("version", 5);
 			
 
 			JsonObject jsonCamera = new JsonObject
@@ -239,15 +242,18 @@ namespace Cyph3D
 					
 					jsonData.Add("velocity", ConvertHelper.JsonConvert(meshObject.Velocity));
 					jsonData.Add("angular_velocity", ConvertHelper.JsonConvert(meshObject.AngularVelocity));
-					jsonData.Add("mesh", meshObject.Mesh?.Name);
 					
+					jsonData.Add("mesh", meshObject.Mesh?.Name);
 					jsonData.Add("material", meshObject.Material?.Name);
+					
+					jsonData.Add("contributeShadows", meshObject.ContributeShadows);
 					break;
 				case PointLight pointLight:
 					jsonObject.Add("type", "point_light");
 					
 					jsonData.Add("color", ConvertHelper.JsonConvert(pointLight.SrgbColor));
 					jsonData.Add("intensity", pointLight.Intensity);
+					jsonData.Add("castShadows", pointLight.CastShadows);
 					break;
 				case DirectionalLight directionalLight:
 					jsonObject.Add("type", "directional_light");
