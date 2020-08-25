@@ -68,11 +68,29 @@ namespace Cyph3D.Helper
 			if (maxSupportedOpenGLVersion < requestedOpenGLVersion)
 			{
 				Logger.Error(
-					$"The following driver does not support OpenGL 4.6.0.\n\n" + 
+					$"OpenGL {requestedOpenGLVersion} is not supported by this driver.\n" +
+					"Please make sure your GPU is compatible and your driver is up to date.\n\n" + 
 					$"Driver: {GL.GetString(StringName.Version)}\n" +
-					$"GPU: {GL.GetString(StringName.Renderer)}\n\n" +
-					"Please ensure your GPU is compatible and update your drivers", "OPGL");
+					$"GPU: {GL.GetString(StringName.Renderer)}\n", "OPGL");
 				error = true;
+			}
+
+			string[] requiredExtensions = {"GL_ARB_bindless_texture"};
+
+			foreach (string extension in requiredExtensions)
+			{
+				if (error)
+					break;
+				
+				if (!GLFW.ExtensionSupported(extension))
+				{
+					Logger.Error(
+						$"OpenGL extension '{extension}' is not supported by this driver.\n" +
+						"Please make sure your GPU is compatible and your driver is up to date.\n\n" + 
+						$"Driver: {GL.GetString(StringName.Version)}\n" +
+						$"GPU: {GL.GetString(StringName.Renderer)}\n", "OPGL");
+					error = true;
+				}
 			}
 			
 			GLFW.MakeContextCurrent(null);
