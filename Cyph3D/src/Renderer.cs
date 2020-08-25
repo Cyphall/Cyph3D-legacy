@@ -49,8 +49,6 @@ namespace Cyph3D
 					Filtering = TextureFiltering.Linear
 				}, out _depthTexture);
 
-			GL.ClearColor(0, 0, 0, 0);
-
 			_lightingPassShader = Engine.GlobalResourceManager.RequestShaderProgram(
 				new ShaderProgramRequest()
 					.WithShader(ShaderType.VertexShader,
@@ -136,7 +134,7 @@ namespace Cyph3D
 			
 			GL.Viewport(0, 0, Engine.Window.Size.x, Engine.Window.Size.y);
 			_gbuffer.Bind();
-			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+			_gbuffer.ClearAll();
 			
 			FirstPass(camera.View, camera.Projection, camera.Position);
 			if (Engine.Scene.Skybox != null)

@@ -73,7 +73,7 @@ namespace Cyph3D.Lighting
 			_shadowMapProgram.Bind();
 			_shadowMapProgram.SetValue("viewProjection", ViewProjection);
 			
-			GL.Clear(ClearBufferMask.DepthBufferBit);
+			_shadowMapFb.ClearDepth();
 			
 			for (int i = 0; i < Engine.Scene.Objects.Count; i++)
 			{

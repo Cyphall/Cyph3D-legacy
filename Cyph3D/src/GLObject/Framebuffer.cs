@@ -39,6 +39,31 @@ namespace Cyph3D.GLObject
 			GL.DeleteFramebuffer(_id);
 		}
 
+		public void ClearAll()
+		{
+			ClearColor();
+			ClearDepth();
+			ClearStencil();
+		}
+		
+		public void ClearColor()
+		{
+			for (int i = 0; i < _drawBuffers.Count; i++)
+			{
+				GL.ClearNamedFramebuffer(_id, ClearBuffer.Color, i, new []{0f, 0f, 0f, 0f});
+			}
+		}
+		
+		public void ClearDepth()
+		{
+			GL.ClearNamedFramebuffer(_id, ClearBuffer.Depth, 0, new []{1f});
+		}
+		
+		public void ClearStencil()
+		{
+			GL.ClearNamedFramebuffer(_id, ClearBuffer.Stencil, 0, new []{0});
+		}
+
 		public void Bind()
 		{
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, _id);

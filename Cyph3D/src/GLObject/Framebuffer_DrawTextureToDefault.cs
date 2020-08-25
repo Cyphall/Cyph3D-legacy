@@ -53,7 +53,10 @@ namespace Cyph3D.GLObject
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 			
 			if (clearFramebuffer)
+			{
+				GL.ClearColor(0, 0, 0, 0);
 				GL.Clear(ClearBufferMask.ColorBufferBit);
+			}
 			
 			GL.Enable(EnableCap.Blend);
 			GL.BlendEquation(BlendEquationMode.FuncAdd);
