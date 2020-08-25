@@ -5,9 +5,8 @@ using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D.GLObject
 {
-	public class Cubemap : IDisposable
+	public class Cubemap : BufferBase
 	{
-		private int _ID;
 		private ivec2 _size;
 		public ivec2 Size => _size;
 		
@@ -25,13 +24,11 @@ namespace Cyph3D.GLObject
 			}
 		}
 		
-		public static implicit operator int(Cubemap cubemap) => cubemap._ID;
-		
 		public Cubemap(CubemapSetting setting)
 		{
 			_size = setting.Size;
 			
-			GL.CreateTextures(TextureTarget.TextureCubeMap, 1, out _ID);
+			GL.CreateTextures(TextureTarget.TextureCubeMap, 1, out _id);
 
 			int finteringRaw = setting.Filtering switch
 			{
@@ -40,37 +37,36 @@ namespace Cyph3D.GLObject
 				_ => throw new ArgumentOutOfRangeException(nameof(setting.Filtering), setting.Filtering, null)
 			};
 			
-			GL.TextureParameter(_ID, TextureParameterName.TextureMinFilter, finteringRaw);
-			GL.TextureParameter(_ID, TextureParameterName.TextureMagFilter, finteringRaw);
-			GL.TextureParameter(_ID, TextureParameterName.TextureWrapS, (int)All.ClampToEdge);
-			GL.TextureParameter(_ID, TextureParameterName.TextureWrapT, (int)All.ClampToEdge);
-			GL.TextureParameter(_ID, TextureParameterName.TextureWrapR, (int)All.ClampToEdge);
+			GL.TextureParameter(_id, TextureParameterName.TextureMinFilter, finteringRaw);
+			GL.TextureParameter(_id, TextureParameterName.TextureMagFilter, finteringRaw);
+			GL.TextureParameter(_id, TextureParameterName.TextureWrapS, (int)All.ClampToEdge);
+			GL.TextureParameter(_id, TextureParameterName.TextureWrapT, (int)All.ClampToEdge);
+			GL.TextureParameter(_id, TextureParameterName.TextureWrapR, (int)All.ClampToEdge);
 
 
-			GL.TextureStorage2D(_ID, 1, (SizedInternalFormat)setting.InternalFormat, _size.x, _size.y);
+			GL.TextureStorage2D(_id, 1, (SizedInternalFormat)setting.InternalFormat, _size.x, _size.y);
 			
-			_bindlessHandle = GL.Arb.GetTextureHandle(_ID);
+			_bindlessHandle = GL.Arb.GetTextureHandle(_id);
 		}
 		
 		public void PutData(byte[] data, int face, PixelFormat format = PixelFormat.Rgb, PixelType type = PixelType.UnsignedByte)
 		{
-			GL.TextureSubImage3D(_ID, 0, 0, 0, face, _size.x, _size.y, 1, format, type, data);
+			GL.TextureSubImage3D(_id, 0, 0, 0, face, _size.x, _size.y, 1, format, type, data);
 		}
 		
 		public void PutData(IntPtr data, int face, PixelFormat format = PixelFormat.Rgb, PixelType type = PixelType.UnsignedByte)
 		{
-			GL.TextureSubImage3D(_ID, 0, 0, 0, face, _size.x, _size.y, 1, format, type, data);
+			GL.TextureSubImage3D(_id, 0, 0, 0, face, _size.x, _size.y, 1, format, type, data);
 		}
-		
-		public void Dispose()
+
+		protected override void DeleteBuffer()
 		{
-			GL.DeleteTexture(_ID);
-			_ID = 0;
+			GL.DeleteTexture(_id);
 		}
-		
+
 		public void Bind(int unit)
 		{
-			GL.BindTextureUnit(unit, _ID);
+			GL.BindTextureUnit(unit, _id);
 		}
 	}
 }

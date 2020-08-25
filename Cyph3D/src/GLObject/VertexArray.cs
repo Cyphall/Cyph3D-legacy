@@ -5,15 +5,13 @@ using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D.GLObject
 {
-	public unsafe class VertexArray : IDisposable
+	public class VertexArray : BufferBase
 	{
-		private int _ID;
-		
 		private List<BufferBase> _mappedBuffers = new List<BufferBase>();
 
 		public VertexArray()
 		{
-			GL.CreateVertexArrays(1, out _ID);
+			GL.CreateVertexArrays(1, out _id);
 		}
 
 		private int ResolveBufferIndex<T>(VertexBuffer<T> buffer) where T: unmanaged
@@ -21,7 +19,7 @@ namespace Cyph3D.GLObject
 			if (!_mappedBuffers.Contains(buffer))
 			{
 				_mappedBuffers.Add(buffer);
-				GL.VertexArrayVertexBuffer(_ID, _mappedBuffers.Count-1, buffer, IntPtr.Zero, buffer.Stride);
+				GL.VertexArrayVertexBuffer(_id, _mappedBuffers.Count-1, buffer, IntPtr.Zero, buffer.Stride);
 			}
 
 			return _mappedBuffers.IndexOf(buffer);
@@ -31,9 +29,9 @@ namespace Cyph3D.GLObject
 		{
 			int bindingIndex = ResolveBufferIndex(buffer);
 			
-			GL.EnableVertexArrayAttrib(_ID, index);
-			GL.VertexArrayAttribFormat(_ID, index, dataCount, dataType, false, offset);
-			GL.VertexArrayAttribBinding(_ID, index, bindingIndex);
+			GL.EnableVertexArrayAttrib(_id, index);
+			GL.VertexArrayAttribFormat(_id, index, dataCount, dataType, false, offset);
+			GL.VertexArrayAttribBinding(_id, index, bindingIndex);
 		}
 		
 		public void RegisterAttrib<T>(VertexBuffer<T> buffer, int index, int dataCount, VertexAttribType dataType, string structFieldName) where T: unmanaged
@@ -43,18 +41,17 @@ namespace Cyph3D.GLObject
 
 		public void RegisterIndexBuffer(BufferBase buffer)
 		{
-			GL.VertexArrayElementBuffer(_ID, buffer);
+			GL.VertexArrayElementBuffer(_id, buffer);
 		}
 
 		public void Bind()
 		{
-			GL.BindVertexArray(_ID);
+			GL.BindVertexArray(_id);
 		}
 
-		public void Dispose()
+		protected override void DeleteBuffer()
 		{
-			GL.DeleteVertexArray(_ID);
-			_ID = 0;
+			GL.DeleteVertexArray(_id);
 		}
 	}
 }

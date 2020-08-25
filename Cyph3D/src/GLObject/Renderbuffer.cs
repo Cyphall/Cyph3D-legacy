@@ -5,22 +5,18 @@ using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D.GLObject
 {
-	public class Renderbuffer : IDisposable
+	public class Renderbuffer : BufferBase
 	{
-		private int _ID;
-
-		public static implicit operator int(Renderbuffer renderbuffer) => renderbuffer._ID;
-
 		public Renderbuffer(ivec2 size, RenderbufferStorage internalFormat)
 		{
-			GL.CreateRenderbuffers(1, out _ID);
+			GL.CreateRenderbuffers(1, out _id);
 			
-			GL.NamedRenderbufferStorage(_ID, internalFormat, size.x, size.y);
+			GL.NamedRenderbufferStorage(_id, internalFormat, size.x, size.y);
 		}
 		
 		public void Bind()
 		{
-			Bind(this);
+			Bind(_id);
 		}
 		
 		private static void Bind(int renderbuffer)
@@ -28,10 +24,9 @@ namespace Cyph3D.GLObject
 			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, renderbuffer);
 		}
 
-		public void Dispose()
+		protected override void DeleteBuffer()
 		{
-			GL.DeleteRenderbuffer(_ID);
-			_ID = 0;
+			GL.DeleteRenderbuffer(_id);
 		}
 	}
 }

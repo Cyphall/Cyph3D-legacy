@@ -9,7 +9,7 @@ namespace Cyph3D.GLObject
 	{
 		public void Bind(int bindingPoint)
 		{
-			GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, bindingPoint, _ID);
+			GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, bindingPoint, _id);
 		}
 
 		public ShaderStorageBuffer() : base(true)

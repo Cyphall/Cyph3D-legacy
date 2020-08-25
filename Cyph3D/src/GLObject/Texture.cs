@@ -8,9 +8,8 @@ using ExtTextureFilterAnisotropic = OpenToolkit.Graphics.OpenGL.ExtTextureFilter
 
 namespace Cyph3D.GLObject
 {
-	public class Texture : IDisposable
+	public class Texture : BufferBase
 	{
-		private int _ID;
 		private ivec2 _size;
 		public ivec2 Size => _size;
 		private bool _useMipmaps;
@@ -28,8 +27,6 @@ namespace Cyph3D.GLObject
 				return _bindlessHandle;
 			}
 		}
-		
-		public static implicit operator int(Texture texture) => texture._ID;
 
 		public Texture(TextureSetting settings)
 		{
@@ -38,7 +35,7 @@ namespace Cyph3D.GLObject
 			_size = settings.Size;
 			_useMipmaps = settings.UseMipmaps;
 			
-			GL.CreateTextures(TextureTarget.Texture2D, 1, out _ID);
+			GL.CreateTextures(TextureTarget.Texture2D, 1, out _id);
 
 			int minFintering = (int)(_useMipmaps ? All.LinearMipmapLinear : All.Linear);
 			int magFintering = settings.Filtering switch
@@ -48,24 +45,24 @@ namespace Cyph3D.GLObject
 				_ => throw new ArgumentOutOfRangeException(nameof(settings.Filtering), settings.Filtering, null)
 			};
 			
-			GL.TextureParameter(_ID, TextureParameterName.TextureMinFilter, minFintering);
-			GL.TextureParameter(_ID, TextureParameterName.TextureMagFilter, magFintering);
+			GL.TextureParameter(_id, TextureParameterName.TextureMinFilter, minFintering);
+			GL.TextureParameter(_id, TextureParameterName.TextureMagFilter, magFintering);
 			if (_useMipmaps)
 			{
 				GL.GetFloat((GetPName) ExtTextureFilterAnisotropic.MaxTextureMaxAnisotropyExt, out float anisoCount);
-				GL.TextureParameter(_ID, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, anisoCount);
+				GL.TextureParameter(_id, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, anisoCount);
 			}
 
 			if (settings.IsShadowMap)
 			{
-				GL.TextureParameter(_ID, TextureParameterName.TextureWrapS, (int)All.ClampToBorder);
-				GL.TextureParameter(_ID, TextureParameterName.TextureWrapT, (int)All.ClampToBorder);
-				GL.TextureParameter(_ID, TextureParameterName.TextureBorderColor, new []{1f, 1f, 1f, 1f});
+				GL.TextureParameter(_id, TextureParameterName.TextureWrapS, (int)All.ClampToBorder);
+				GL.TextureParameter(_id, TextureParameterName.TextureWrapT, (int)All.ClampToBorder);
+				GL.TextureParameter(_id, TextureParameterName.TextureBorderColor, new []{1f, 1f, 1f, 1f});
 			}
 
-			GL.TextureStorage2D(_ID, _useMipmaps ? CalculateMipmapCount(_size) : 1, (SizedInternalFormat)settings.InternalFormat, _size.x, _size.y);
+			GL.TextureStorage2D(_id, _useMipmaps ? CalculateMipmapCount(_size) : 1, (SizedInternalFormat)settings.InternalFormat, _size.x, _size.y);
 			
-			_bindlessHandle = GL.Arb.GetTextureHandle(_ID);
+			_bindlessHandle = GL.Arb.GetTextureHandle(_id);
 		}
 
 		private static int CalculateMipmapCount(ivec2 size)
@@ -75,27 +72,26 @@ namespace Cyph3D.GLObject
 
 		public void PutData(byte[] data, PixelFormat format = PixelFormat.Rgb, PixelType type = PixelType.UnsignedByte)
 		{
-			GL.TextureSubImage2D(_ID, 0, 0, 0, _size.x, _size.y, format, type, data);
+			GL.TextureSubImage2D(_id, 0, 0, 0, _size.x, _size.y, format, type, data);
 			if (_useMipmaps)
-				GL.GenerateTextureMipmap(_ID);
+				GL.GenerateTextureMipmap(_id);
 		}
 		
 		public void PutData(IntPtr data, PixelFormat format = PixelFormat.Rgb, PixelType type = PixelType.UnsignedByte)
 		{
-			GL.TextureSubImage2D(_ID, 0, 0, 0, _size.x, _size.y, format, type, data);
+			GL.TextureSubImage2D(_id, 0, 0, 0, _size.x, _size.y, format, type, data);
 			if (_useMipmaps)
-				GL.GenerateTextureMipmap(_ID);
+				GL.GenerateTextureMipmap(_id);
 		}
 
-		public void Dispose()
+		protected override void DeleteBuffer()
 		{
-			GL.DeleteTexture(_ID);
-			_ID = 0;
+			GL.DeleteTexture(_id);
 		}
 
 		public void Bind(int unit)
 		{
-			GL.BindTextureUnit(unit, _ID);
+			GL.BindTextureUnit(unit, _id);
 		}
 
 		static Texture()

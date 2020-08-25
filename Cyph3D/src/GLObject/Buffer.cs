@@ -3,7 +3,7 @@ using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D.GLObject
 {
-	public unsafe class Buffer<T> : BufferBase, IDisposable where T: unmanaged
+	public unsafe class Buffer<T> : BufferBase where T: unmanaged
 	{
 		public bool IsMutable { get; }
 
@@ -11,6 +11,7 @@ namespace Cyph3D.GLObject
 
 		public Buffer(bool mutable)
 		{
+			GL.CreateBuffers(1, out _id);
 			IsMutable = mutable;
 		}
 
@@ -18,26 +19,25 @@ namespace Cyph3D.GLObject
 		{
 			if (IsMutable)
 			{
-				GL.NamedBufferData(_ID, sizeof(T) * data.Length, data, BufferUsageHint.DynamicDraw);
+				GL.NamedBufferData(_id, sizeof(T) * data.Length, data, BufferUsageHint.DynamicDraw);
 			}
 			else
 			{
 				if (_isAlloccated)
 				{
-					GL.NamedBufferSubData(_ID, IntPtr.Zero, sizeof(T) * data.Length, data);
+					GL.NamedBufferSubData(_id, IntPtr.Zero, sizeof(T) * data.Length, data);
 				}
 				else
 				{
-					GL.NamedBufferStorage(_ID, sizeof(T) * data.Length, data, BufferStorageFlags.None);
+					GL.NamedBufferStorage(_id, sizeof(T) * data.Length, data, BufferStorageFlags.None);
 					_isAlloccated = true;
 				}
 			}
 		}
 
-		public void Dispose()
+		protected override void DeleteBuffer()
 		{
-			GL.DeleteBuffer(_ID);
-			_ID = 0;
+			GL.DeleteBuffer(_id);
 		}
 	}
 }

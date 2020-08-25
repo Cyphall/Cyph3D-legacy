@@ -20,7 +20,7 @@ namespace Cyph3D.GLObject
 				throw new InvalidOperationException("The texture has a different size than the framebuffer size");
 			}
 			
-			GL.NamedFramebufferTexture(_ID, attachment, texture ?? 0, 0);
+			GL.NamedFramebufferTexture(_id, attachment, texture ?? 0, 0);
 
 			if (IsDrawBuffer(attachment))
 			{
@@ -56,11 +56,11 @@ namespace Cyph3D.GLObject
 
 			if (face != null)
 			{
-				GL.NamedFramebufferTextureLayer(_ID, attachment, cubemap ?? 0, 0, face.Value);
+				GL.NamedFramebufferTextureLayer(_id, attachment, cubemap ?? 0, 0, face.Value);
 			}
 			else
 			{
-				GL.NamedFramebufferTexture(_ID, attachment, cubemap ?? 0, 0);
+				GL.NamedFramebufferTexture(_id, attachment, cubemap ?? 0, 0);
 			}
 
 			if (IsDrawBuffer(attachment))
@@ -84,7 +84,7 @@ namespace Cyph3D.GLObject
 		{
 			Renderbuffer renderbuffer = new Renderbuffer(_size, internalFormat);
 			
-			GL.NamedFramebufferRenderbuffer(_ID, attachment, RenderbufferTarget.Renderbuffer, renderbuffer);
+			GL.NamedFramebufferRenderbuffer(_id, attachment, RenderbufferTarget.Renderbuffer, renderbuffer);
 			
 			if (IsDrawBuffer(attachment))
 				_drawBuffers.Add((DrawBuffersEnum)attachment);

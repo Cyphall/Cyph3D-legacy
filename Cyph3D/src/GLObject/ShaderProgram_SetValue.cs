@@ -7,14 +7,14 @@ namespace Cyph3D.GLObject
 	{
 		public void SetValue(string variableName, params float[] data)
 		{
-			GL.ProgramUniform1(_ID, GetLocation(variableName), data.Length, data);
+			GL.ProgramUniform1(_id, GetLocation(variableName), data.Length, data);
 		}
 		
 		public unsafe void SetValue(string variableName, params vec2[] data)
 		{
 			fixed (vec2* ptr = data)
 			{
-				GL.ProgramUniform2(_ID, GetLocation(variableName), data.Length, (float*)ptr);
+				GL.ProgramUniform2(_id, GetLocation(variableName), data.Length, (float*)ptr);
 			}
 		}
 		
@@ -22,20 +22,20 @@ namespace Cyph3D.GLObject
 		{
 			fixed (vec3* ptr = data)
 			{
-				GL.ProgramUniform3(_ID, GetLocation(variableName), data.Length, (float*)ptr);
+				GL.ProgramUniform3(_id, GetLocation(variableName), data.Length, (float*)ptr);
 			}
 		}
 		
 		public void SetValue(string variableName, params int[] data)
 		{
-			GL.ProgramUniform1(_ID, GetLocation(variableName), data.Length, data);
+			GL.ProgramUniform1(_id, GetLocation(variableName), data.Length, data);
 		}
 		
 		public unsafe void SetValue(string variableName, params ivec2[] data)
 		{
 			fixed (ivec2* ptr = data)
 			{
-				GL.ProgramUniform2(_ID, GetLocation(variableName), data.Length, (int*)ptr);
+				GL.ProgramUniform2(_id, GetLocation(variableName), data.Length, (int*)ptr);
 			}
 		}
 		
@@ -43,7 +43,7 @@ namespace Cyph3D.GLObject
 		{
 			fixed (ivec3* ptr = data)
 			{
-				GL.ProgramUniform3(_ID, GetLocation(variableName), data.Length, (int*)ptr);
+				GL.ProgramUniform3(_id, GetLocation(variableName), data.Length, (int*)ptr);
 			}
 		}
 
@@ -51,7 +51,7 @@ namespace Cyph3D.GLObject
 		{
 			fixed (mat3* ptr = data)
 			{
-				GL.ProgramUniformMatrix3(_ID, GetLocation(variableName), data.Length, false, (float*)ptr);
+				GL.ProgramUniformMatrix3(_id, GetLocation(variableName), data.Length, false, (float*)ptr);
 			}
 		}
 		
@@ -59,7 +59,7 @@ namespace Cyph3D.GLObject
 		{
 			fixed (mat4* ptr = data)
 			{
-				GL.ProgramUniformMatrix4(_ID, GetLocation(variableName), data.Length, false, (float*)ptr);
+				GL.ProgramUniformMatrix4(_id, GetLocation(variableName), data.Length, false, (float*)ptr);
 			}
 		}
 		
@@ -71,7 +71,7 @@ namespace Cyph3D.GLObject
 				handles[i] = data[i].BindlessHandle;
 			}
 			
-			GL.Arb.ProgramUniformHandle(_ID, GetLocation(variableName), data.Length, handles);
+			GL.Arb.ProgramUniformHandle(_id, GetLocation(variableName), data.Length, handles);
 		}
 		
 		public void SetValue(string variableName, params Cubemap[] data)
@@ -82,7 +82,7 @@ namespace Cyph3D.GLObject
 				handles[i] = data[i].BindlessHandle;
 			}
 			
-			GL.Arb.ProgramUniformHandle(_ID, GetLocation(variableName), data.Length, handles);
+			GL.Arb.ProgramUniformHandle(_id, GetLocation(variableName), data.Length, handles);
 		}
 	}
 }

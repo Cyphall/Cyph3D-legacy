@@ -8,18 +8,14 @@ using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D.GLObject
 {
-	public partial class ShaderProgram : IDisposable
+	public partial class ShaderProgram : BufferBase
 	{
-		private int _ID;
-
 		private Dictionary<string, int> _uniforms = new Dictionary<string, int>();
-		
-		public static implicit operator int(ShaderProgram shaderProgramc) => shaderProgramc._ID;
 		
 		public ShaderProgram(Dictionary<ShaderType, string[]> data)
 		{
-			_ID = GL.CreateProgram();
-			if (_ID == 0)
+			_id = GL.CreateProgram();
+			if (_id == 0)
 			{
 				throw new InvalidOperationException("Unable to create shader program instance");
 			}
@@ -29,37 +25,37 @@ namespace Cyph3D.GLObject
 			foreach ((ShaderType type, string[] files) in data)
 			{
 				int shader = LoadShader(type, files);
-				GL.AttachShader(_ID, shader);
+				GL.AttachShader(_id, shader);
 				shaders.Add(shader);
 			}
 			
-			GL.LinkProgram(_ID);
+			GL.LinkProgram(_id);
 
 			for (int i = 0; i < shaders.Count; i++)
 			{
 				int shader = shaders[i];
-				GL.DetachShader(_ID, shader);
+				GL.DetachShader(_id, shader);
 				GL.DeleteShader(shader);
 			}
 			
-			GL.GetProgram(_ID, GetProgramParameterName.LinkStatus, out int linkSuccess);
+			GL.GetProgram(_id, GetProgramParameterName.LinkStatus, out int linkSuccess);
 			
 			if(linkSuccess == (int)All.False)
 			{
-				GL.GetProgram(_ID, GetProgramParameterName.InfoLogLength, out int length);
+				GL.GetProgram(_id, GetProgramParameterName.InfoLogLength, out int length);
 				
-				GL.GetProgramInfoLog(_ID, length, out _, out string error);
+				GL.GetProgramInfoLog(_id, length, out _, out string error);
 		
 				throw new InvalidOperationException($"Error while linking shaders to program: {error}");
 			}
 			
-			GL.GetProgramInterface(_ID, ProgramInterface.Uniform, ProgramInterfaceParameter.ActiveResources, out int uniformCount);
+			GL.GetProgramInterface(_id, ProgramInterface.Uniform, ProgramInterfaceParameter.ActiveResources, out int uniformCount);
 
 			for (int i = 0; i < uniformCount; i++)
 			{
 				int[] values = new int[2];
 				GL.GetProgramResource(
-					_ID,
+					_id,
 					ProgramInterface.Uniform,
 					i,
 					2,
@@ -69,7 +65,7 @@ namespace Cyph3D.GLObject
 					values
 				);
 				
-				GL.GetProgramResourceName(_ID, ProgramInterface.Uniform, i, values[0], out int _, out string name);
+				GL.GetProgramResourceName(_id, ProgramInterface.Uniform, i, values[0], out int _, out string name);
 
 				if (values[1] > 1)
 				{
@@ -78,7 +74,7 @@ namespace Cyph3D.GLObject
 					for (int j = 0; j < values[1]; j++)
 					{
 						string fullName = $"{arrayName}[{j}]";
-						_uniforms.Add(fullName, GL.GetUniformLocation(_ID, fullName));
+						_uniforms.Add(fullName, GL.GetUniformLocation(_id, fullName));
 					}
 				}
 				else
@@ -146,15 +142,14 @@ namespace Cyph3D.GLObject
 			return _uniforms.GetValueOrDefault(variableName, -1);
 		}
 
-		public void Dispose()
+		protected override void DeleteBuffer()
 		{
-			GL.DeleteProgram(_ID);
-			_ID = 0;
+			GL.DeleteProgram(_id);
 		}
-		
+
 		public void Bind()
 		{
-			GL.UseProgram(_ID);
+			GL.UseProgram(_id);
 		}
 	}
 }

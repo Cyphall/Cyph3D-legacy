@@ -1,16 +1,19 @@
-﻿using OpenToolkit.Graphics.OpenGL4;
+﻿using System;
 
 namespace Cyph3D.GLObject
 {
-	public abstract class BufferBase
+	public abstract class BufferBase : IDisposable
 	{
-		protected int _ID;
+		protected int _id = -1;
 		
-		public static implicit operator int(BufferBase buffer) => buffer._ID;
+		public static implicit operator int(BufferBase buffer) => buffer._id;
 
-		protected BufferBase()
+		public void Dispose()
 		{
-			GL.CreateBuffers(1, out _ID);
+			DeleteBuffer();
+			_id = -1;
 		}
+		
+		protected abstract void DeleteBuffer();
 	}
 }
