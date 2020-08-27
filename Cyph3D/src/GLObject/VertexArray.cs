@@ -25,18 +25,18 @@ namespace Cyph3D.GLObject
 			return _mappedBuffers.IndexOf(buffer);
 		}
 
-		public void RegisterAttrib<T>(VertexBuffer<T> buffer, int index, int elementsPerVertex, VertexAttribType dataType, int offset) where T: unmanaged
+		public void RegisterAttrib<T>(VertexBuffer<T> buffer, int location, int elementsPerVertex, VertexAttribType dataType, int offset) where T: unmanaged
 		{
 			int bindingIndex = ResolveBufferIndex(buffer);
 			
-			GL.EnableVertexArrayAttrib(_id, index);
-			GL.VertexArrayAttribFormat(_id, index, elementsPerVertex, dataType, false, offset);
-			GL.VertexArrayAttribBinding(_id, index, bindingIndex);
+			GL.EnableVertexArrayAttrib(_id, location);
+			GL.VertexArrayAttribFormat(_id, location, elementsPerVertex, dataType, false, offset);
+			GL.VertexArrayAttribBinding(_id, location, bindingIndex);
 		}
 		
-		public void RegisterAttrib<T>(VertexBuffer<T> buffer, int index, int elementsPerVertex, VertexAttribType dataType, string structFieldName) where T: unmanaged
+		public void RegisterAttrib<T>(VertexBuffer<T> buffer, int location, int elementsPerVertex, VertexAttribType dataType, string structFieldName) where T: unmanaged
 		{
-			RegisterAttrib(buffer, index, elementsPerVertex, dataType, Marshal.OffsetOf<T>(structFieldName).ToInt32());
+			RegisterAttrib(buffer, location, elementsPerVertex, dataType, Marshal.OffsetOf<T>(structFieldName).ToInt32());
 		}
 
 		public void RegisterIndexBuffer(BufferBase buffer)
