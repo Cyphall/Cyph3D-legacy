@@ -6,8 +6,6 @@ namespace Cyph3D.GLObject
 {
 	public partial class Framebuffer
 	{
-		private static VertexArray _quadVAO;
-		private static VertexBuffer<float> _quadVBO;
 		private static ShaderProgram _shaderProgram;
 
 		public static void InitDrawToDefault()
