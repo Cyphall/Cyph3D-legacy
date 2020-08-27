@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Cyph3D.Misc;
-using OpenToolkit.Graphics.OpenGL4;
+﻿using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D.GLObject
 {

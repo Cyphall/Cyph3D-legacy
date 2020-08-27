@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using GlmSharp;
+﻿using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D.GLObject

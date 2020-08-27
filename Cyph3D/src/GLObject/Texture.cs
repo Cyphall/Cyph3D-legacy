@@ -2,9 +2,16 @@
 using System.Diagnostics;
 using Cyph3D.Enumerable;
 using GlmSharp;
-using OpenToolkit.Graphics.OpenGL4;
+using OpenToolkit.Graphics.OpenGL;
 using StbImageNET;
-using ExtTextureFilterAnisotropic = OpenToolkit.Graphics.OpenGL.ExtTextureFilterAnisotropic;
+using All = OpenToolkit.Graphics.OpenGL4.All;
+using GetPName = OpenToolkit.Graphics.OpenGL4.GetPName;
+using GL = OpenToolkit.Graphics.OpenGL4.GL;
+using PixelFormat = OpenToolkit.Graphics.OpenGL4.PixelFormat;
+using PixelType = OpenToolkit.Graphics.OpenGL4.PixelType;
+using SizedInternalFormat = OpenToolkit.Graphics.OpenGL4.SizedInternalFormat;
+using TextureParameterName = OpenToolkit.Graphics.OpenGL4.TextureParameterName;
+using TextureTarget = OpenToolkit.Graphics.OpenGL4.TextureTarget;
 
 namespace Cyph3D.GLObject
 {

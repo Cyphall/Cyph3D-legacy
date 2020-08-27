@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cyph3D.Lighting;
-using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D
 {

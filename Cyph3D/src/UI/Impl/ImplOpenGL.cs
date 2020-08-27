@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Cyph3D.Enumerable;
 using Cyph3D.GLObject;
-using Cyph3D.Misc;
 using Cyph3D.ResourceManagement;
 using GlmSharp;
 using ImGuiNET;

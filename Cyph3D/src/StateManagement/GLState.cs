@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Cyph3D.GLObject;
 using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D.StateManagement
