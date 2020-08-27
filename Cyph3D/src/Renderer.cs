@@ -125,12 +125,20 @@ namespace Cyph3D
 		{
 			ShadowMapPass();
 			
+			UpdateLightBuffers();
+			
 			_gbuffer.ClearAll();
 
 			FirstPass(camera.View, camera.Projection, camera.Position);
 			if (Engine.Scene.Skybox != null)
 				SkyboxPass(camera.View, camera.Projection);
 			LightingPass(camera.Position, camera.View, camera.Projection);
+		}
+		
+		private void UpdateLightBuffers()
+		{
+			_pointLightsBuffer.PutData(Engine.Scene.LightManager.PointLightsNative);
+			_directionalLightsBuffer.PutData(Engine.Scene.LightManager.DirectionalLightsNative);
 		}
 
 		private void ShadowMapPass()
@@ -193,9 +201,7 @@ namespace Cyph3D
 
 		private void LightingPass(vec3 viewPos, mat4 view, mat4 projection)
 		{
-			_pointLightsBuffer.PutData(Engine.Scene.LightManager.PointLightsNative);
 			_pointLightsBuffer.Bind(0);
-			_directionalLightsBuffer.PutData(Engine.Scene.LightManager.DirectionalLightsNative);
 			_directionalLightsBuffer.Bind(1);
 
 			_lightingPassShader.SetValue("viewPos", viewPos);
