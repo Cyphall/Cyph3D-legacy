@@ -1,7 +1,7 @@
 ﻿using System;
 using OpenToolkit.Graphics.OpenGL4;
 
-namespace Cyph3D.Extension
+namespace Cyph3D.Helper
 {
 	public static class TextureHelper
 	{

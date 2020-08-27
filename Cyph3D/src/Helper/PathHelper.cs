@@ -1,6 +1,6 @@
-﻿namespace Cyph3D.Extension
+﻿namespace Cyph3D.Helper
 {
-	public static class PathUtility
+	public static class PathHelper
 	{
 		public static string GetPathWithoutExtension(string path)
 		{

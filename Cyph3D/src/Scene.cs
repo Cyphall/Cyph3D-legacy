@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Json;
-using Cyph3D.Extension;
 using Cyph3D.GLObject;
+using Cyph3D.Helper;
 using Cyph3D.Lighting;
 using Cyph3D.Misc;
 using Cyph3D.ResourceManagement;

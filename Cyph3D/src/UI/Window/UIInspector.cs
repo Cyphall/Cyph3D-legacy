@@ -1,11 +1,10 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Cyph3D.Extension;
 using Cyph3D.GLObject;
+using Cyph3D.Helper;
 using Cyph3D.Lighting;
-using Cyph3D.Misc;
 using ImGuiNET;
 
 // ReSharper disable PossibleLossOfFraction

@@ -1,5 +1,4 @@
 ﻿using Cyph3D.Helper;
-using Cyph3D.Misc;
 using Cyph3D.ResourceManagement;
 using OpenToolkit.Graphics.OpenGL4;
 

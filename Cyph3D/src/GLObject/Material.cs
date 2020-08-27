@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Json;
 using Cyph3D.Enumerable;
-using Cyph3D.Extension;
+using Cyph3D.Helper;
 using Cyph3D.Misc;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;

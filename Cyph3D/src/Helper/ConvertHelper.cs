@@ -3,7 +3,7 @@ using System.Numerics;
 using GlmSharp;
 using Quaternion = Cyph3D.Misc.Quaternion;
 
-namespace Cyph3D.Extension
+namespace Cyph3D.Helper
 {
 	public static class ConvertHelper
 	{

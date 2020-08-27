@@ -4,6 +4,7 @@ using System.IO;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Cyph3D.Extension;
+using Cyph3D.Helper;
 using ImGuiNET;
 
 namespace Cyph3D.UI.Window
@@ -136,7 +137,7 @@ namespace Cyph3D.UI.Window
 		{
 			foreach (string meshPath in Directory.GetFiles(path))
 			{
-				_meshes.Add(PathUtility.GetPathWithoutExtension(meshPath.Remove("resources/meshes/").Replace(@"\", "/")));
+				_meshes.Add(PathHelper.GetPathWithoutExtension(meshPath.Remove("resources/meshes/").Replace(@"\", "/")));
 			}
 			
 			foreach (string folder in Directory.GetDirectories(path))
