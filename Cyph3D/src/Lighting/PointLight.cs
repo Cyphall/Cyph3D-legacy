@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using Cyph3D.GLObject;
 using Cyph3D.Misc;
 using Cyph3D.ResourceManagement;
+using Cyph3D.StateManagement;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 
@@ -65,7 +66,9 @@ namespace Cyph3D.Lighting
 		{
 			if (!_castShadows) throw new InvalidOperationException("UpdateShadowMap() should not be called on non-shadow-casting lights");
 			
-			GL.Viewport(0, 0, SIZE, SIZE);
+			GLStateManager.Push();
+			
+			GLStateManager.Viewport = new GlViewport(0, 0, SIZE, SIZE);
 
 			vec3 worldPos = Transform.WorldPosition;
 			
@@ -99,6 +102,8 @@ namespace Cyph3D.Lighting
 					meshObject.Mesh?.Render();
 				}
 			}
+			
+			GLStateManager.Pop();
 		}
 		
 		public NativeLightData NativeLight =>

@@ -1,5 +1,6 @@
 ﻿using Cyph3D.Helper;
 using Cyph3D.ResourceManagement;
+using Cyph3D.StateManagement;
 using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D.GLObject
@@ -21,34 +22,24 @@ namespace Cyph3D.GLObject
 
 		public static void DrawToDefault(ShaderProgram shader, bool clearFramebuffer = false)
 		{
-			int previousBlend = GL.GetInteger(GetPName.Blend);
-			int previousBlendSrc= GL.GetInteger(GetPName.BlendSrc);
-			int previousBlendDst= GL.GetInteger(GetPName.BlendDst);
-			int previousBlendEquationRgb = GL.GetInteger(GetPName.BlendEquationRgb);
-			int previousBlendEquationAlpha = GL.GetInteger(GetPName.BlendEquationAlpha);
+			GLStateManager.Push();
 			
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 			
 			if (clearFramebuffer)
 			{
-				GL.ClearColor(0, 0, 0, 0);
 				GL.Clear(ClearBufferMask.ColorBufferBit);
 			}
 			
-			GL.Enable(EnableCap.Blend);
-			GL.BlendEquation(BlendEquationMode.FuncAdd);
-			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+			GLStateManager.Blend = true;
+			GLStateManager.BlendEquation = BlendEquationMode.FuncAdd;
+			GLStateManager.BlendFunc = new GLBlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 			
 			shader.Bind();
 			
 			RenderHelper.DrawScreenQuad();
 
-			if (previousBlend == 1)
-				GL.Enable(EnableCap.Blend);
-			else 
-				GL.Disable(EnableCap.Blend);
-			GL.BlendFunc((BlendingFactor)previousBlendSrc, (BlendingFactor)previousBlendDst);
-			GL.BlendEquationSeparate((BlendEquationMode)previousBlendEquationRgb, (BlendEquationMode)previousBlendEquationAlpha);
+			GLStateManager.Pop();
 		}
 		
 		public static void DrawToDefault(Texture texture, bool clearFramebuffer = false)

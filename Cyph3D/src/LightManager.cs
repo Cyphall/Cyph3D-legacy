@@ -83,7 +83,6 @@ namespace Cyph3D
 
 		public void UpdateShadowMaps()
 		{
-			GL.Disable(EnableCap.CullFace);
 			for (int i = 0; i < _directionalLights.Count; i++)
 			{
 				if (_directionalLights[i].CastShadows)

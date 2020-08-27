@@ -4,6 +4,7 @@ using Cyph3D.GLObject;
 using Cyph3D.Helper;
 using Cyph3D.Lighting;
 using Cyph3D.ResourceManagement;
+using Cyph3D.StateManagement;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 
@@ -122,26 +123,38 @@ namespace Cyph3D
 
 		public void Render(Camera camera)
 		{
-			GL.Enable(EnableCap.DepthTest);
-			GL.DepthFunc(DepthFunction.Lequal);
+			ShadowMapPass();
 			
-			Engine.Scene.LightManager.UpdateShadowMaps();
-			
-			GL.Enable(EnableCap.CullFace);
-			GL.FrontFace(FrontFaceDirection.Ccw);
-			
-			GL.Viewport(0, 0, Engine.Window.Size.x, Engine.Window.Size.y);
-			_gbuffer.Bind();
 			_gbuffer.ClearAll();
-			
+
 			FirstPass(camera.View, camera.Projection, camera.Position);
 			if (Engine.Scene.Skybox != null)
 				SkyboxPass(camera.View, camera.Projection);
 			LightingPass(camera.Position, camera.View, camera.Projection);
 		}
 
+		private void ShadowMapPass()
+		{
+			GLStateManager.Push();
+
+			GLStateManager.DepthTest = true;
+			GLStateManager.DepthFunc = DepthFunction.Lequal;
+			
+			Engine.Scene.LightManager.UpdateShadowMaps();
+			
+			GLStateManager.Pop();
+		}
+
 		private void FirstPass(mat4 view, mat4 projection, vec3 viewPos)
 		{
+			GLStateManager.Push();
+			
+			GLStateManager.DepthTest = true;
+			GLStateManager.DepthFunc = DepthFunction.Lequal;
+			
+			GLStateManager.CullFace = true;
+			GLStateManager.FrontFace = FrontFaceDirection.Ccw;
+			
 			_gbuffer.Bind();
 			
 			for (int i = 0; i < Engine.Scene.Objects.Count; i++)
@@ -149,11 +162,18 @@ namespace Cyph3D
 				if (Engine.Scene.Objects[i] is MeshObject meshObject)
 					meshObject.Render(view, projection, viewPos);
 			}
+			
+			GLStateManager.Pop();
 		}
 		
 		private void SkyboxPass(mat4 view, mat4 projection)
 		{
-			GL.DepthMask(false);
+			GLStateManager.Push();
+
+			GLStateManager.DepthTest = true;
+			GLStateManager.DepthFunc = DepthFunction.Lequal;
+			GLStateManager.DepthMask = false;
+			
 			_gbuffer.Bind();
 			
 			_skyboxShader.Bind();
@@ -167,13 +187,12 @@ namespace Cyph3D
 			_skyboxVAO.Bind();
 			
 			GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
-			GL.DepthMask(true);
+			
+			GLStateManager.Pop();
 		}
 
 		private void LightingPass(vec3 viewPos, mat4 view, mat4 projection)
 		{
-			GL.Disable(EnableCap.DepthTest);
-			
 			_pointLightsBuffer.PutData(Engine.Scene.LightManager.PointLightsNative);
 			_pointLightsBuffer.Bind(0);
 			_directionalLightsBuffer.PutData(Engine.Scene.LightManager.DirectionalLightsNative);

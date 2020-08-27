@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using Cyph3D.GLObject;
 using Cyph3D.Misc;
 using Cyph3D.ResourceManagement;
+using Cyph3D.StateManagement;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 
@@ -61,7 +62,9 @@ namespace Cyph3D.Lighting
 		{
 			if (!_castShadows) throw new InvalidOperationException("UpdateShadowMap() should not be called on non-shadow-casting lights");
 			
-			GL.Viewport(0, 0, SIZE, SIZE);
+			GLStateManager.Push();
+			
+			GLStateManager.Viewport = new GlViewport(0, 0, SIZE, SIZE);
 			
 			ViewProjection = mat4.Ortho(-30, 30, -30, 30, 0, 100) *
 			                 mat4.LookAt(
@@ -83,6 +86,8 @@ namespace Cyph3D.Lighting
 					meshObject.Mesh?.Render();
 				}
 			}
+			
+			GLStateManager.Pop();
 		}
 
 		private vec3 LightDirection => (new mat4(new mat3(Transform.WorldMatrix)) * new vec4(0, -1, 0, 1)).xyz;
