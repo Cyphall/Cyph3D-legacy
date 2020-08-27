@@ -1,6 +1,6 @@
-﻿using System;
-using Cyph3D.Enumerable;
+﻿using Cyph3D.Enumerable;
 using Cyph3D.GLObject;
+using Cyph3D.Helper;
 using Cyph3D.Lighting;
 using Cyph3D.ResourceManagement;
 using GlmSharp;
@@ -16,7 +16,8 @@ namespace Cyph3D
 		private Texture _materialTexture;
 		private Texture _geometryNormalTexture;
 		private Texture _depthTexture;
-		private int _skyboxVAO;
+		private VertexArray _skyboxVAO;
+		private VertexBuffer<float> _skyboxVBO;
 		private ShaderProgram _lightingPassShader;
 		private ShaderProgram _skyboxShader;
 		private ShaderStorageBuffer<PointLight.NativeLightData> _pointLightsBuffer;
@@ -56,14 +57,16 @@ namespace Cyph3D
 					.WithShader(ShaderType.FragmentShader,
 						"lightingPass")
 				);
-				
+
+			_skyboxVAO = new VertexArray();
 			
-			float[] skyboxVertices = {
+			_skyboxVBO = new VertexBuffer<float>(false, Stride.Get<float>(3));
+			_skyboxVBO.PutData(new []{
 				-1.0f,  1.0f, -1.0f,
 				-1.0f, -1.0f, -1.0f,
-				 1.0f, -1.0f, -1.0f,
-				 1.0f, -1.0f, -1.0f,
-				 1.0f,  1.0f, -1.0f,
+				1.0f, -1.0f, -1.0f,
+				1.0f, -1.0f, -1.0f,
+				1.0f,  1.0f, -1.0f,
 				-1.0f,  1.0f, -1.0f,
 				
 				-1.0f, -1.0f,  1.0f,
@@ -73,42 +76,36 @@ namespace Cyph3D
 				-1.0f,  1.0f,  1.0f,
 				-1.0f, -1.0f,  1.0f,
 				
-				 1.0f, -1.0f, -1.0f,
-				 1.0f, -1.0f,  1.0f,
-				 1.0f,  1.0f,  1.0f,
-				 1.0f,  1.0f,  1.0f,
-				 1.0f,  1.0f, -1.0f,
-				 1.0f, -1.0f, -1.0f,
+				1.0f, -1.0f, -1.0f,
+				1.0f, -1.0f,  1.0f,
+				1.0f,  1.0f,  1.0f,
+				1.0f,  1.0f,  1.0f,
+				1.0f,  1.0f, -1.0f,
+				1.0f, -1.0f, -1.0f,
 				
 				-1.0f, -1.0f,  1.0f,
 				-1.0f,  1.0f,  1.0f,
-				 1.0f,  1.0f,  1.0f,
-				 1.0f,  1.0f,  1.0f,
-				 1.0f, -1.0f,  1.0f,
+				1.0f,  1.0f,  1.0f,
+				1.0f,  1.0f,  1.0f,
+				1.0f, -1.0f,  1.0f,
 				-1.0f, -1.0f,  1.0f,
 				
 				-1.0f,  1.0f, -1.0f,
-				 1.0f,  1.0f, -1.0f,
-				 1.0f,  1.0f,  1.0f,
-				 1.0f,  1.0f,  1.0f,
+				1.0f,  1.0f, -1.0f,
+				1.0f,  1.0f,  1.0f,
+				1.0f,  1.0f,  1.0f,
 				-1.0f,  1.0f,  1.0f,
 				-1.0f,  1.0f, -1.0f,
 				
 				-1.0f, -1.0f, -1.0f,
 				-1.0f, -1.0f,  1.0f,
-				 1.0f, -1.0f, -1.0f,
-				 1.0f, -1.0f, -1.0f,
+				1.0f, -1.0f, -1.0f,
+				1.0f, -1.0f, -1.0f,
 				-1.0f, -1.0f,  1.0f,
-				 1.0f, -1.0f,  1.0f
-			};
+				1.0f, -1.0f,  1.0f
+			});
 			
-			_skyboxVAO = GL.GenVertexArray();
-			int skyboxVBO = GL.GenBuffer();
-			GL.BindVertexArray(_skyboxVAO);
-			GL.BindBuffer(BufferTarget.ArrayBuffer, skyboxVBO);
-			GL.BufferData(BufferTarget.ArrayBuffer, skyboxVertices.Length * sizeof(float), skyboxVertices, BufferUsageHint.StaticDraw);
-			GL.EnableVertexAttribArray(0);
-			GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
+			_skyboxVAO.RegisterAttrib(_skyboxVBO, 0, 3, VertexAttribType.Float, 0);
 
 			_skyboxShader = Engine.GlobalResourceManager.RequestShaderProgram(
 				new ShaderProgramRequest()
@@ -166,7 +163,7 @@ namespace Cyph3D
 			
 			_skyboxShader.SetValue("skybox", Engine.Scene.Skybox);
 			
-			GL.BindVertexArray(_skyboxVAO);
+			_skyboxVAO.Bind();
 			
 			GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
 			GL.DepthMask(true);
