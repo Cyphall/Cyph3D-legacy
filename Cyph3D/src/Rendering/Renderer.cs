@@ -8,7 +8,7 @@ using Cyph3D.StateManagement;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 
-namespace Cyph3D
+namespace Cyph3D.Rendering
 {
 	public class Renderer : IDisposable
 	{
