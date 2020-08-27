@@ -1,4 +1,5 @@
-﻿using Cyph3D.Enumerable;
+﻿using System;
+using Cyph3D.Enumerable;
 using Cyph3D.GLObject;
 using Cyph3D.Helper;
 using Cyph3D.Lighting;
@@ -8,7 +9,7 @@ using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D
 {
-	public class Renderer
+	public class Renderer : IDisposable
 	{
 		private Framebuffer _gbuffer;
 		private Texture _normalTexture;
@@ -190,6 +191,22 @@ namespace Cyph3D
 			_lightingPassShader.SetValue("depthTexture", _depthTexture);
 
 			Framebuffer.DrawToDefault(_lightingPassShader, true);
+		}
+
+		public void Dispose()
+		{
+			_gbuffer?.Dispose();
+			_normalTexture?.Dispose();
+			_colorTexture?.Dispose();
+			_materialTexture?.Dispose();
+			_geometryNormalTexture?.Dispose();
+			_depthTexture?.Dispose();
+			_skyboxVAO?.Dispose();
+			_skyboxVBO?.Dispose();
+			_lightingPassShader?.Dispose();
+			_skyboxShader?.Dispose();
+			_pointLightsBuffer?.Dispose();
+			_directionalLightsBuffer?.Dispose();
 		}
 	}
 }

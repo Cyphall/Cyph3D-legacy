@@ -120,6 +120,8 @@ namespace Cyph3D
 
 			UIHelper.Shutdown();
 			
+			Renderer.Dispose();
+			
 			GLFW.Terminate();
 		}
 
