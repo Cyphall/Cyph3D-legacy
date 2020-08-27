@@ -12,26 +12,6 @@ namespace Cyph3D.GLObject
 
 		public static void InitDrawToDefault()
 		{
-			float[] quadVertices =
-			{
-				// positions   // texCoords
-				-1.0f, 1.0f, 0.0f, 1.0f,
-				-1.0f, -1.0f, 0.0f, 0.0f,
-				1.0f, -1.0f, 1.0f, 0.0f,
-
-				-1.0f, 1.0f, 0.0f, 1.0f,
-				1.0f, -1.0f, 1.0f, 0.0f,
-				1.0f, 1.0f, 1.0f, 1.0f
-			};
-			
-			_quadVAO = new VertexArray();
-			
-			_quadVBO = new VertexBuffer<float>(false, Stride.Get<float>(4));
-			_quadVBO.PutData(quadVertices);
-			
-			_quadVAO.RegisterAttrib(_quadVBO, 0, 2, VertexAttribType.Float, 0);
-			_quadVAO.RegisterAttrib(_quadVBO, 1, 2, VertexAttribType.Float, 2 * sizeof(float));
-			
 			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram(
 				new ShaderProgramRequest()
 					.WithShader(ShaderType.VertexShader,
@@ -63,8 +43,7 @@ namespace Cyph3D.GLObject
 			
 			shader.Bind();
 			
-			_quadVAO.Bind();
-			GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+			RenderHelper.DrawScreenQuad();
 
 			if (previousBlend == 1)
 				GL.Enable(EnableCap.Blend);
