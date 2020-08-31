@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cyph3D.Enumerable;
 using Cyph3D.GLObject;
 using Cyph3D.Helper;
@@ -24,11 +25,18 @@ namespace Cyph3D.Rendering
 		private ShaderProgram _skyboxShader;
 		private ShaderStorageBuffer<PointLight.NativeLightData> _pointLightsBuffer;
 		private ShaderStorageBuffer<DirectionalLight.NativeLightData> _directionalLightsBuffer;
+
+		private Framebuffer _resultFramebuffer;
+		private Texture _resultTexture;
+
+		private List<IPostProcessPass> _postProcessEffects = new List<IPostProcessPass>();
 		
 		public bool Debug { get; set; }
 
 		public Renderer()
 		{
+			// Main setup
+			
 			_gbuffer = new Framebuffer(Engine.Window.Size)
 				.SetTexture(FramebufferAttachment.ColorAttachment0, new TextureSetting
 				{
@@ -59,6 +67,15 @@ namespace Cyph3D.Rendering
 					.WithShader(ShaderType.FragmentShader,
 						"lightingPass")
 				);
+			
+			_resultFramebuffer = new Framebuffer(Engine.Window.Size)
+				.SetTexture(FramebufferAttachment.ColorAttachment0, new TextureSetting
+				{
+					InternalFormat = InternalFormat.Rgb16f
+				}, out _resultTexture);
+			
+			
+			// Skybox pass setup
 
 			_skyboxVAO = new VertexArray();
 			
@@ -117,8 +134,16 @@ namespace Cyph3D.Rendering
 						"internal/skybox/skybox")
 				);
 
+			
+			// Light buffers setup
+			
 			_pointLightsBuffer = new ShaderStorageBuffer<PointLight.NativeLightData>();
 			_directionalLightsBuffer = new ShaderStorageBuffer<DirectionalLight.NativeLightData>();
+			
+			
+			// Post processing passes setup
+			
+			_postProcessEffects.Add(new ToneMappingPostProcess());
 		}
 
 		public void Render(Camera camera)
@@ -133,8 +158,24 @@ namespace Cyph3D.Rendering
 			if (Engine.Scene.Skybox != null)
 				SkyboxPass(camera.View, camera.Projection);
 			LightingPass(camera.Position, camera.View, camera.Projection);
+
+			Texture finalRenderResult = PostProcessingPass();
+			
+			Framebuffer.DrawToDefault(finalRenderResult, true);
 		}
-		
+
+		private Texture PostProcessingPass()
+		{
+			Texture renderResult = _resultTexture;
+			
+			for (int i = 0; i < _postProcessEffects.Count; i++)
+			{
+				renderResult = _postProcessEffects[i].Render(renderResult, _resultTexture, _depthTexture);
+			}
+
+			return renderResult;
+		}
+
 		private void UpdateLightBuffers()
 		{
 			_pointLightsBuffer.PutData(Engine.Scene.LightManager.PointLightsNative);
@@ -215,7 +256,12 @@ namespace Cyph3D.Rendering
 			_lightingPassShader.SetValue("geometryNormalTexture", _geometryNormalTexture);
 			_lightingPassShader.SetValue("depthTexture", _depthTexture);
 
-			Framebuffer.DrawToDefault(_lightingPassShader, true);
+			_lightingPassShader.Bind();
+			_resultFramebuffer.Bind();
+			
+			_resultFramebuffer.ClearAll();
+			
+			RenderHelper.DrawScreenQuad();
 		}
 
 		public void Dispose()

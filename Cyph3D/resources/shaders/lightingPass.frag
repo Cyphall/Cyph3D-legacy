@@ -86,9 +86,6 @@ float getEmissive();
 float getDepth();
 int isLit();
 
-vec3 toSRGB(vec3 linear);
-vec4 reinhard_tone_mapping(vec3 hdrColor);
-
 float DistributionGGX(vec3 N, vec3 H, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
@@ -106,7 +103,7 @@ void main()
 	}
 	else if (isLit() == 0)
 	{
-		out_Color = vec4(toSRGB(getColor()), 1);
+		out_Color = vec4(getColor(), 1);
 	}
 	else
 	{
@@ -149,7 +146,7 @@ vec4 debugView()
 		fragData.texCoords.x = (fragData.texCoords.x - 1.0/3.0) * 3;
 		fragData.texCoords.y = (fragData.texCoords.y - 1.0/3.0) * 3;
 		fragData.depth = getDepth();
-		return fragData.depth < 1 ? vec4(toSRGB(texture(colorTexture, fragData.texCoords).rgb), 1) : vec4(0);
+		return fragData.depth < 1 ? texture(colorTexture, fragData.texCoords) : vec4(0);
 	}
 	else if (fragData.texCoords.x <= 3.0/3.0 && fragData.texCoords.y >= 1.0/3.0)
 	{
@@ -212,7 +209,7 @@ vec4 lighting()
 		finalColor += calculateLighting(radiance, lightDir, halfwayDir) * (1 - shadow);
 	}
 
-	return reinhard_tone_mapping(finalColor);
+	return vec4(finalColor, 1);
 }
 
 // Based on the code at https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping by Joey de Vries (https://twitter.com/JoeyDeVriez)
@@ -326,26 +323,6 @@ float getDepth()
 int isLit()
 {
 	return int(texture(materialTexture, fragData.texCoords).a);
-}
-
-vec3 toSRGB(vec3 linear)
-{
-	bvec3 cutoff = lessThan(linear, vec3(0.0031308));
-	vec3 higher = vec3(1.055) * pow(linear, vec3(1.0/2.4)) - vec3(0.055);
-	vec3 lower = linear * vec3(12.92);
-
-	return mix(higher, lower, cutoff);
-}
-
-vec4 reinhard_tone_mapping(vec3 color)
-{
-	float exposure = 2;
-	color *= exposure/(1. + color / exposure);
-
-	// sRGB correction
-	color = toSRGB(color);
-
-	return vec4(color, 1);
 }
 
 // Normal Distribution Function
