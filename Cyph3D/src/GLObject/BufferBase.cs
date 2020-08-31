@@ -10,6 +10,8 @@ namespace Cyph3D.GLObject
 
 		public void Dispose()
 		{
+			if (_id == -1) return;
+			
 			DeleteBuffer();
 			_id = -1;
 		}
