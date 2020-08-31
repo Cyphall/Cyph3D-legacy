@@ -46,6 +46,17 @@ namespace Cyph3D.GLObject
 				GL.ProgramUniform3(_id, GetLocation(variableName), data.Length, (int*)ptr);
 			}
 		}
+		
+		public void SetValue(string variableName, params bool[] data)
+		{
+			int[] values = new int[data.Length];
+			for (int i = 0; i < data.Length; i++)
+			{
+				values[i] = data[i] ? 1 : 0;
+			}
+			
+			SetValue(variableName, values);
+		}
 
 		public unsafe void SetValue(string variableName, params mat3[] data)
 		{
