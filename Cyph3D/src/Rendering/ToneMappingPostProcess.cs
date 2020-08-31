@@ -16,7 +16,7 @@ namespace Cyph3D.Rendering
 			_framebuffer = new Framebuffer(Engine.Window.Size)
 				.SetTexture(FramebufferAttachment.ColorAttachment0, new TextureSetting
 				{
-					InternalFormat = InternalFormat.Rgb16f
+					InternalFormat = InternalFormat.Rgb8
 				}, out _outputTexture);
 
 			_shaderProgram = Engine.GlobalResourceManager.RequestShaderProgram(
