@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Management;
 using System.Runtime.InteropServices;
 using Cyph3D.GLObject;
@@ -54,6 +55,7 @@ namespace Cyph3D
 			
 			ThreadPool = new ThreadPool(Math.Max(coreCount-1, 1));
 
+			GL.Enable(EnableCap.DebugOutputSynchronous);
 			GL.Enable(EnableCap.DebugOutput);
 			GL.DebugMessageCallback(
 				(source, type, id, severity, length, message, param) => {
@@ -63,6 +65,7 @@ namespace Cyph3D
 					{
 						case DebugSeverity.DebugSeverityHigh:
 							Logger.Error(logMessage, "OPGL");
+							Debugger.Break();
 							break;
 						case DebugSeverity.DebugSeverityMedium:
 							Logger.Warning(logMessage, "OPGL");
