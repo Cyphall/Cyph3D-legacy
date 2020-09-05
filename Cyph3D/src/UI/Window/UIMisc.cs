@@ -100,7 +100,7 @@ namespace Cyph3D.UI.Window
 					if (payload.IsValid())
 					{
 						string name = (string) GCHandle.FromIntPtr(payload.Data).Target;
-						Engine.Scene.ResourceManager.RequestSkybox(name, skybox => Engine.Scene.Skybox = skybox);
+						Engine.Scene.Skybox = Engine.Scene.ResourceManager.RequestSkybox(name);
 					}
 					ImGui.EndDragDropTarget();
 				}

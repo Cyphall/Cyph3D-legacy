@@ -24,17 +24,17 @@ namespace Cyph3D.GLObject
 			}
 		}
 		
-		public Cubemap(CubemapSetting setting)
+		public Cubemap(CubemapCreateInfo createInfo)
 		{
-			_size = setting.Size;
+			_size = createInfo.Size;
 			
 			GL.CreateTextures(TextureTarget.TextureCubeMap, 1, out _id);
 
-			int finteringRaw = setting.Filtering switch
+			int finteringRaw = createInfo.Filtering switch
 			{
 				TextureFiltering.Linear => (int)All.Linear,
 				TextureFiltering.Nearest => (int)All.Nearest,
-				_ => throw new ArgumentOutOfRangeException(nameof(setting.Filtering), setting.Filtering, null)
+				_ => throw new ArgumentOutOfRangeException(nameof(createInfo.Filtering), createInfo.Filtering, null)
 			};
 			
 			GL.TextureParameter(_id, TextureParameterName.TextureMinFilter, finteringRaw);
@@ -44,7 +44,7 @@ namespace Cyph3D.GLObject
 			GL.TextureParameter(_id, TextureParameterName.TextureWrapR, (int)All.ClampToEdge);
 
 
-			GL.TextureStorage2D(_id, 1, (SizedInternalFormat)setting.InternalFormat, _size.x, _size.y);
+			GL.TextureStorage2D(_id, 1, (SizedInternalFormat)createInfo.InternalFormat, _size.x, _size.y);
 			
 			_bindlessHandle = GL.Arb.GetTextureHandle(_id);
 		}

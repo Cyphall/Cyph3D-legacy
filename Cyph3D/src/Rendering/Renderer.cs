@@ -38,23 +38,23 @@ namespace Cyph3D.Rendering
 			// Main setup
 			
 			_gbuffer = new Framebuffer(Engine.Window.Size)
-				.SetTexture(FramebufferAttachment.ColorAttachment0, new TextureSetting
+				.SetTexture(FramebufferAttachment.ColorAttachment0, new TextureCreateInfo
 				{
 					InternalFormat = InternalFormat.Rgb16f
 				}, out _normalTexture)
-				.SetTexture(FramebufferAttachment.ColorAttachment1, new TextureSetting
+				.SetTexture(FramebufferAttachment.ColorAttachment1, new TextureCreateInfo
 				{
 					InternalFormat = InternalFormat.Rgb16f
 				}, out _colorTexture)
-				.SetTexture(FramebufferAttachment.ColorAttachment2, new TextureSetting
+				.SetTexture(FramebufferAttachment.ColorAttachment2, new TextureCreateInfo
 				{
 					InternalFormat = InternalFormat.Rgba8
 				}, out _materialTexture)
-				.SetTexture(FramebufferAttachment.ColorAttachment3, new TextureSetting
+				.SetTexture(FramebufferAttachment.ColorAttachment3, new TextureCreateInfo
 				{
 					InternalFormat = InternalFormat.Rgb16f
 				}, out _geometryNormalTexture)
-				.SetTexture(FramebufferAttachment.DepthAttachment, new TextureSetting
+				.SetTexture(FramebufferAttachment.DepthAttachment, new TextureCreateInfo
 				{
 					InternalFormat = (InternalFormat) All.DepthComponent24,
 					Filtering = TextureFiltering.Linear
@@ -69,7 +69,7 @@ namespace Cyph3D.Rendering
 				);
 			
 			_resultFramebuffer = new Framebuffer(Engine.Window.Size)
-				.SetTexture(FramebufferAttachment.ColorAttachment0, new TextureSetting
+				.SetTexture(FramebufferAttachment.ColorAttachment0, new TextureCreateInfo
 				{
 					InternalFormat = InternalFormat.Rgb16f
 				}, out _resultTexture);
@@ -155,7 +155,7 @@ namespace Cyph3D.Rendering
 			_gbuffer.ClearAll();
 
 			FirstPass(camera.View, camera.Projection, camera.Position);
-			if (Engine.Scene.Skybox != null)
+			if (Engine.Scene.Skybox != null && Engine.Scene.Skybox.IsResourceReady)
 				SkyboxPass(camera.View, camera.Projection);
 			LightingPass(camera.Position, camera.View, camera.Projection);
 
@@ -231,7 +231,7 @@ namespace Cyph3D.Rendering
 			_skyboxShader.SetValue("view", new mat4(new mat3(view)));
 			_skyboxShader.SetValue("projection", projection);
 			
-			_skyboxShader.SetValue("skybox", Engine.Scene.Skybox);
+			_skyboxShader.SetValue("skybox", Engine.Scene.Skybox.ResourceData);
 			
 			_skyboxVAO.Bind();
 			

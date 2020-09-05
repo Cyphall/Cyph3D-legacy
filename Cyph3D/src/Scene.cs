@@ -92,7 +92,7 @@ namespace Cyph3D
 			{
 				if (!string.IsNullOrEmpty(jsonRoot["skybox"]))
 				{
-					Engine.Scene.ResourceManager.RequestSkybox(jsonRoot["skybox"], skybox => Engine.Scene.Skybox = skybox);
+					Engine.Scene.Skybox = Engine.Scene.ResourceManager.RequestSkybox(jsonRoot["skybox"]);
 				}
 			}
 			else if (version >= 3)
@@ -100,10 +100,8 @@ namespace Cyph3D
 				if (jsonRoot["skybox"].Count > 0)
 				{
 					float skyboxRotation = jsonRoot["skybox"]["rotation"];
-					Engine.Scene.ResourceManager.RequestSkybox(jsonRoot["skybox"]["name"], skybox => {
-						skybox.Rotation = skyboxRotation;
-						Engine.Scene.Skybox = skybox;
-					});
+					Engine.Scene.Skybox = Engine.Scene.ResourceManager.RequestSkybox(jsonRoot["skybox"]["name"]);
+					Engine.Scene.Skybox.Rotation = skyboxRotation;
 				}
 			}
 			
@@ -149,7 +147,7 @@ namespace Cyph3D
 					
 					string meshName = jsonData["mesh"];
 					if (!string.IsNullOrEmpty(meshName))
-						Engine.Scene.ResourceManager.RequestMesh(meshName, mesh => ((MeshObject)sceneObject).Mesh = mesh);
+						((MeshObject)sceneObject).Mesh = Engine.Scene.ResourceManager.RequestMesh(meshName);
 
 					((MeshObject)sceneObject).ContributeShadows = version >= 5 ? (bool)jsonData["contributeShadows"] : true;
 					

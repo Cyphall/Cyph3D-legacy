@@ -5,10 +5,10 @@ namespace Cyph3D.GLObject
 {
 	public partial class Framebuffer
 	{
-		public Framebuffer SetTexture(FramebufferAttachment attachment, TextureSetting textureSetting, out Texture texture)
+		public Framebuffer SetTexture(FramebufferAttachment attachment, TextureCreateInfo textureSetting, out Texture texture)
 		{
 			textureSetting.Size = _size;
-			texture = textureSetting.CreateTexture();
+			texture = new Texture(textureSetting);
 			
 			return SetTexture(attachment, texture);
 		}
@@ -39,10 +39,10 @@ namespace Cyph3D.GLObject
 			return this;
 		}
 
-		public Framebuffer SetCubemap(FramebufferAttachment attachment, CubemapSetting cubemapSetting, out Cubemap cubemap, int? face = null)
+		public Framebuffer SetCubemap(FramebufferAttachment attachment, CubemapCreateInfo cubemapSetting, out Cubemap cubemap, int? face = null)
 		{
 			cubemapSetting.Size = _size;
-			cubemap = cubemapSetting.CreateCubemap();
+			cubemap = new Cubemap(cubemapSetting);
 
 			return SetCubemap(attachment, cubemap, face);
 		}

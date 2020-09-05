@@ -43,7 +43,7 @@ namespace Cyph3D.Lighting
 				if (value)
 				{
 					_shadowMapFb = new Framebuffer(new ivec2(SIZE))
-						.SetTexture(FramebufferAttachment.DepthAttachment, new TextureSetting
+						.SetTexture(FramebufferAttachment.DepthAttachment, new TextureCreateInfo
 						{
 							InternalFormat = (InternalFormat) All.DepthComponent24,
 							IsShadowMap = true

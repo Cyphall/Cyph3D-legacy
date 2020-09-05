@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Json;
+using System.Linq;
 using Cyph3D.Enumerable;
 using Cyph3D.Helper;
 using Cyph3D.Misc;
@@ -14,9 +15,9 @@ namespace Cyph3D.GLObject
 	{
 		private MaterialShaderProgram _shaderProgram;
 
-		private Dictionary<string, Texture> _textures = new Dictionary<string, Texture>();
+		private Dictionary<string, (Texture, Image)> _textures = new Dictionary<string, (Texture, Image)>();
 		
-		private int _remainingTextures;
+		private bool _loaded;
 
 		public string Name { get; }
 		
@@ -37,26 +38,28 @@ namespace Cyph3D.GLObject
 			{
 				(InternalFormat internalFormat, PixelFormat pixelFormat) = TextureHelper.GetTextureSetting(mapDefinition.DefaultData.Length, mapDefinition.Compressed, mapDefinition.sRGB);
 
-				Texture defaultTexture = new TextureSetting
+				TextureCreateInfo createInfo = new TextureCreateInfo
 				{
 					Size = new ivec2(1),
 					InternalFormat = internalFormat,
 					Filtering = TextureFiltering.Nearest
-				}.CreateTexture();
-				defaultTexture.PutData(mapDefinition.DefaultData, pixelFormat);
+				};
+				
+				Texture defaultColor = new Texture(createInfo);
+				defaultColor.PutData(mapDefinition.DefaultData, pixelFormat);
 
-				_textures[mapName] = defaultTexture;
+				Image image = null;
 				
 				if (jsonRoot.ContainsKey(mapName))
 				{
-					Engine.Scene.ResourceManager.RequestImageTexture(
+					image = Engine.Scene.ResourceManager.RequestImage(
 						$"{name}/{(string)jsonRoot[mapName]}",
-						texture => HandleLoadedTexture(mapName, texture),
 						mapDefinition.sRGB,
 						mapDefinition.Compressed
 					);
-					_remainingTextures++;
 				}
+				
+				_textures[mapName] = (defaultColor, image);
 			}
 
 			Name = name;
@@ -68,36 +71,52 @@ namespace Cyph3D.GLObject
 			
 			(InternalFormat internalFormat, PixelFormat pixelFormat) = TextureHelper.GetTextureSetting(3, true, true);
 
-			Texture defaultColor = new TextureSetting
+			TextureCreateInfo createInfo = new TextureCreateInfo
 			{
 				Size = new ivec2(1),
 				InternalFormat = internalFormat,
 				Filtering = TextureFiltering.Nearest
-			}.CreateTexture();
+			};
+			
+			Texture defaultColor = new Texture(createInfo);
 			defaultColor.PutData(new byte[]{255, 0, 255}, pixelFormat);
 
-			_textures.Add("colorMap", defaultColor);
+			_textures.Add("colorMap", (defaultColor, null));
 			
 			Name = "Default Material";
 		}
 
-		private void HandleLoadedTexture(string name, Texture texture)
-		{
-			_textures[name].Dispose();
-			_textures[name] = texture;
-
-			_remainingTextures--;
-			if (_remainingTextures == 0)
-			{
-				Logger.Info($"Material \"{Name}\" loaded");
-			}
-		}
-
 		public void Bind(mat4 model, mat4 view, mat4 projection, vec3 cameraPos)
 		{
-			foreach ((string name, Texture texture) in _textures)
+			bool allImagesAreReady = true;
+			foreach (string name in _textures.Keys.ToArray())
 			{
-				_shaderProgram.ShaderProgram.SetValue(name, texture);
+				(Texture texture, Image image) = _textures[name];
+				
+				if (texture != null && image != null && image.IsResourceReady)
+				{
+					texture.Dispose();
+					_textures[name] = (null, image);
+				}
+				else if (image != null && !image.IsResourceReady)
+				{
+					allImagesAreReady = false;
+				}
+
+				if (image != null && image.IsResourceReady)
+				{
+					_shaderProgram.ShaderProgram.SetValue(name, image.ResourceData);
+				}
+				else
+				{
+					_shaderProgram.ShaderProgram.SetValue(name, texture);
+				}
+			}
+
+			if (!_loaded && allImagesAreReady)
+			{
+				Logger.Info($"Material \"{Name}\" loaded");
+				_loaded = true;
 			}
 			
 			_shaderProgram.ShaderProgram.SetValue("normalMatrix", new mat3(model).Inverse.Transposed);

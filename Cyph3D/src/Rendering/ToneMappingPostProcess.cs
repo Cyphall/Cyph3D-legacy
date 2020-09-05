@@ -14,7 +14,7 @@ namespace Cyph3D.Rendering
 		public ToneMappingPostProcess()
 		{
 			_framebuffer = new Framebuffer(Engine.Window.Size)
-				.SetTexture(FramebufferAttachment.ColorAttachment0, new TextureSetting
+				.SetTexture(FramebufferAttachment.ColorAttachment0, new TextureCreateInfo
 				{
 					InternalFormat = InternalFormat.Rgb8
 				}, out _outputTexture);

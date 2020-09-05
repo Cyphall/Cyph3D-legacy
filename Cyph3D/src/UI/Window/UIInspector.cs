@@ -121,7 +121,7 @@ namespace Cyph3D.UI.Window
 				if (payload.IsValid())
 				{
 					string newMesh = (string) GCHandle.FromIntPtr(payload.Data).Target;
-					Engine.Scene.ResourceManager.RequestMesh(newMesh, mesh => meshObject.Mesh = mesh);
+					meshObject.Mesh = Engine.Scene.ResourceManager.RequestMesh(newMesh);
 				}
 				ImGui.EndDragDropTarget();
 			}

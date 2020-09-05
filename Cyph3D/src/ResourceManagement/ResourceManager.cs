@@ -3,13 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Json;
-using Cyph3D.Enumerable;
 using Cyph3D.GLObject;
-using Cyph3D.Helper;
 using Cyph3D.Misc;
-using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
-using StbImageNET;
 
 namespace Cyph3D.ResourceManagement
 {
@@ -17,105 +13,68 @@ namespace Cyph3D.ResourceManagement
 	{
 		public void Update()
 		{
-			TextureUpdate();
+			ImageUpdate();
 			SkyboxUpdate();
 			MeshUpdate();
 		}
 		
 		public void Dispose()
 		{
-			foreach (ResourceHandler<Texture> handler in _textures.Values)
+			foreach (Image image in _images.Values)
 			{
-				handler.Dispose();
+				image.Dispose();
 			}
-			foreach (ResourceHandler<Skybox> handler in _skyboxes.Values)
+			foreach (Skybox skybox in _skyboxes.Values)
 			{
-				handler.Dispose();
+				skybox.Dispose();
 			}
 			foreach (ShaderProgram shaderProgram in _shaderPrograms.Values)
 			{
 				shaderProgram.Dispose();
 			}
-			foreach (ResourceHandler<Mesh> handler in _meshes.Values)
+			foreach (Mesh mesh in _meshes.Values)
 			{
-				handler.Dispose();
+				mesh.Dispose();
 			}
 		}
 		
-		#region Textures
+		#region Images
 		
-		private Dictionary<string, ResourceHandler<Texture>> _textures = new Dictionary<string, ResourceHandler<Texture>>();
-		private ConcurrentQueue<Tuple<string, Texture>> _loadedTextures = new ConcurrentQueue<Tuple<string, Texture>>();
+		private Dictionary<string, Image> _images = new Dictionary<string, Image>();
+		private ConcurrentQueue<(Image, ImageFinalizationData)> _imagesLoadingFinalizationQueue = new ConcurrentQueue<(Image, ImageFinalizationData)>();
 
-		public void RequestImageTexture(string name, ResourceHandler<Texture>.ResourceCallback callback, bool sRGB = false, bool compressed = false)
+		public Image RequestImage(string name, bool sRGB = false, bool compressed = false)
 		{
+			if (!_images.ContainsKey(name))
+			{
+				Image image = new Image(name);
+				_images.Add(name, image);
+				LoadImage(image, name, sRGB, compressed);
+			}
+
+			return _images[name];
+		}
+
+		private void LoadImage(Image image, string name, bool sRGB, bool compressed)
+		{
+			Logger.Info($"Loading image texture \"{name}\"");
+			
 			string path = $"resources/materials/{name}";
 			
-			if (!_textures.ContainsKey(path))
-			{
-				_textures.Add(path, new ResourceHandler<Texture>());
-				LoadImageTexture(path, sRGB, compressed);
-			}
-			
-			_textures[path].AddCallback(callback);
-		}
-
-		private void LoadImageTexture(string path, bool sRGB, bool compressed)
-		{
-			Logger.Info($"Loading image texture \"{path}\"");
-
-			int x;
-			int y;
-			Components comp;
-			
-			try
-			{
-				StbImage.Info(path, out x, out y, out comp);
-			}
-			catch (IOException)
-			{
-				throw new IOException($"Unable to load image {path} from disk");
-			}
-
-			(InternalFormat internalFormat, PixelFormat pixelFormat) = TextureHelper.GetTextureSetting((int) comp, compressed, sRGB);
-			
-			Texture texture = new TextureSetting
-			{
-				Size = new ivec2(x, y),
-				InternalFormat = internalFormat,
-				Filtering = TextureFiltering.Linear,
-				UseMipmaps = true
-			}.CreateTexture();
-			
-			GL.Finish();
-			
 			Engine.ThreadPool.Schedule(() => {
-				byte[] image;
+				ImageFinalizationData imageData = Image.LoadFromFile(path, sRGB, compressed);
 				
-				try
-				{
-					image = StbImage.Load(path, out int _, out int _, out Components _, comp);
-				}
-				catch (IOException)
-				{
-					throw new IOException($"Unable to load image {path} from disk");
-				}
-				
-				texture.PutData(image, pixelFormat);
-				
-				GL.Finish();
-				
-				Logger.Info($"Texture \"{path}\" loaded (id: {(int)texture})");
-				
-				_loadedTextures.Enqueue(new Tuple<string, Texture>(path, texture));
+				_imagesLoadingFinalizationQueue.Enqueue((image, imageData));
 			});
 		}
 
-		private void TextureUpdate()
+		private void ImageUpdate()
 		{
-			while (_loadedTextures.TryDequeue(out Tuple<string, Texture> data))
+			while (_imagesLoadingFinalizationQueue.TryDequeue(out (Image, ImageFinalizationData) data))
 			{
-				_textures[data.Item1].ValidateLoading(data.Item2);
+				data.Item1.FinalizeLoading(data.Item2);
+				
+				Logger.Info($"Texture \"{data.Item1.Name}\" loaded");
 			}
 		}
 		
@@ -123,117 +82,53 @@ namespace Cyph3D.ResourceManagement
 
 		#region Skybox
 
-		private Dictionary<string, ResourceHandler<Skybox>> _skyboxes = new Dictionary<string, ResourceHandler<Skybox>>();
-		private ConcurrentQueue<Tuple<string, Skybox>> _loadedSkyboxes = new ConcurrentQueue<Tuple<string, Skybox>>();
+		private Dictionary<string, Skybox> _skyboxes = new Dictionary<string, Skybox>();
+		private ConcurrentQueue<(Skybox, SkyboxFinalizationData)> _skyboxLoadingFinalizationQueue = new ConcurrentQueue<(Skybox, SkyboxFinalizationData)>();
 
-		public void RequestSkybox(string name, ResourceHandler<Skybox>.ResourceCallback callback)
+		public Skybox RequestSkybox(string name)
 		{
-			string path = $"resources/skyboxes/{name}";
-			
-			if (!_skyboxes.ContainsKey(path))
+			if (!_skyboxes.ContainsKey(name))
 			{
-				_skyboxes.Add(path, new ResourceHandler<Skybox>());
-				LoadSkybox(path, name);
+				Skybox skybox = new Skybox(name);
+				_skyboxes.Add(name, skybox);
+				LoadSkybox(name, skybox);
 			}
-			
-			_skyboxes[path].AddCallback(callback);
+
+			return _skyboxes[name];
 		}
 
-		private void LoadSkybox(string path, string name)
+		private void LoadSkybox(string name, Skybox skybox)
 		{
-			string[] jsonDataNames =
-			{
-				"right",
-				"left",
-				"down",
-				"up",
-				"front",
-				"back"
-			};
+			Logger.Info($"Loading skybox \"{name}\"");
 			
-			Logger.Info($"Loading skybox \"{path}\"");
+			string path = $"resources/skyboxes/{name}";
 			
 			JsonObject jsonRoot = (JsonObject)JsonValue.Parse(File.ReadAllText($"{path}/skybox.json"));
 
-			int x;
-			int y;
-			Components comp;
-			
-			try
+			string[] facesPath = 
 			{
-				StbImage.Info($"{path}/{(string)jsonRoot["front"]}", out x, out y, out comp);
-			}
-			catch (IOException)
-			{
-				throw new IOException($"Unable to load skybox {path}/{(string)jsonRoot["front"]} from disk");
-			}
+				$"{path}/{(string)jsonRoot["right"]}",
+				$"{path}/{(string)jsonRoot["left"]}",
+				$"{path}/{(string)jsonRoot["down"]}",
+				$"{path}/{(string)jsonRoot["up"]}",
+				$"{path}/{(string)jsonRoot["front"]}",
+				$"{path}/{(string)jsonRoot["back"]}"
+			};
 
-			InternalFormat internalFormat;
-			PixelFormat pixelFormat;
-			switch (comp)
-			{
-				case Components.Grey:
-					pixelFormat = PixelFormat.Luminance;
-					internalFormat = InternalFormat.CompressedSrgbS3tcDxt1Ext;
-					break;
-				case Components.GreyAlpha:
-					pixelFormat = PixelFormat.LuminanceAlpha;
-					internalFormat = InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext;
-					break;
-				case Components.RedGreenBlue:
-					pixelFormat = PixelFormat.Rgb;
-					internalFormat = InternalFormat.CompressedSrgbS3tcDxt1Ext;
-					break;
-				case Components.RedGreenBlueAlpha:
-					pixelFormat = PixelFormat.Rgba;
-					internalFormat = InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext;
-					break;
-				default:
-					throw new NotSupportedException($"The colors format {comp} is not supported");
-			}
-			
-			Skybox skybox = new Skybox(new ivec2(x, y), name, internalFormat);
+			Engine.ThreadPool.Schedule(() => {
+				SkyboxFinalizationData skyboxData = Skybox.LoadFromFiles(facesPath);
 
-			GL.Finish();
-
-			Engine.ThreadPool.Schedule(
-				() => {
-					// 0 = positive x face
-					// 1 = negative x face
-					// 2 = positive y face
-					// 3 = negative y face
-					// 4 = positive z face
-					// 5 = negative z face
-					
-					for (int i = 0; i < 6; i++)
-					{
-						byte[] image;
-			
-						try
-						{
-							image = StbImage.Load($"{path}/{(string)jsonRoot[jsonDataNames[i]]}", out int _, out int _, out Components _, comp);
-						}
-						catch (IOException)
-						{
-							throw new IOException($"Unable to load image {path}/{(string)jsonRoot[jsonDataNames[i]]} from disk");
-						}
-				
-						skybox.PutData(image, i, pixelFormat);
-					}
-					
-					GL.Finish();
-			
-					Logger.Info($"Skybox \"{path}\" loaded (id: {(int)skybox})");
-			
-					_loadedSkyboxes.Enqueue(new Tuple<string, Skybox>(path, skybox));
-				});
+				_skyboxLoadingFinalizationQueue.Enqueue((skybox, skyboxData));
+			});
 		}
 
 		private void SkyboxUpdate()
 		{
-			while (_loadedSkyboxes.TryDequeue(out Tuple<string, Skybox> data))
+			while (_skyboxLoadingFinalizationQueue.TryDequeue(out (Skybox, SkyboxFinalizationData) data))
 			{
-				_skyboxes[data.Item1].ValidateLoading(data.Item2);
+				data.Item1.FinalizeLoading(data.Item2);
+				
+				Logger.Info($"Skybox \"{data.Item1.Name}\" loaded");
 			}
 		}
 		
@@ -279,44 +174,38 @@ namespace Cyph3D.ResourceManagement
 		
 		#region Meshes
 		
-		private Dictionary<string, ResourceHandler<Mesh>> _meshes = new Dictionary<string, ResourceHandler<Mesh>>();
-		private ConcurrentQueue<Tuple<string, Mesh>> _loadedMeshes = new ConcurrentQueue<Tuple<string, Mesh>>();
+		private Dictionary<string, Mesh> _meshes = new Dictionary<string, Mesh>();
+		private ConcurrentQueue<(Mesh, MeshFinalizationData)> _meshLoadingFinalizationQueue = new ConcurrentQueue<(Mesh, MeshFinalizationData)>();
 		
-		public void RequestMesh(string name, ResourceHandler<Mesh>.ResourceCallback callback)
+		public Mesh RequestMesh(string name)
 		{
 			if (!_meshes.ContainsKey(name))
 			{
-				_meshes.Add(name, new ResourceHandler<Mesh>());
-				LoadMesh(name);
+				Mesh mesh = new Mesh(name);
+				_meshes.Add(name, mesh);
+				LoadMesh(name, mesh);
 			}
-			
-			_meshes[name].AddCallback(callback);
+
+			return _meshes[name];
 		}
 
-		private void LoadMesh(string name)
+		private void LoadMesh(string name, Mesh mesh)
 		{
 			Logger.Info($"Loading mesh \"{name}\"");
 			
-			Mesh mesh = new Mesh();
-
-			GL.Finish();
-			
 			Engine.ThreadPool.Schedule(() => {
-				mesh.LoadFromFile(name);
-				
-				GL.Finish();
-				
-				Logger.Info($"Mesh \"{name}\" loaded");
-				
-				_loadedMeshes.Enqueue(new Tuple<string, Mesh>(name, mesh));
+				MeshFinalizationData meshData = Mesh.LoadFromFile(name);
+
+				_meshLoadingFinalizationQueue.Enqueue((mesh, meshData));
 			});
 		}
 
 		private void MeshUpdate()
 		{
-			while (_loadedMeshes.TryDequeue(out Tuple<string, Mesh> data))
+			while (_meshLoadingFinalizationQueue.TryDequeue(out (Mesh, MeshFinalizationData) data))
 			{
-				_meshes[data.Item1].ValidateLoading(data.Item2);
+				data.Item1.FinalizeLoading(data.Item2);
+				Logger.Info($"Mesh \"{data.Item1.Name}\" loaded");
 			}
 		}
 		

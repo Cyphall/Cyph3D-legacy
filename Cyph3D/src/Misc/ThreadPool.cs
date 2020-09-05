@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using OpenToolkit.Windowing.GraphicsLibraryFramework;
 using GLFWWindow = OpenToolkit.Windowing.GraphicsLibraryFramework.Window;
 
 namespace Cyph3D.Misc
@@ -14,17 +13,15 @@ namespace Cyph3D.Misc
 
 		public ThreadPool(int threadCount)
 		{
-			GLFW.WindowHint(WindowHintBool.Visible, false);
 			for (int i = 0; i < threadCount; i++)
 			{
 				Thread thread = new Thread(ThreadProgram)
 				{
 					IsBackground = true
 				};
-				thread.Start((IntPtr)GLFW.CreateWindow(1, 1, "", null, Engine.Window));
+				thread.Start();
 				_threads.Add(thread);
 			}
-			GLFW.WindowHint(WindowHintBool.Visible, true);
 		}
 
 		public void Schedule(Action task)
@@ -32,16 +29,12 @@ namespace Cyph3D.Misc
 			_tasks.Add(task);
 		}
 
-		private void ThreadProgram(object o)
+		private void ThreadProgram()
 		{
-			GLFW.MakeContextCurrent((GLFWWindow*)(IntPtr) o);
-
 			while (!_tasks.IsAddingCompleted)
 			{
 				_tasks.Take().Invoke();
 			}
-			
-			GLFW.MakeContextCurrent(null);
 		}
 
 		public void Dispose()

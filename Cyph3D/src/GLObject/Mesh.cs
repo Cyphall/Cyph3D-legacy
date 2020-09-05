@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using Assimp;
+using Cyph3D.Enumerable;
 using Cyph3D.Helper;
+using Cyph3D.ResourceManagement;
 using GlmSharp;
 using OpenToolkit.Graphics.OpenGL4;
 using AssImpScene = Assimp.Scene;
@@ -17,13 +18,14 @@ namespace Cyph3D.GLObject
 		private Buffer<int> _ibo;
 
 		private VertexArray _vao;
-
-		private int _indicesCount;
 		
-		public string Name { get; private set; }
+		public string Name { get; }
+		public bool IsResourceReady { get; private set; }
 
-		public Mesh()
+		public Mesh(string name)
 		{
+			Name = name;
+			
 			_vbo = new VertexBuffer<VertexData>(false, Stride.Get<VertexData>(1));
 			_ibo = new Buffer<int>(false);
 
@@ -35,10 +37,30 @@ namespace Cyph3D.GLObject
 			_vao.RegisterIndexBuffer(_ibo);
 		}
 
-		public unsafe void LoadFromFile(string name)
+		public void FinalizeLoading(MeshFinalizationData data)
 		{
-			Name = name;
+			_vbo.PutData(data.VertexData);
+			_ibo.PutData(data.Indices);
+
+			IsResourceReady = true;
+		}
+
+		public void Render()
+		{
+			_vao.Bind();
+			GL.DrawElements(PrimitiveType.Triangles, _ibo.Size, DrawElementsType.UnsignedInt, 0);
+		}
+
+		public void Dispose()
+		{
+			_vao.Dispose();
+			_vbo.Dispose();
 			
+			IsResourceReady = false;
+		}
+		
+		public static unsafe MeshFinalizationData LoadFromFile(string name)
+		{
 			AssImpScene scene = new AssimpContext().ImportFile($"resources/meshes/{name}.obj",
 				PostProcessSteps.CalculateTangentSpace | PostProcessSteps.Triangulate);
 			AssImpMesh mesh = scene.Meshes[0];
@@ -71,32 +93,11 @@ namespace Cyph3D.GLObject
 				
 				vertexData.Add(vData);
 			}
-			
-			_vbo.PutData(vertexData.ToArray());
-			_ibo.PutData(indices.ToArray());
 
-			_indicesCount = indices.Count;
-		}
-
-		public void Render()
-		{
-			_vao.Bind();
-			GL.DrawElements(PrimitiveType.Triangles, _indicesCount, DrawElementsType.UnsignedInt, 0);
-		}
-
-		public void Dispose()
-		{
-			_vao.Dispose();
-			_vbo.Dispose();
-		}
-
-		[StructLayout(LayoutKind.Sequential)]
-		private struct VertexData
-		{
-			public vec3 Position;
-			public vec2 UV;
-			public vec3 Normal;
-			public vec3 Tangent;
+			return new MeshFinalizationData(
+				vertexData.ToArray(),
+				indices.ToArray()
+			);
 		}
 	}
 }

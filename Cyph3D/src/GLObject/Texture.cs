@@ -35,7 +35,7 @@ namespace Cyph3D.GLObject
 			}
 		}
 
-		public Texture(TextureSetting settings)
+		public Texture(TextureCreateInfo settings)
 		{
 			Debug.Assert(settings.Size != default);
 			

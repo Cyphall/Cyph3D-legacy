@@ -48,7 +48,7 @@ namespace Cyph3D.Lighting
 				if (value)
 				{
 					_shadowMapFb = new Framebuffer(new ivec2(SIZE))
-						.SetCubemap(FramebufferAttachment.DepthAttachment, new CubemapSetting
+						.SetCubemap(FramebufferAttachment.DepthAttachment, new CubemapCreateInfo
 						{
 							InternalFormat = (InternalFormat) All.DepthComponent24
 						}, out Cubemap shadowMap);

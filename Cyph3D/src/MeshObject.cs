@@ -38,7 +38,8 @@ namespace Cyph3D
 			else
 				Material.Default.Bind(Transform.WorldMatrix, view, projection, cameraPos);
 			
-			Mesh?.Render();
+			if (Mesh != null && Mesh.IsResourceReady)
+				Mesh.Render();
 		}
 
 		public override void Update(double deltaTime)
