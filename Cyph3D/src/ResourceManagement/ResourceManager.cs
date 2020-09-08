@@ -24,6 +24,10 @@ namespace Cyph3D.ResourceManagement
 			{
 				image.Dispose();
 			}
+			foreach (Material material in _materials.Values)
+			{
+				material.Dispose();
+			}
 			foreach (Skybox skybox in _skyboxes.Values)
 			{
 				skybox.Dispose();

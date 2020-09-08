@@ -90,6 +90,15 @@ namespace Cyph3D.Lighting
 			GLStateManager.Pop();
 		}
 
+		public override void Dispose()
+		{
+			if (_castShadows)
+			{
+				ShadowMap.Dispose();
+				_shadowMapFb.Dispose();
+			}
+		}
+
 		private vec3 LightDirection => (new mat4(new mat3(Transform.WorldMatrix)) * new vec4(0, -1, 0, 1)).xyz;
 		
 		public NativeLightData NativeLight =>

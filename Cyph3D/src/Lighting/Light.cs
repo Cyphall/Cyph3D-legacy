@@ -1,9 +1,10 @@
-﻿using Cyph3D.Misc;
+﻿using System;
+using Cyph3D.Misc;
 using GlmSharp;
 
 namespace Cyph3D.Lighting
 {
-	public abstract class Light : SceneObject
+	public abstract class Light : SceneObject, IDisposable
 	{
 		private vec3 _sRGBColor;
 		private vec3 _linearColor;
@@ -54,5 +55,7 @@ namespace Cyph3D.Lighting
 			
 			return vec3.Mix(higher, lower, (vec3)cutoff);
 		}
+
+		public abstract void Dispose();
 	}
 }

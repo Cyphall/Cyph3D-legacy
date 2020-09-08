@@ -31,7 +31,8 @@ namespace Cyph3D
 		public void Dispose()
 		{
 			Skybox?.Dispose();
-			ResourceManager?.Dispose();
+			LightManager.Dispose();
+			ResourceManager.Dispose();
 		}
 
 		public void Add(SceneObject obj)

@@ -106,6 +106,15 @@ namespace Cyph3D.Lighting
 			GLStateManager.Pop();
 		}
 		
+		public override void Dispose()
+		{
+			if (_castShadows)
+			{
+				ShadowMap.Dispose();
+				_shadowMapFb.Dispose();
+			}
+		}
+		
 		public NativeLightData NativeLight =>
 			new NativeLightData
 			{

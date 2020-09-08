@@ -11,7 +11,7 @@ using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D.GLObject
 {
-	public class Material
+	public class Material : IDisposable
 	{
 		private MaterialShaderProgram _shaderProgram;
 
@@ -132,6 +132,15 @@ namespace Cyph3D.GLObject
 		public static void InitializeDefault()
 		{
 			Default = new Material();
+		}
+
+		public void Dispose()
+		{
+			foreach ((Texture texture, Image image) in _textures.Values)
+			{
+				texture?.Dispose();
+				image?.Dispose();
+			}
 		}
 	}
 }

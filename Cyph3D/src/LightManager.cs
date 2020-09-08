@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Cyph3D.Lighting;
 
 namespace Cyph3D
 {
-	public class LightManager
+	public class LightManager : IDisposable
 	{
 #region PointLight
 		private List<PointLight> _pointLights = new List<PointLight>();
@@ -95,6 +96,18 @@ namespace Cyph3D
 				{
 					_pointLights[i].UpdateShadowMap();
 				}
+			}
+		}
+
+		public void Dispose()
+		{
+			foreach (DirectionalLight light in _directionalLights)
+			{
+				light.Dispose();
+			}
+			foreach (PointLight light in _pointLights)
+			{
+				light.Dispose();
 			}
 		}
 	}
