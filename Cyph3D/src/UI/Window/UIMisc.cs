@@ -49,6 +49,12 @@ namespace Cyph3D.UI.Window
 				{
 					Engine.Scene.Camera.Speed = cameraSpeed;
 				}
+
+				float exposure = Engine.Scene.Camera.Exposure;
+				if (ImGui.SliderFloat("Exposure", ref exposure, 0, 10))
+				{
+					Engine.Scene.Camera.Exposure = exposure;
+				}
 			
 				ImGui.Separator();
 
@@ -100,6 +106,7 @@ namespace Cyph3D.UI.Window
 					if (payload.IsValid())
 					{
 						string name = (string) GCHandle.FromIntPtr(payload.Data).Target;
+						Engine.Scene.Skybox?.Dispose();
 						Engine.Scene.Skybox = Engine.Scene.ResourceManager.RequestSkybox(name);
 					}
 					ImGui.EndDragDropTarget();

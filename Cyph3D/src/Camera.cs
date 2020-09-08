@@ -68,6 +68,7 @@ namespace Cyph3D
 		}
 
 		public float Speed { get; set; } = 2;
+		public float Exposure { get; set; } = 4;
 		
 		private vec2 _previousMousePos;
 

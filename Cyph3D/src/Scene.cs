@@ -7,6 +7,7 @@ using Cyph3D.Helper;
 using Cyph3D.Lighting;
 using Cyph3D.Misc;
 using Cyph3D.ResourceManagement;
+using Cyph3D.UI.Window;
 using GlmSharp;
 
 namespace Cyph3D
@@ -29,6 +30,7 @@ namespace Cyph3D
 
 		public void Dispose()
 		{
+			Skybox?.Dispose();
 			ResourceManager?.Dispose();
 		}
 
@@ -85,6 +87,11 @@ namespace Cyph3D
 				new vec3(cameraPosArray[0], cameraPosArray[1], cameraPosArray[2]),
 				new vec2(cameraSphCoordsArray[0], cameraSphCoordsArray[1])
 			);
+
+			if (version >= 6)
+			{
+				camera.Exposure = jsonRoot["camera"]["exposure"];
+			}
 			
 			Engine.Scene = new Scene(camera, name);
 
@@ -188,13 +195,14 @@ namespace Cyph3D
 		{
 			JsonObject jsonRoot = new JsonObject();
 			
-			jsonRoot.Add("version", 5);
+			jsonRoot.Add("version", 6);
 			
 
 			JsonObject jsonCamera = new JsonObject
 			{
 				{"position", ConvertHelper.JsonConvert(Camera.Position)},
-				{"spherical_coords", ConvertHelper.JsonConvert(Camera.SphericalCoords)}
+				{"spherical_coords", ConvertHelper.JsonConvert(Camera.SphericalCoords)},
+				{"exposure", Camera.Exposure}
 			};
 
 

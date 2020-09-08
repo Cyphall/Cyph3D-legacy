@@ -1,6 +1,7 @@
 ﻿using Cyph3D.GLObject;
 using Cyph3D.Helper;
 using Cyph3D.ResourceManagement;
+using Cyph3D.UI.Window;
 using OpenToolkit.Graphics.OpenGL4;
 
 namespace Cyph3D.Rendering
@@ -28,6 +29,7 @@ namespace Cyph3D.Rendering
 		public Texture Render(Texture currentRenderResult, Texture renderRaw, Texture depth)
 		{
 			_shaderProgram.SetValue("colorTexture", currentRenderResult);
+			_shaderProgram.SetValue("exposure", Engine.Scene.Camera.Exposure);
 			
 			_framebuffer.Bind();
 			_shaderProgram.Bind();

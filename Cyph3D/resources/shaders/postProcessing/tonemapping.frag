@@ -1,17 +1,19 @@
 ﻿vec3 toSRGB(vec3 linear);
-vec3 reinhard_tone_mapping(vec3 color);
+vec3 ACESFitted(vec3 color);
 
 layout(bindless_sampler) uniform sampler2D colorTexture;
 
+uniform float exposure;
+
 in vec2 TexCoords;
 
-out vec4 color;
+out vec4 outColor;
 
 void main()
 {
 	vec4 rawColor = texture(colorTexture, TexCoords);
 
-	color = vec4(reinhard_tone_mapping(rawColor.rgb), rawColor.a);
+	outColor = vec4(ACESFitted(rawColor.rgb), rawColor.a);
 }
 
 vec3 toSRGB(vec3 linear)
@@ -23,13 +25,41 @@ vec3 toSRGB(vec3 linear)
 	return mix(higher, lower, cutoff);
 }
 
-vec3 reinhard_tone_mapping(vec3 color)
-{
-	float exposure = 2;
-	color *= exposure/(1. + color / exposure);
+// https://github.com/TheRealMJP/BakingLab/blob/master/BakingLab/ACES.hlsl
 
-	// sRGB correction
-	color = toSRGB(color);
+const mat3 ACESInputMat = mat3(
+	0.59719, 0.07600, 0.02840,
+	0.35458, 0.90834, 0.13383,
+	0.04823, 0.01566, 0.83777
+);
+
+// ODT_SAT => XYZ => D60_2_D65 => sRGB
+const mat3 ACESOutputMat = mat3(
+	 1.60475, -0.10208, -0.00327,
+	-0.53108,  1.10813, -0.07276,
+	-0.07367, -0.00605,  1.07602
+);
+
+vec3 RRTAndODTFit(vec3 v)
+{
+	vec3 a = v * (v + 0.0245786f) - 0.000090537f;
+	vec3 b = v * (0.983729f * v + 0.4329510f) + 0.238081f;
+	return a / b;
+}
+
+vec3 ACESFitted(vec3 color)
+{
+	color *= pow(2, exposure);
+	
+	color = ACESInputMat * color;
+
+	// Apply RRT and ODT
+	color = RRTAndODTFit(color);
+
+	color = ACESOutputMat * color;
+
+	// Clamp to [0, 1]
+	color = clamp(color, 0f, 1f);
 
 	return color;
 }
