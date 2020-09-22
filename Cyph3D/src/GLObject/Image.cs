@@ -32,7 +32,7 @@ namespace Cyph3D.GLObject
 			
 			ResourceData = new Texture(createInfo);
 			
-				ResourceData.PutData(data.TextureData, data.PixelFormat);
+			ResourceData.PutData(data.TextureData, data.PixelFormat);
 
 			IsResourceReady = true;
 		}
